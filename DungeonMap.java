@@ -35,6 +35,36 @@ public class DungeonMap {
     private static final int DOOR_FIRST_GID = 5429;
     private static final int DOOR_LAST_GID = 5578;
 
+    /*
+     * Escadas do tileset Objects.
+     *
+     * A escada é composta por 4 tiles verticais.
+     * 5610/5611 = topo da escada
+     * 5634/5635 = parte superior
+     * 5658/5659 = parte inferior
+     * 5682/5683 = base da escada
+     *
+     * Existem duas variantes do topo/base porque o mapa usa
+     * a escada em layers diferentes.
+     */
+    private static final int ESCADA_TOPO_1 = 5610;
+    private static final int ESCADA_TOPO_2 = 5611;
+    private static final int ESCADA_MEIO_1 = 5634;
+    private static final int ESCADA_MEIO_2 = 5635;
+    private static final int ESCADA_MEIO_3_1 = 5658;
+    private static final int ESCADA_MEIO_3_2 = 5659;
+    private static final int ESCADA_BASE_1 = 5682;
+    private static final int ESCADA_BASE_2 = 5683;
+
+    private final BitSet escadasPixels =
+        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+
+    private final BitSet topoEscadasPixels =
+        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+
+    private final BitSet baseEscadasPixels =
+        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+
     private final GreenfootImage imagem;
 
     /*
@@ -42,6 +72,10 @@ public class DungeonMap {
      * true = existe parte sólida visível de uma parede nesse pixel.
      */
     private final BitSet colisaoPixels =
+        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+
+    /* Água: não é piso caminhável. */
+    private final BitSet aguaPixels =
         new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
     private final Map<String, GreenfootImage> folhasCache =
@@ -105,6 +139,93 @@ public class DungeonMap {
         return colisaoPixels.get(indice);
     }
 
+    /**
+     * Indica se os pés do jogador estão sobre água.
+     */
+    public boolean estaNaAgua(int x, int y) {
+        return existeNoBitSet(
+            aguaPixels,
+            x - 6,
+            y + 18,
+            x + 6,
+            y + 28
+        );
+    }
+
+    /**
+     * Indica se os pés do jogador estão sobre uma escada.
+     */
+    public boolean estaNaEscada(int x, int y) {
+        return existeEscadaNaZona(x - 6, y + 18, x + 6, y + 28);
+    }
+
+    /**
+     * Indica se os pés estão na parte superior de uma escada.
+     */
+    public boolean estaNoTopoDaEscada(int x, int y) {
+        return existeNoBitSet(
+            topoEscadasPixels,
+            x - 6,
+            y + 18,
+            x + 6,
+            y + 28
+        );
+    }
+
+    /**
+     * Indica se os pés estão na parte inferior de uma escada.
+     */
+    public boolean estaNaBaseDaEscada(int x, int y) {
+        return existeNoBitSet(
+            baseEscadasPixels,
+            x - 6,
+            y + 18,
+            x + 6,
+            y + 28
+        );
+    }
+
+    private boolean existeEscadaNaZona(
+            int x1,
+            int y1,
+            int x2,
+            int y2) {
+
+        return existeNoBitSet(
+            escadasPixels,
+            x1,
+            y1,
+            x2,
+            y2
+        );
+    }
+
+    private boolean existeNoBitSet(
+            BitSet mascara,
+            int x1,
+            int y1,
+            int x2,
+            int y2) {
+
+        x1 = Math.max(0, x1);
+        y1 = Math.max(0, y1);
+        x2 = Math.min(WORLD_WIDTH - 1, x2);
+        y2 = Math.min(WORLD_HEIGHT - 1, y2);
+
+        for (int y = y1; y <= y2; y++) {
+            int inicio = y * WORLD_WIDTH + x1;
+            int fim = y * WORLD_WIDTH + x2 + 1;
+
+            if (mascara.nextSetBit(inicio) >= 0 &&
+                mascara.nextSetBit(inicio) < fim) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void carregar() {
         try {
             File ficheiro = new File(
@@ -162,7 +283,8 @@ public class DungeonMap {
                  * aparecem obstáculos invisíveis.
                  */
                 boolean colide =
-                    nome.equals("walls");
+                    nome.equals("walls") ||
+                    ehLayerDeAgua(nome);
 
                 desenharCamadas(
                     layer,
@@ -560,6 +682,17 @@ public class DungeonMap {
             );
 
             /*
+             * ESCADAS
+             *
+             * As escadas pertencem às layers Objects/Objects2.
+             * Não têm colisão, mas ficam registadas numa máscara
+             * própria para os jogadores poderem mudar de nível.
+             */
+            if (ehTileDeEscada(gid)) {
+                marcarEscada(px, py, gid);
+            }
+
+            /*
              * COLISÃO PIXEL A PIXEL
              *
              * Só criamos colisão para a parte realmente visível
@@ -577,7 +710,10 @@ public class DungeonMap {
                 construirMascaraColisao(
                     tile,
                     px,
-                    py
+                    py,
+                    ehLayerDeAgua(
+                        nomeLayer.toLowerCase()
+                    )
                 );
             }
 
@@ -595,7 +731,8 @@ public class DungeonMap {
     private void construirMascaraColisao(
             GreenfootImage tile,
             int px,
-            int py) {
+            int py,
+            boolean agua) {
 
         /*
          * O tile original tem 16x16 e é apresentado
@@ -628,10 +765,17 @@ public class DungeonMap {
                 int wy =
                     py + sy * 2;
 
-                marcarPixel(wx, wy);
-                marcarPixel(wx + 1, wy);
-                marcarPixel(wx, wy + 1);
-                marcarPixel(wx + 1, wy + 1);
+                if (agua) {
+                    marcarAgua(wx, wy);
+                    marcarAgua(wx + 1, wy);
+                    marcarAgua(wx, wy + 1);
+                    marcarAgua(wx + 1, wy + 1);
+                } else {
+                    marcarPixel(wx, wy);
+                    marcarPixel(wx + 1, wy);
+                    marcarPixel(wx, wy + 1);
+                    marcarPixel(wx + 1, wy + 1);
+                }
             }
         }
     }
@@ -651,6 +795,70 @@ public class DungeonMap {
         colisaoPixels.set(
             y * WORLD_WIDTH + x
         );
+    }
+
+    private void marcarAgua(int x, int y) {
+        if (x < 0 || y < 0 ||
+            x >= WORLD_WIDTH || y >= WORLD_HEIGHT) {
+            return;
+        }
+
+        aguaPixels.set(
+            y * WORLD_WIDTH + x
+        );
+    }
+
+    private boolean ehLayerDeAgua(String nomeLayer) {
+        String nome = nomeLayer.toLowerCase();
+
+        /*
+         * Estas são as layers que representam a superfície da água.
+         * As layers de detalhe e paredes debaixo de água continuam
+         * apenas visuais.
+         */
+        return nome.equals("water_floor3") ||
+               nome.equals("floor2_pool");
+    }
+
+    private boolean ehTileDeEscada(int gid) {
+        return gid == ESCADA_TOPO_1 ||
+               gid == ESCADA_TOPO_2 ||
+               gid == ESCADA_MEIO_1 ||
+               gid == ESCADA_MEIO_2 ||
+               gid == ESCADA_MEIO_3_1 ||
+               gid == ESCADA_MEIO_3_2 ||
+               gid == ESCADA_BASE_1 ||
+               gid == ESCADA_BASE_2;
+    }
+
+    private void marcarEscada(
+            int px,
+            int py,
+            int gid) {
+
+        for (int y = py; y < py + TILE; y++) {
+            for (int x = px; x < px + TILE; x++) {
+
+                if (x < 0 || y < 0 ||
+                    x >= WORLD_WIDTH ||
+                    y >= WORLD_HEIGHT) {
+                    continue;
+                }
+
+                int indice = y * WORLD_WIDTH + x;
+                escadasPixels.set(indice);
+
+                if (gid == ESCADA_TOPO_1 ||
+                    gid == ESCADA_TOPO_2) {
+                    topoEscadasPixels.set(indice);
+                }
+
+                if (gid == ESCADA_BASE_1 ||
+                    gid == ESCADA_BASE_2) {
+                    baseEscadasPixels.set(indice);
+                }
+            }
+        }
     }
 
     private boolean deveBloquear(

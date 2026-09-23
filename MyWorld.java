@@ -2,8 +2,29 @@ import greenfoot.*;
 
 public class MyWorld extends World {
     private DungeonMap mapa;
+
+    /*
+     * "Fase" continua a representar os mapas Dungeon1, Dungeon2
+     * e Dungeon3.
+     *
+     * "Nivel" representa o andar dentro da própria masmorra.
+     * Cada jogador tem o seu próprio nível.
+     */
     private int faseAtual = 1;
     private static final int MAX_FASES = 3;
+
+    private int nivelZag = 0;
+    private int nivelZig = 0;
+
+    private int ultimoYZag;
+    private int ultimoYZig;
+
+    /*
+     * Evita que o mesmo jogador desça/suba várias vezes enquanto
+     * permanece parado na extremidade da escada.
+     */
+    private boolean transicaoEscadaZag = false;
+    private boolean transicaoEscadaZig = false;
 
     private boolean teclaProximaFasePressionada = false;
 
@@ -15,12 +36,23 @@ public class MyWorld extends World {
     public void carregarFase(int fase) {
         this.faseAtual = fase;
 
+        /*
+         * Quando começamos uma nova fase/mapa, os jogadores
+         * começam novamente no nível 0.
+         */
+        nivelZag = 0;
+        nivelZig = 0;
+
+        transicaoEscadaZag = false;
+        transicaoEscadaZig = false;
+
         mapa = new DungeonMap(faseAtual);
         setBackground(mapa.getImagem());
 
         removeObjects(getObjects(null));
 
         configurarSpawnAtor();
+        atualizarPosicoesAnteriores();
         atualizarInterface();
     }
 
@@ -58,6 +90,34 @@ public class MyWorld extends World {
         );
     }
 
+    private void atualizarPosicoesAnteriores() {
+        Zag zag = null;
+
+        java.util.List<Zag> zags =
+            getObjects(Zag.class);
+
+        if (!zags.isEmpty()) {
+            zag = zags.get(0);
+        }
+
+        Zig zig = null;
+
+        java.util.List<Zig> zigs =
+            getObjects(Zig.class);
+
+        if (!zigs.isEmpty()) {
+            zig = zigs.get(0);
+        }
+
+        if (zag != null) {
+            ultimoYZag = zag.getY();
+        }
+
+        if (zig != null) {
+            ultimoYZig = zig.getY();
+        }
+    }
+
     private void atualizarInterface() {
         showText(
             "FASE " + faseAtual + " / " + MAX_FASES,
@@ -66,8 +126,15 @@ public class MyWorld extends World {
         );
 
         showText(
+            "Zag: andar " + nivelZag +
+            " | Zig: andar " + nivelZig,
+            330,
+            25
+        );
+
+        showText(
             "WASD: Zag | Setas: Zig | N: Próxima Fase",
-            450,
+            850,
             25
         );
     }
@@ -86,6 +153,11 @@ public class MyWorld extends World {
 
     @Override
     public void act() {
+
+        /*
+         * A tecla N fica disponível como teste para mudar de
+         * Dungeon1 -> Dungeon2 -> Dungeon3.
+         */
         boolean teclaN =
             Greenfoot.isKeyDown("n");
 
@@ -96,10 +168,104 @@ public class MyWorld extends World {
         }
 
         teclaProximaFasePressionada = teclaN;
+
+        verificarEscadas();
+        atualizarInterface();
     }
 
     /**
-     * A colisão agora usa apenas a zona inferior do personagem.
+     * Verifica se algum jogador chegou ao topo ou à base de uma
+     * escada e atualiza o andar correspondente.
+     *
+     * Descer pela escada:
+     *      movimento para baixo + base da escada -> nível - 1
+     *
+     * Subir pela escada:
+     *      movimento para cima + topo da escada -> nível + 1
+     */
+    private void verificarEscadas() {
+
+        Zag zag = null;
+        java.util.List<Zag> zags = getObjects(Zag.class);
+        if (!zags.isEmpty()) {
+            zag = zags.get(0);
+        }
+
+        if (zag != null) {
+            int yAtual = zag.getY();
+
+            /*
+             * A mudança de andar acontece quando o jogador entra
+             * numa escada e começa a percorrê-la.
+             *
+             * Y aumenta -> está a descer no ecrã -> andar -1
+             * Y diminui -> está a subir no ecrã -> andar +1
+             *
+             * Não esperamos pela última tile da escada. Isto evita
+             * falhas quando o sprite não consegue ficar exatamente
+             * no centro da tile de topo/base.
+             */
+            if (yAtual != ultimoYZag &&
+                mapa.estaNaEscada(zag.getX(), yAtual)) {
+
+                if (!transicaoEscadaZag) {
+                    if (yAtual > ultimoYZag) {
+                        nivelZag--;
+                    } else {
+                        nivelZag++;
+                    }
+
+                    transicaoEscadaZag = true;
+                }
+            }
+
+            /*
+             * Só pode iniciar outra mudança depois de sair da escada.
+             */
+            if (!mapa.estaNaEscada(
+                    zag.getX(),
+                    zag.getY())) {
+                transicaoEscadaZag = false;
+            }
+
+            ultimoYZag = yAtual;
+        }
+
+        Zig zig = null;
+        java.util.List<Zig> zigs = getObjects(Zig.class);
+        if (!zigs.isEmpty()) {
+            zig = zigs.get(0);
+        }
+
+        if (zig != null) {
+            int yAtual = zig.getY();
+
+            if (yAtual != ultimoYZig &&
+                mapa.estaNaEscada(zig.getX(), yAtual)) {
+
+                if (!transicaoEscadaZig) {
+                    if (yAtual > ultimoYZig) {
+                        nivelZig--;
+                    } else {
+                        nivelZig++;
+                    }
+
+                    transicaoEscadaZig = true;
+                }
+            }
+
+            if (!mapa.estaNaEscada(
+                    zig.getX(),
+                    zig.getY())) {
+                transicaoEscadaZig = false;
+            }
+
+            ultimoYZig = yAtual;
+        }
+    }
+
+    /**
+     * A colisão usa apenas a zona inferior do personagem.
      *
      * A máscara do DungeonMap é pixel a pixel, por isso não
      * precisamos considerar um quadrado inteiro de 32x32.
@@ -111,11 +277,6 @@ public class MyWorld extends World {
 
         int raio = 5;
 
-        /*
-         * Dois níveis na zona dos pés.
-         * Isto evita que a cabeça/corpo do sprite
-         * impeça a passagem.
-         */
         int[] offsetsX = {
             -raio,
             0,
@@ -130,10 +291,15 @@ public class MyWorld extends World {
         for (int dx : offsetsX) {
             for (int dy : offsetsY) {
 
-                if (mapa.estaBloqueado(
-                        novoX + dx,
-                        novoY + dy)) {
+                int x = novoX + dx;
+                int y = novoY + dy;
 
+                /* Água não é uma superfície caminhável. */
+                if (mapa.estaNaAgua(x, y)) {
+                    return false;
+                }
+
+                if (mapa.estaBloqueado(x, y)) {
                     return false;
                 }
             }
@@ -144,5 +310,30 @@ public class MyWorld extends World {
 
     public int getFaseAtual() {
         return faseAtual;
+    }
+
+    public int getNivelZag() {
+        return nivelZag;
+    }
+
+    public int getNivelZig() {
+        return nivelZig;
+    }
+
+    /**
+     * Permite que Zag/Zig consultem o seu nível se for necessário
+     * noutra parte do jogo.
+     */
+    public int getNivelDoJogador(Actor jogador) {
+
+        if (jogador instanceof Zag) {
+            return nivelZag;
+        }
+
+        if (jogador instanceof Zig) {
+            return nivelZig;
+        }
+
+        return 0;
     }
 }
