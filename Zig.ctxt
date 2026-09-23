@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Zig
+comment1.params=
+comment1.target=Zig()
+comment2.params=
+comment2.target=void\ act()
+comment3.params=
+comment3.target=void\ moverParaCima()
+comment4.params=
+comment4.target=void\ moverParaBaixo()
+comment5.params=
+comment5.target=void\ moverParaEsquerda()
+comment6.params=
+comment6.target=void\ moverParaDireita()
+comment7.params=
+comment7.target=void\ animarAndar()
+comment8.params=
+comment8.target=void\ animarParado()
+comment9.params=spritesheet\ frame
+comment9.target=void\ mostrarFrame(greenfoot.GreenfootImage,\ int)
+numComments=10
