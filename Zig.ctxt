@@ -1,14 +1,14 @@
 #BlueJ class context
 comment0.target=Zig
-comment0.text=Jogador\ 2\:\ Swordsman\ n\u00EDvel\ 3,\ controlado\ pelas\ setas.
+comment0.text=Jogador\ 2\:\ controlado\ pelas\ setas.
 comment1.params=
 comment1.target=Zig()
 comment2.params=
 comment2.target=void\ act()
-comment3.params=movimento
-comment3.target=void\ atualizarAnimacao(boolean)
-comment4.params=x\ y
-comment4.target=void\ tentarMover(int,\ int)
+comment3.params=x\ y
+comment3.target=void\ tentarMover(int,\ int)
+comment4.params=movimento
+comment4.target=void\ atualizarAnimacao(boolean)
 comment5.params=numero
 comment5.target=void\ mostrarFrame(int)
 numComments=6

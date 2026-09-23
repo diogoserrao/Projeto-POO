@@ -14,6 +14,7 @@ comment6.params=
 comment6.target=void\ act()
 comment7.params=jogador\ novoX\ novoY
 comment7.target=boolean\ podeMover(greenfoot.Actor,\ int,\ int)
+comment7.text=\r\n\ A\ colis\u00E3o\ agora\ usa\ apenas\ a\ zona\ inferior\ do\ personagem.\r\n\r\n\ A\ m\u00E1scara\ do\ DungeonMap\ \u00E9\ pixel\ a\ pixel,\ por\ isso\ n\u00E3o\r\n\ precisamos\ considerar\ um\ quadrado\ inteiro\ de\ 32x32.\r\n
 comment8.params=
 comment8.target=int\ getFaseAtual()
 numComments=9
