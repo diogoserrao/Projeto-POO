@@ -275,6 +275,15 @@ public class MyWorld extends World {
             int novoX,
             int novoY) {
 
+        /*
+         * A sala do Zig (boneco azul) só tem uma entrada válida:
+         * a porta inferior. Isto também bloqueia a entrada pelas
+         * escadas de pedra no topo da sala.
+         */
+        if (movimentoBloqueadoNaSalaDoZig(jogador, novoX, novoY)) {
+            return false;
+        }
+
         int raio = 5;
 
         int[] offsetsX = {
@@ -300,12 +309,59 @@ public class MyWorld extends World {
                 }
 
                 if (mapa.estaBloqueado(x, y)) {
-                    return false;
+                    // Uma escada pode atravessar a máscara de uma parede.
+                    // Fora da escada, a colisão normal mantém-se.
+                    if (!mapa.estaNaEscada(x, y)) {
+                        return false;
+                    }
                 }
             }
         }
 
         return true;
+    }
+
+    private boolean movimentoBloqueadoNaSalaDoZig(
+            Actor jogador,
+            int novoX,
+            int novoY) {
+
+        /* Coordenadas em pixels do mundo (tx=-19..-17, ty=3..5). */
+        int salaEsquerda = 32;
+        int salaDireita = 128;
+        int salaTopo = 288;
+        int salaBase = 384;
+
+        /* Vão inferior alinhado com a porta (tx=-17). */
+        int portaEsquerda = 96;
+        int portaDireita = 128;
+
+        int xAtual = jogador.getX();
+        int yAtual = jogador.getY();
+
+        boolean dentroAgora =
+            xAtual >= salaEsquerda &&
+            xAtual < salaDireita &&
+            yAtual >= salaTopo &&
+            yAtual < salaBase;
+
+        boolean dentroDepois =
+            novoX >= salaEsquerda &&
+            novoX < salaDireita &&
+            novoY >= salaTopo &&
+            novoY < salaBase;
+
+        if (dentroAgora == dentroDepois) {
+            return false;
+        }
+
+        boolean passaPelaPorta =
+            novoX >= portaEsquerda &&
+            novoX < portaDireita &&
+            ((yAtual >= salaBase && novoY < salaBase) ||
+             (yAtual < salaBase && novoY >= salaBase));
+
+        return !passaPelaPorta;
     }
 
     public int getFaseAtual() {

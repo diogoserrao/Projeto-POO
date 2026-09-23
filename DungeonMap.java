@@ -36,25 +36,44 @@ public class DungeonMap {
     private static final int DOOR_LAST_GID = 5578;
 
     /*
-     * Escadas do tileset Objects.
+     * Escadas válidas do tileset Objects.
      *
-     * A escada é composta por 4 tiles verticais.
-     * 5610/5611 = topo da escada
-     * 5634/5635 = parte superior
-     * 5658/5659 = parte inferior
-     * 5682/5683 = base da escada
+     * A escada de madeira é formada por duas colunas (5610/5611,
+     * 5634/5635, 5658/5659 e 5682/5683). As escadas de pedra são
+     * as duas variantes visuais do canto superior do tileset, como
+     * a que aparece na imagem de referência. Cada uma ocupa quatro
+     * linhas de tiles.
      *
-     * Existem duas variantes do topo/base porque o mapa usa
-     * a escada em layers diferentes.
+     * É importante manter estes IDs explícitos: IDs próximos no
+     * tileset pertencem a caixas, barris e outros objetos e não são
+     * escadas.
      */
-    private static final int ESCADA_TOPO_1 = 5610;
-    private static final int ESCADA_TOPO_2 = 5611;
-    private static final int ESCADA_MEIO_1 = 5634;
-    private static final int ESCADA_MEIO_2 = 5635;
-    private static final int ESCADA_MEIO_3_1 = 5658;
-    private static final int ESCADA_MEIO_3_2 = 5659;
-    private static final int ESCADA_BASE_1 = 5682;
-    private static final int ESCADA_BASE_2 = 5683;
+    private static final int[] ESCADAS_TOPO = {
+        // Pedra, variante 1
+        5604, 5605, 5606,
+        // Pedra, variante 2
+        5607, 5608, 5609,
+        // Madeira
+        5610, 5611
+    };
+
+    private static final int[] ESCADAS_MEIO = {
+        // Pedra, variante 1
+        5628, 5629, 5630, 5652, 5653, 5654,
+        // Pedra, variante 2
+        5631, 5632, 5633, 5655, 5656, 5657,
+        // Madeira
+        5634, 5635, 5658, 5659
+    };
+
+    private static final int[] ESCADAS_BASE = {
+        // Pedra, variante 1
+        5676, 5677, 5678,
+        // Pedra, variante 2
+        5679, 5680, 5681,
+        // Madeira
+        5682, 5683
+    };
 
     private final BitSet escadasPixels =
         new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
@@ -135,6 +154,13 @@ public class DungeonMap {
 
         int indice =
             y * WORLD_WIDTH + x;
+
+        // A escada é uma passagem entre alturas.
+        // Se houver uma parede por baixo da tile da escada,
+        // a parede não deve prender o jogador.
+        if (escadasPixels.get(indice)) {
+            return false;
+        }
 
         return colisaoPixels.get(indice);
     }
@@ -583,6 +609,21 @@ public class DungeonMap {
             boolean colide,
             String nomeLayer) {
 
+        /*
+         * A escada de madeira no topo do Dungeon1 é apenas decoração
+         * e não deve ligar esta zona a outro andar.
+         */
+        if (fase == 1 &&
+            tx == 1 &&
+            ty >= -4 &&
+            ty <= -1 &&
+            (gid == 5610 ||
+             gid == 5634 ||
+             gid == 5658 ||
+             gid == 5682)) {
+            return;
+        }
+
         Tileset escolhido = null;
 
         for (Tileset t : tilesets) {
@@ -821,14 +862,19 @@ public class DungeonMap {
     }
 
     private boolean ehTileDeEscada(int gid) {
-        return gid == ESCADA_TOPO_1 ||
-               gid == ESCADA_TOPO_2 ||
-               gid == ESCADA_MEIO_1 ||
-               gid == ESCADA_MEIO_2 ||
-               gid == ESCADA_MEIO_3_1 ||
-               gid == ESCADA_MEIO_3_2 ||
-               gid == ESCADA_BASE_1 ||
-               gid == ESCADA_BASE_2;
+        return contem(ESCADAS_TOPO, gid) ||
+               contem(ESCADAS_MEIO, gid) ||
+               contem(ESCADAS_BASE, gid);
+    }
+
+    private boolean contem(int[] valores, int valor) {
+        for (int candidato : valores) {
+            if (candidato == valor) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void marcarEscada(
@@ -848,13 +894,11 @@ public class DungeonMap {
                 int indice = y * WORLD_WIDTH + x;
                 escadasPixels.set(indice);
 
-                if (gid == ESCADA_TOPO_1 ||
-                    gid == ESCADA_TOPO_2) {
+                if (contem(ESCADAS_TOPO, gid)) {
                     topoEscadasPixels.set(indice);
                 }
 
-                if (gid == ESCADA_BASE_1 ||
-                    gid == ESCADA_BASE_2) {
+                if (contem(ESCADAS_BASE, gid)) {
                     baseEscadasPixels.set(indice);
                 }
             }
