@@ -15,3 +15,10 @@ considerando apenas a zona dos pés dos personagens. Pressione N para avançar
 para a fase seguinte. Dungeon2.tmx e Dungeon3.tmx podem ser adicionados em
 images/mundo/Tiled_files; na sua ausência o mapa base é reutilizado com um
 ambiente visual diferente, mantendo o projeto executável.
+
+INIMIGOS:
+Cada fase contém inimigos parados e inimigos patrulheiros. Os patrulheiros
+movem-se apenas dentro da zona configurada para eles e mudam de direção
+quando chegam ao limite ou encontram uma parede. Todos usam sprites da pasta
+images/jogador/PNG, que contém os sprites transparentes do mesmo conjunto
+de personagens, e respeitam a mesma colisão do mapa usada pelos jogadores.

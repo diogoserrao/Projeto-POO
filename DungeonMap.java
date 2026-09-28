@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
+import java.awt.Rectangle;
 
 /**
  * Carrega o mapa do Tiled e cria uma colisão baseada nos pixels
@@ -49,40 +50,45 @@ public class DungeonMap {
      * escadas.
      */
     private static final int[] ESCADAS_TOPO = {
-        // Pedra, variante 1
-        5604, 5605, 5606,
-        // Pedra, variante 2
-        5607, 5608, 5609,
-        // Madeira
-        5610, 5611
+
+            // Pedra, variante 1
+            5604, 5605, 5606,
+
+            // Pedra, variante 2
+            5607, 5608, 5609,
+
+            // Madeira
+            5610, 5611,
+
+            // Nova escada
+            5672, 5673
     };
 
     private static final int[] ESCADAS_MEIO = {
-        // Pedra, variante 1
-        5628, 5629, 5630, 5652, 5653, 5654,
-        // Pedra, variante 2
-        5631, 5632, 5633, 5655, 5656, 5657,
-        // Madeira
-        5634, 5635, 5658, 5659
+            // Pedra, variante 1
+            5628, 5629, 5630, 5652, 5653, 5654,
+            // Pedra, variante 2
+            5631, 5632, 5633, 5655, 5656, 5657,
+            // Madeira
+            5634, 5635, 5658, 5659
     };
 
     private static final int[] ESCADAS_BASE = {
-        // Pedra, variante 1
-        5676, 5677, 5678,
-        // Pedra, variante 2
-        5679, 5680, 5681,
-        // Madeira
-        5682, 5683
+            // Pedra, variante 1
+            5676, 5677, 5678,
+            // Pedra, variante 2
+            5679, 5680, 5681,
+            // Madeira
+            5682, 5683,
+
+            5696, 5697
     };
 
-    private final BitSet escadasPixels =
-        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+    private final BitSet escadasPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
-    private final BitSet topoEscadasPixels =
-        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+    private final BitSet topoEscadasPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
-    private final BitSet baseEscadasPixels =
-        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+    private final BitSet baseEscadasPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
     private final GreenfootImage imagem;
 
@@ -90,17 +96,16 @@ public class DungeonMap {
      * Um bit por pixel do mundo.
      * true = existe parte sólida visível de uma parede nesse pixel.
      */
-    private final BitSet colisaoPixels =
-        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+    private final BitSet colisaoPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
     /* Água: não é piso caminhável. */
-    private final BitSet aguaPixels =
-        new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
+    private final BitSet aguaPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
-    private final Map<String, GreenfootImage> folhasCache =
-        new HashMap<String, GreenfootImage>();
+    private final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
 
     private final int fase;
+
+    private final ArrayList<Rectangle> passagens = new ArrayList<Rectangle>();
 
     private static class Tileset {
         int firstGid;
@@ -116,13 +121,11 @@ public class DungeonMap {
         this.fase = Math.max(1, Math.min(3, fase));
 
         imagem = new GreenfootImage(
-            WORLD_WIDTH,
-            WORLD_HEIGHT
-        );
+                WORLD_WIDTH,
+                WORLD_HEIGHT);
 
         imagem.setColor(
-            new greenfoot.Color(13, 17, 24)
-        );
+                new greenfoot.Color(13, 17, 24));
         imagem.fill();
 
         carregar();
@@ -145,15 +148,14 @@ public class DungeonMap {
      */
     public boolean estaBloqueado(int x, int y) {
         if (x < 0 ||
-            x >= WORLD_WIDTH ||
-            y < 0 ||
-            y >= WORLD_HEIGHT) {
+                x >= WORLD_WIDTH ||
+                y < 0 ||
+                y >= WORLD_HEIGHT) {
 
             return true;
         }
 
-        int indice =
-            y * WORLD_WIDTH + x;
+        int indice = y * WORLD_WIDTH + x;
 
         // A escada é uma passagem entre alturas.
         // Se houver uma parede por baixo da tile da escada,
@@ -170,12 +172,11 @@ public class DungeonMap {
      */
     public boolean estaNaAgua(int x, int y) {
         return existeNoBitSet(
-            aguaPixels,
-            x - 6,
-            y + 18,
-            x + 6,
-            y + 28
-        );
+                aguaPixels,
+                x - 6,
+                y + 18,
+                x + 6,
+                y + 28);
     }
 
     /**
@@ -190,12 +191,11 @@ public class DungeonMap {
      */
     public boolean estaNoTopoDaEscada(int x, int y) {
         return existeNoBitSet(
-            topoEscadasPixels,
-            x - 6,
-            y + 18,
-            x + 6,
-            y + 28
-        );
+                topoEscadasPixels,
+                x - 6,
+                y + 18,
+                x + 6,
+                y + 28);
     }
 
     /**
@@ -203,12 +203,11 @@ public class DungeonMap {
      */
     public boolean estaNaBaseDaEscada(int x, int y) {
         return existeNoBitSet(
-            baseEscadasPixels,
-            x - 6,
-            y + 18,
-            x + 6,
-            y + 28
-        );
+                baseEscadasPixels,
+                x - 6,
+                y + 18,
+                x + 6,
+                y + 28);
     }
 
     private boolean existeEscadaNaZona(
@@ -218,12 +217,11 @@ public class DungeonMap {
             int y2) {
 
         return existeNoBitSet(
-            escadasPixels,
-            x1,
-            y1,
-            x2,
-            y2
-        );
+                escadasPixels,
+                x1,
+                y1,
+                x2,
+                y2);
     }
 
     private boolean existeNoBitSet(
@@ -243,7 +241,7 @@ public class DungeonMap {
             int fim = y * WORLD_WIDTH + x2 + 1;
 
             if (mascara.nextSetBit(inicio) >= 0 &&
-                mascara.nextSetBit(inicio) < fim) {
+                    mascara.nextSetBit(inicio) < fim) {
 
                 return true;
             }
@@ -255,51 +253,54 @@ public class DungeonMap {
     private void carregar() {
         try {
             File ficheiro = new File(
-                "images/mundo/Tiled_files/Dungeon" +
-                fase +
-                ".tmx"
-            );
+                    "images/mundo/Tiled_files/Dungeon" +
+                            fase +
+                            ".tmx");
 
             if (!ficheiro.exists()) {
                 ficheiro = new File(
-                    "images/mundo/Tiled_files/Dungeon1.tmx"
-                );
+                        "images/mundo/Tiled_files/Dungeon1.tmx");
             }
 
-            Document doc =
-                DocumentBuilderFactory
+            Document doc = DocumentBuilderFactory
                     .newInstance()
                     .newDocumentBuilder()
                     .parse(ficheiro);
 
-            Element mapa =
-                doc.getDocumentElement();
+            Element mapa = doc.getDocumentElement();
 
-            ArrayList<Tileset> tilesets =
-                lerTilesets(mapa);
+            ArrayList<Tileset> tilesets = lerTilesets(mapa);
 
-            NodeList layers =
-                mapa.getChildNodes();
+            NodeList layers = mapa.getChildNodes();
 
-            for (int i = 0;
-                 i < layers.getLength();
-                 i++) {
+            for (int i = 0; i < layers.getLength(); i++) {
 
-                Node node =
-                    layers.item(i);
+                Node node = layers.item(i);
 
-                if (!(node instanceof Element) ||
-                    !"layer".equals(node.getNodeName())) {
+                if (!(node instanceof Element)) {
+                    continue;
+                }
+
+                Element layer = (Element) node;
+
+                // Ler a camada de objetos "passagem"
+                if ("objectgroup".equals(node.getNodeName())) {
+
+                    String nomeObjeto = layer.getAttribute("name");
+
+                    if ("passagem".equalsIgnoreCase(nomeObjeto)) {
+                        lerPassagens(layer);
+                    }
 
                     continue;
                 }
 
-                Element layer =
-                    (Element) node;
+                if (!"layer".equals(node.getNodeName())) {
+                    continue;
+                }
 
-                String nome =
-                    layer.getAttribute("name")
-                         .toLowerCase();
+                String nome = layer.getAttribute("name")
+                        .toLowerCase();
 
                 /*
                  * APENAS Walls gera colisão.
@@ -308,115 +309,151 @@ public class DungeonMap {
                  * são visuais. Se os tratarmos como paredes,
                  * aparecem obstáculos invisíveis.
                  */
-                boolean colide =
-                    nome.equals("walls") ||
-                    ehLayerDeAgua(nome);
+                boolean colide = nome.equals("walls") ||
+                        ehLayerDeAgua(nome);
 
                 desenharCamadas(
-                    layer,
-                    tilesets,
-                    colide
-                );
+                        layer,
+                        tilesets,
+                        colide);
             }
 
         } catch (Exception erro) {
             System.out.println(
-                "Erro ao carregar o mapa: " +
-                erro.getMessage()
-            );
+                    "Erro ao carregar o mapa: " +
+                            erro.getMessage());
         }
+    }
+
+    private void lerPassagens(Element objectGroup) {
+
+        NodeList objetos = objectGroup.getElementsByTagName("object");
+
+        for (int i = 0; i < objetos.getLength(); i++) {
+
+            Element objeto = (Element) objetos.item(i);
+
+            if (!objeto.hasAttribute("x") ||
+                    !objeto.hasAttribute("y") ||
+                    !objeto.hasAttribute("width") ||
+                    !objeto.hasAttribute("height")) {
+
+                continue;
+            }
+
+            double x = Double.parseDouble(
+                    objeto.getAttribute("x"));
+
+            double y = Double.parseDouble(
+                    objeto.getAttribute("y"));
+
+            double largura = Double.parseDouble(
+                    objeto.getAttribute("width"));
+
+            double altura = Double.parseDouble(
+                    objeto.getAttribute("height"));
+
+            int mundoX = (int) Math.round(
+                    x - (MIN_X * TILE));
+
+            int mundoY = (int) Math.round(
+                    y - (MIN_Y * TILE));
+
+            int mundoLargura = (int) Math.round(largura);
+            int mundoAltura = (int) Math.round(altura);
+
+            passagens.add(
+                    new Rectangle(
+                            mundoX,
+                            mundoY,
+                            mundoLargura,
+                            mundoAltura));
+        }
+    }
+
+    public boolean estaNaPassagem(int x, int y) {
+
+        Rectangle zonaJogador = new Rectangle(
+                x - 6,
+                y + 18,
+                12,
+                12);
+
+        for (Rectangle passagem : passagens) {
+
+            if (passagem.intersects(zonaJogador)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void aplicarAmbiente() {
         greenfoot.Color cor;
 
         if (fase == 2) {
-            cor =
-                new greenfoot.Color(
-                    22, 42, 58, 55
-                );
+            cor = new greenfoot.Color(
+                    22, 42, 58, 55);
 
         } else if (fase == 3) {
-            cor =
-                new greenfoot.Color(
-                    62, 30, 45, 65
-                );
+            cor = new greenfoot.Color(
+                    62, 30, 45, 65);
 
         } else {
-            cor =
-                new greenfoot.Color(
-                    8, 8, 18, 25
-                );
+            cor = new greenfoot.Color(
+                    8, 8, 18, 25);
         }
 
         imagem.setColor(cor);
 
         imagem.fillRect(
-            0,
-            0,
-            imagem.getWidth(),
-            imagem.getHeight()
-        );
+                0,
+                0,
+                imagem.getWidth(),
+                imagem.getHeight());
     }
 
     private ArrayList<Tileset> lerTilesets(
             Element mapa) {
 
-        ArrayList<Tileset> resultado =
-            new ArrayList<Tileset>();
+        ArrayList<Tileset> resultado = new ArrayList<Tileset>();
 
-        NodeList nodes =
-            mapa.getChildNodes();
+        NodeList nodes = mapa.getChildNodes();
 
-        for (int i = 0;
-             i < nodes.getLength();
-             i++) {
+        for (int i = 0; i < nodes.getLength(); i++) {
 
-            Node node =
-                nodes.item(i);
+            Node node = nodes.item(i);
 
             if (!(node instanceof Element) ||
-                !"tileset".equals(node.getNodeName())) {
+                    !"tileset".equals(node.getNodeName())) {
 
                 continue;
             }
 
-            Element ts =
-                (Element) node;
+            Element ts = (Element) node;
 
-            Element img =
-                (Element)
-                ts.getElementsByTagName(
-                    "image"
-                ).item(0);
+            Element img = (Element) ts.getElementsByTagName(
+                    "image").item(0);
 
             if (img == null) {
                 continue;
             }
 
-            Tileset t =
-                new Tileset();
+            Tileset t = new Tileset();
 
-            t.firstGid =
-                Integer.parseInt(
+            t.firstGid = Integer.parseInt(
                     ts.getAttribute(
-                        "firstgid"
-                    )
-                );
+                            "firstgid"));
 
-            t.columns =
-                Integer.parseInt(
+            t.columns = Integer.parseInt(
                     ts.getAttribute(
-                        "columns"
-                    )
-                );
+                            "columns"));
 
-            String src =
-                img.getAttribute("source");
+            String src = img.getAttribute("source");
 
-            t.imagePath =
-                "images/mundo/Tiled_files/" +
-                new File(src).getName();
+            t.imagePath = "images/mundo/Tiled_files/" +
+                    new File(src).getName();
 
             resultado.add(t);
         }
@@ -429,104 +466,74 @@ public class DungeonMap {
             ArrayList<Tileset> tilesets,
             boolean colide) {
 
-        NodeList chunks =
-            layer.getElementsByTagName(
-                "chunk"
-            );
+        NodeList chunks = layer.getElementsByTagName(
+                "chunk");
 
         if (chunks.getLength() > 0) {
 
-            for (int c = 0;
-                 c < chunks.getLength();
-                 c++) {
+            for (int c = 0; c < chunks.getLength(); c++) {
 
-                Element chunk =
-                    (Element) chunks.item(c);
+                Element chunk = (Element) chunks.item(c);
 
-                int origemX =
-                    Integer.parseInt(
-                        chunk.getAttribute("x")
-                    );
+                int origemX = Integer.parseInt(
+                        chunk.getAttribute("x"));
 
-                int origemY =
-                    Integer.parseInt(
-                        chunk.getAttribute("y")
-                    );
+                int origemY = Integer.parseInt(
+                        chunk.getAttribute("y"));
 
-                int largura =
-                    Integer.parseInt(
+                int largura = Integer.parseInt(
                         chunk.getAttribute(
-                            "width"
-                        )
-                    );
+                                "width"));
 
-                int altura =
-                    Integer.parseInt(
+                int altura = Integer.parseInt(
                         chunk.getAttribute(
-                            "height"
-                        )
-                    );
+                                "height"));
 
                 processarCSV(
-                    chunk.getTextContent(),
-                    origemX,
-                    origemY,
-                    largura,
-                    altura,
-                    tilesets,
-                    colide,
-                    layer.getAttribute(
-                        "name"
-                    )
-                );
+                        chunk.getTextContent(),
+                        origemX,
+                        origemY,
+                        largura,
+                        altura,
+                        tilesets,
+                        colide,
+                        layer.getAttribute(
+                                "name"));
             }
 
         } else {
 
-            Element data =
-                (Element)
-                layer.getElementsByTagName(
-                    "data"
-                ).item(0);
+            Element data = (Element) layer.getElementsByTagName(
+                    "data").item(0);
 
             if (data != null) {
 
-                int largura =
-                    MAP_WIDTH;
+                int largura = MAP_WIDTH;
 
-                int altura =
-                    MAP_HEIGHT;
+                int altura = MAP_HEIGHT;
 
                 if (layer.hasAttribute("width")) {
-                    largura =
-                        Integer.parseInt(
+                    largura = Integer.parseInt(
                             layer.getAttribute(
-                                "width"
-                            )
-                        );
+                                    "width"));
                 }
 
                 if (layer.hasAttribute("height")) {
-                    altura =
-                        Integer.parseInt(
+                    altura = Integer.parseInt(
                             layer.getAttribute(
-                                "height"
-                            )
-                        );
+                                    "height"));
                 }
 
                 processarCSV(
-                    data.getTextContent(),
-                    0,
-                    0,
-                    largura,
-                    altura,
-                    tilesets,
-                    colide,
-                    layer.getAttribute(
-                        "name"
-                    )
-                );
+                        data.getTextContent(),
+                        0,
+                        0,
+                        largura,
+                        altura,
+                        tilesets,
+                        colide,
+                        layer.getAttribute(
+                                "name"));
             }
         }
     }
@@ -541,24 +548,18 @@ public class DungeonMap {
             boolean colide,
             String nomeLayer) {
 
-        String[] valores =
-            texto
+        String[] valores = texto
                 .replace('\n', ' ')
                 .replace('\r', ' ')
                 .split(",");
 
-        int limite =
-            Math.min(
+        int limite = Math.min(
                 valores.length,
-                largura * altura
-            );
+                largura * altura);
 
-        for (int i = 0;
-             i < limite;
-             i++) {
+        for (int i = 0; i < limite; i++) {
 
-            String valor =
-                valores[i].trim();
+            String valor = valores[i].trim();
 
             if (valor.length() == 0) {
                 continue;
@@ -570,9 +571,8 @@ public class DungeonMap {
                 /*
                  * Remove os bits de flip do Tiled.
                  */
-                gidLong =
-                    Long.parseLong(valor) &
-                    0x1fffffffL;
+                gidLong = Long.parseLong(valor) &
+                        0x1fffffffL;
 
             } catch (NumberFormatException erro) {
                 continue;
@@ -582,22 +582,19 @@ public class DungeonMap {
                 continue;
             }
 
-            int tx =
-                origemX +
-                (i % largura);
+            int tx = origemX +
+                    (i % largura);
 
-            int ty =
-                origemY +
-                (i / largura);
+            int ty = origemY +
+                    (i / largura);
 
             desenharTile(
-                (int) gidLong,
-                tx,
-                ty,
-                tilesets,
-                colide,
-                nomeLayer
-            );
+                    (int) gidLong,
+                    tx,
+                    ty,
+                    tilesets,
+                    colide,
+                    nomeLayer);
         }
     }
 
@@ -614,13 +611,13 @@ public class DungeonMap {
          * e não deve ligar esta zona a outro andar.
          */
         if (fase == 1 &&
-            tx == 1 &&
-            ty >= -4 &&
-            ty <= -1 &&
-            (gid == 5610 ||
-             gid == 5634 ||
-             gid == 5658 ||
-             gid == 5682)) {
+                tx == 1 &&
+                ty >= -4 &&
+                ty <= -1 &&
+                (gid == 5610 ||
+                        gid == 5634 ||
+                        gid == 5658 ||
+                        gid == 5682)) {
             return;
         }
 
@@ -629,9 +626,8 @@ public class DungeonMap {
         for (Tileset t : tilesets) {
 
             if (t.firstGid <= gid &&
-                (escolhido == null ||
-                 t.firstGid >
-                 escolhido.firstGid)) {
+                    (escolhido == null ||
+                            t.firstGid > escolhido.firstGid)) {
 
                 escolhido = t;
             }
@@ -643,62 +639,49 @@ public class DungeonMap {
 
         try {
 
-            GreenfootImage folha =
-                folhasCache.get(
-                    escolhido.imagePath
-                );
+            GreenfootImage folha = folhasCache.get(
+                    escolhido.imagePath);
 
             if (folha == null) {
 
-                folha =
-                    new GreenfootImage(
-                        escolhido.imagePath
-                    );
+                folha = new GreenfootImage(
+                        escolhido.imagePath);
 
                 folhasCache.put(
-                    escolhido.imagePath,
-                    folha
-                );
+                        escolhido.imagePath,
+                        folha);
             }
 
-            int local =
-                gid -
-                escolhido.firstGid;
+            int local = gid -
+                    escolhido.firstGid;
 
-            int sx =
-                (local %
-                 escolhido.columns) *
-                SOURCE_TILE;
+            int sx = (local %
+                    escolhido.columns) *
+                    SOURCE_TILE;
 
-            int sy =
-                (local /
-                 escolhido.columns) *
-                SOURCE_TILE;
+            int sy = (local /
+                    escolhido.columns) *
+                    SOURCE_TILE;
 
-            GreenfootImage tile =
-                new GreenfootImage(
+            GreenfootImage tile = new GreenfootImage(
                     SOURCE_TILE,
-                    SOURCE_TILE
-                );
+                    SOURCE_TILE);
 
             tile.drawImage(
-                folha,
-                -sx,
-                -sy
-            );
+                    folha,
+                    -sx,
+                    -sy);
 
-            int px =
-                (tx - MIN_X) *
-                TILE;
+            int px = (tx - MIN_X) *
+                    TILE;
 
-            int py =
-                (ty - MIN_Y) *
-                TILE;
+            int py = (ty - MIN_Y) *
+                    TILE;
 
             if (px < 0 ||
-                py < 0 ||
-                px >= WORLD_WIDTH ||
-                py >= WORLD_HEIGHT) {
+                    py < 0 ||
+                    px >= WORLD_WIDTH ||
+                    py >= WORLD_HEIGHT) {
 
                 return;
             }
@@ -706,21 +689,17 @@ public class DungeonMap {
             /*
              * Desenha o tile à escala final.
              */
-            GreenfootImage tileFinal =
-                new GreenfootImage(
-                    tile
-                );
+            GreenfootImage tileFinal = new GreenfootImage(
+                    tile);
 
             tileFinal.scale(
-                TILE,
-                TILE
-            );
+                    TILE,
+                    TILE);
 
             imagem.drawImage(
-                tileFinal,
-                px,
-                py
-            );
+                    tileFinal,
+                    px,
+                    py);
 
             /*
              * ESCADAS
@@ -743,29 +722,25 @@ public class DungeonMap {
              * continue a ter uma passagem.
              */
             if (colide &&
-                deveBloquear(
-                    gid,
-                    nomeLayer
-                )) {
+                    deveBloquear(
+                            gid,
+                            nomeLayer)) {
 
                 construirMascaraColisao(
-                    tile,
-                    px,
-                    py,
-                    ehLayerDeAgua(
-                        nomeLayer.toLowerCase()
-                    )
-                );
+                        tile,
+                        px,
+                        py,
+                        ehLayerDeAgua(
+                                nomeLayer.toLowerCase()));
             }
 
         } catch (Exception erro) {
 
             System.out.println(
-                "Erro no tile " +
-                gid +
-                ": " +
-                erro.getMessage()
-            );
+                    "Erro no tile " +
+                            gid +
+                            ": " +
+                            erro.getMessage());
         }
     }
 
@@ -782,29 +757,21 @@ public class DungeonMap {
          *
          * Alpha >= 160 = parte visível/sólida.
          */
-        for (int sy = 0;
-             sy < SOURCE_TILE;
-             sy++) {
+        for (int sy = 0; sy < SOURCE_TILE; sy++) {
 
-            for (int sx = 0;
-                 sx < SOURCE_TILE;
-                 sx++) {
+            for (int sx = 0; sx < SOURCE_TILE; sx++) {
 
-                greenfoot.Color cor =
-                    tile.getColorAt(
+                greenfoot.Color cor = tile.getColorAt(
                         sx,
-                        sy
-                    );
+                        sy);
 
                 if (cor.getAlpha() < 160) {
                     continue;
                 }
 
-                int wx =
-                    px + sx * 2;
+                int wx = px + sx * 2;
 
-                int wy =
-                    py + sy * 2;
+                int wy = py + sy * 2;
 
                 if (agua) {
                     marcarAgua(wx, wy);
@@ -826,27 +793,25 @@ public class DungeonMap {
             int y) {
 
         if (x < 0 ||
-            y < 0 ||
-            x >= WORLD_WIDTH ||
-            y >= WORLD_HEIGHT) {
+                y < 0 ||
+                x >= WORLD_WIDTH ||
+                y >= WORLD_HEIGHT) {
 
             return;
         }
 
         colisaoPixels.set(
-            y * WORLD_WIDTH + x
-        );
+                y * WORLD_WIDTH + x);
     }
 
     private void marcarAgua(int x, int y) {
         if (x < 0 || y < 0 ||
-            x >= WORLD_WIDTH || y >= WORLD_HEIGHT) {
+                x >= WORLD_WIDTH || y >= WORLD_HEIGHT) {
             return;
         }
 
         aguaPixels.set(
-            y * WORLD_WIDTH + x
-        );
+                y * WORLD_WIDTH + x);
     }
 
     private boolean ehLayerDeAgua(String nomeLayer) {
@@ -858,13 +823,13 @@ public class DungeonMap {
          * apenas visuais.
          */
         return nome.equals("water_floor3") ||
-               nome.equals("floor2_pool");
+                nome.equals("floor2_pool");
     }
 
     private boolean ehTileDeEscada(int gid) {
         return contem(ESCADAS_TOPO, gid) ||
-               contem(ESCADAS_MEIO, gid) ||
-               contem(ESCADAS_BASE, gid);
+                contem(ESCADAS_MEIO, gid) ||
+                contem(ESCADAS_BASE, gid);
     }
 
     private boolean contem(int[] valores, int valor) {
@@ -886,8 +851,8 @@ public class DungeonMap {
             for (int x = px; x < px + TILE; x++) {
 
                 if (x < 0 || y < 0 ||
-                    x >= WORLD_WIDTH ||
-                    y >= WORLD_HEIGHT) {
+                        x >= WORLD_WIDTH ||
+                        y >= WORLD_HEIGHT) {
                     continue;
                 }
 
@@ -909,16 +874,15 @@ public class DungeonMap {
             int gid,
             String nomeLayer) {
 
-        String nome =
-            nomeLayer.toLowerCase();
+        String nome = nomeLayer.toLowerCase();
 
         /*
          * Tiles do conjunto de portas:
          * não são paredes sólidas.
          */
         if (nome.equals("walls") &&
-            gid >= DOOR_FIRST_GID &&
-            gid <= DOOR_LAST_GID) {
+                gid >= DOOR_FIRST_GID &&
+                gid <= DOOR_LAST_GID) {
 
             return false;
         }

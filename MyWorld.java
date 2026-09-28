@@ -56,6 +56,7 @@ public class MyWorld extends World {
         removeObjects(getObjects(null));
 
         configurarSpawnAtor();
+        configurarInimigos();
 
         atualizarPosicoesAnteriores();
         atualizarInterface();
@@ -99,6 +100,48 @@ public class MyWorld extends World {
                 jogador2,
                 spawnX + 32,
                 spawnY);
+    }
+
+    /**
+     * Cria os inimigos da fase. O parâmetro patrulha define se cada inimigo
+     * anda dentro de uma zona ou fica parado.
+     */
+    private void configurarInimigos() {
+
+        switch (faseAtual) {
+
+            case 1:
+                adicionarInimigo(520, 280, 1, true, true, 460, 640);
+                adicionarInimigo(745, 520, 2, true, false, 450, 590);
+                adicionarInimigoParado(600, 180, 1);
+                adicionarInimigoParado(930, 365, 2);
+                break;
+
+            case 2:
+                adicionarInimigo(420, 250, 1, true, true, 360, 560);
+                adicionarInimigo(820, 690, 2, true, false, 610, 790);
+                adicionarInimigoParado(650, 215, 2);
+                adicionarInimigoParado(1060, 500, 1);
+                break;
+
+            case 3:
+                adicionarInimigo(340, 180, 1, true, true, 260, 470);
+                adicionarInimigo(920, 330, 2, true, false, 250, 470);
+                adicionarInimigoParado(560, 560, 1);
+                adicionarInimigoParado(1040, 720, 2);
+                break;
+        }
+    }
+
+    private void adicionarInimigo(int x, int y, int personagem,
+            boolean patrulha, boolean horizontal,
+            int limiteInicial, int limiteFinal) {
+        addObject(new Enemy(personagem, patrulha, horizontal,
+                limiteInicial, limiteFinal, 2), x, y);
+    }
+
+    private void adicionarInimigoParado(int x, int y, int personagem) {
+        addObject(new Enemy(personagem), x, y);
     }
 
     private void atualizarPosicoesAnteriores() {
@@ -212,7 +255,7 @@ public class MyWorld extends World {
          * O jogador mudou de posição e está numa escada.
          */
         if (yAtual != ultimoY &&
-                mapa.estaNaEscada(
+                mapa.estaNaPassagem(
                         jogador.getX(),
                         yAtual)) {
 
@@ -250,9 +293,9 @@ public class MyWorld extends World {
 
         /*
          * Só permite uma nova mudança de nível depois
-         * de o jogador sair da escada.
+         * de o jogador sair da passagem.
          */
-        if (!mapa.estaNaEscada(
+        if (!mapa.estaNaPassagem(
                 jogador.getX(),
                 jogador.getY())) {
 
@@ -296,17 +339,21 @@ public class MyWorld extends World {
             return false;
         }
 
-        int raio = 5;
+        int raio = 8;
 
         int[] offsetsX = {
                 -raio,
+                -4,
                 0,
+                4,
                 raio
         };
 
         int[] offsetsY = {
+                16,
                 20,
-                26
+                24,
+                28
         };
 
         for (int dx : offsetsX) {
@@ -325,11 +372,8 @@ public class MyWorld extends World {
 
                 if (mapa.estaBloqueado(x, y)) {
 
-                    /*
-                     * Uma escada pode atravessar a máscara
-                     * de uma parede.
-                     */
-                    if (!mapa.estaNaEscada(x, y)) {
+                    if (!mapa.estaNaEscada(x, y) &&
+                            !mapa.estaNaPassagem(x, y)) {
                         return false;
                     }
                 }
@@ -361,14 +405,12 @@ public class MyWorld extends World {
         int xAtual = jogador.getX();
         int yAtual = jogador.getY();
 
-        boolean dentroAgora =
-                xAtual >= salaEsquerda &&
+        boolean dentroAgora = xAtual >= salaEsquerda &&
                 xAtual < salaDireita &&
                 yAtual >= salaTopo &&
                 yAtual < salaBase;
 
-        boolean dentroDepois =
-                novoX >= salaEsquerda &&
+        boolean dentroDepois = novoX >= salaEsquerda &&
                 novoX < salaDireita &&
                 novoY >= salaTopo &&
                 novoY < salaBase;
@@ -381,13 +423,10 @@ public class MyWorld extends World {
             return false;
         }
 
-        boolean passaPelaPorta =
-                novoX >= portaEsquerda &&
+        boolean passaPelaPorta = novoX >= portaEsquerda &&
                 novoX < portaDireita &&
-                (
-                    (yAtual >= salaBase && novoY < salaBase) ||
-                    (yAtual < salaBase && novoY >= salaBase)
-                );
+                ((yAtual >= salaBase && novoY < salaBase) ||
+                        (yAtual < salaBase && novoY >= salaBase));
 
         return !passaPelaPorta;
     }
