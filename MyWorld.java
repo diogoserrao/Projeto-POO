@@ -19,12 +19,14 @@ public class MyWorld extends World {
     private int ultimoYJogador1;
     private int ultimoYJogador2;
 
-    /*
-     * Evita que o mesmo jogador suba/desça várias vezes
-     * enquanto permanece na escada.
-     */
-    private boolean transicaoEscadaJogador1 = false;
+     private boolean transicaoEscadaJogador1 = false;
     private boolean transicaoEscadaJogador2 = false;
+    /*
+     * Impede que o mesmo jogador mude de andar várias vezes
+     * enquanto permanece dentro da mesma escada.
+     */
+    private boolean jogador1NaEscadaAnterior;
+    private boolean jogador2NaEscadaAnterior;
 
     private boolean teclaProximaFasePressionada = false;
 
@@ -41,8 +43,8 @@ public class MyWorld extends World {
          * Quando começamos uma nova fase/mapa,
          * os jogadores começam novamente no nível 0.
          */
-        transicaoEscadaJogador1 = false;
-        transicaoEscadaJogador2 = false;
+        jogador1NaEscadaAnterior = false;
+        jogador2NaEscadaAnterior = false;
 
         mapa = new DungeonMap(faseAtual);
 
@@ -209,31 +211,28 @@ public class MyWorld extends World {
         teclaProximaFasePressionada = teclaN;
 
         verificarEscadas();
+        atualizarPosicoesAnteriores();
         atualizarInterface();
     }
 
     /**
-     * Verifica se algum jogador chegou ao topo ou à base
-     * de uma escada e atualiza o seu nível.
+     * Verifica se um jogador está a atravessar uma escada.
      *
-     * Descer:
-     * movimento para baixo -> nível - 1
-     *
-     * Subir:
-     * movimento para cima -> nível + 1
+     * A posição da escada vem diretamente do Tiled. A alteração
+     * de nível acontece apenas uma vez por passagem pela escada.
      */
     private void verificarEscadas() {
 
-        verificarEscadaJogador(
+        processarEscadaJogador(
                 jogador1,
                 true);
 
-        verificarEscadaJogador(
+        processarEscadaJogador(
                 jogador2,
                 false);
     }
 
-    private void verificarEscadaJogador(
+    private void processarEscadaJogador(
             Player jogador,
             boolean primeiroJogador) {
 
@@ -243,61 +242,44 @@ public class MyWorld extends World {
 
         int yAtual = jogador.getY();
 
-        int ultimoY;
+        int ultimoY = primeiroJogador
+                ? ultimoYJogador1
+                : ultimoYJogador2;
 
-        if (primeiroJogador) {
-            ultimoY = ultimoYJogador1;
-        } else {
-            ultimoY = ultimoYJogador2;
-        }
+        boolean estaNaEscada = mapa.estaNaEscada(
+                jogador.getX(),
+                yAtual);
+
+        boolean transicaoAtiva = primeiroJogador
+                ? transicaoEscadaJogador1
+                : transicaoEscadaJogador2;
 
         /*
-         * O jogador mudou de posição e está numa escada.
+         * Só muda de andar quando existe movimento vertical dentro
+         * da escada. Entrar ou permanecer parado na escada não muda
+         * o nível.
          */
-        if (yAtual != ultimoY &&
-                mapa.estaNaPassagem(
-                        jogador.getX(),
-                        yAtual)) {
+        if (estaNaEscada &&
+                yAtual != ultimoY &&
+                !transicaoAtiva) {
 
-            boolean transicaoAtiva;
+            if (yAtual > ultimoY) {
+                jogador.descerNivel();
+            } else {
+                jogador.subirNivel();
+            }
 
             if (primeiroJogador) {
-                transicaoAtiva = transicaoEscadaJogador1;
+                transicaoEscadaJogador1 = true;
             } else {
-                transicaoAtiva = transicaoEscadaJogador2;
-            }
-
-            if (!transicaoAtiva) {
-
-                /*
-                 * Y aumenta -> desce no ecrã -> nível -1
-                 *
-                 * Y diminui -> sobe no ecrã -> nível +1
-                 */
-                if (yAtual > ultimoY) {
-
-                    jogador.descerNivel();
-
-                } else {
-
-                    jogador.subirNivel();
-                }
-
-                if (primeiroJogador) {
-                    transicaoEscadaJogador1 = true;
-                } else {
-                    transicaoEscadaJogador2 = true;
-                }
+                transicaoEscadaJogador2 = true;
             }
         }
 
         /*
-         * Só permite uma nova mudança de nível depois
-         * de o jogador sair da passagem.
+         * Quando o jogador sai da escada, permite uma nova transição.
          */
-        if (!mapa.estaNaPassagem(
-                jogador.getX(),
-                jogador.getY())) {
+        if (!estaNaEscada) {
 
             if (primeiroJogador) {
                 transicaoEscadaJogador1 = false;
@@ -305,130 +287,38 @@ public class MyWorld extends World {
                 transicaoEscadaJogador2 = false;
             }
         }
-
-        /*
-         * Guarda a posição anterior.
-         */
-        if (primeiroJogador) {
-            ultimoYJogador1 = yAtual;
-        } else {
-            ultimoYJogador2 = yAtual;
-        }
     }
 
     /**
-     * A colisão usa apenas a zona inferior do personagem.
+     * Testa apenas a caixa dos pés do personagem.
      *
-     * A máscara do DungeonMap é pixel a pixel, por isso não
-     * precisamos considerar um quadrado inteiro de 32x32.
+     * Mantemos a colisão no DungeonMap, que é a única classe
+     * responsável por saber onde o mapa é sólido.
      */
     public boolean podeMover(
             Actor jogador,
             int novoX,
             int novoY) {
 
-        /*
-         * A sala do jogador 2 só tem uma entrada válida:
-         * a porta inferior.
-         */
-        if (movimentoBloqueadoNaSalaDoJogador2(
-                jogador,
-                novoX,
-                novoY)) {
-
+        if (mapa == null) {
             return false;
         }
 
-        int raio = 8;
-
-        int[] offsetsX = {
-                -raio,
-                -4,
-                0,
-                4,
-                raio
-        };
-
-        int[] offsetsY = {
-                16,
-                20,
-                24,
-                28
-        };
-
-        for (int dx : offsetsX) {
-
-            for (int dy : offsetsY) {
-
-                int x = novoX + dx;
-                int y = novoY + dy;
-
-                /*
-                 * Água não é uma superfície caminhável.
-                 */
-                if (mapa.estaNaAgua(x, y)) {
-                    return false;
-                }
-
-                if (mapa.estaBloqueado(x, y)) {
-
-                    if (!mapa.estaNaEscada(x, y) &&
-                            !mapa.estaNaPassagem(x, y)) {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private boolean movimentoBloqueadoNaSalaDoJogador2(
-            Actor jogador,
-            int novoX,
-            int novoY) {
-
         /*
-         * Coordenadas em pixels do mundo.
+         * Caixa pequena na zona dos pés.
+         * Evita que o corpo 96x96 do sprite colida com paredes.
          */
-        int salaEsquerda = 32;
-        int salaDireita = 128;
-        int salaTopo = 288;
-        int salaBase = 384;
+        final int metadeLargura = 7;
+        final int topoPés = 18;
+        final int fundoPés = 28;
 
-        /*
-         * Vão inferior alinhado com a porta.
-         */
-        int portaEsquerda = 96;
-        int portaDireita = 128;
-
-        int xAtual = jogador.getX();
-        int yAtual = jogador.getY();
-
-        boolean dentroAgora = xAtual >= salaEsquerda &&
-                xAtual < salaDireita &&
-                yAtual >= salaTopo &&
-                yAtual < salaBase;
-
-        boolean dentroDepois = novoX >= salaEsquerda &&
-                novoX < salaDireita &&
-                novoY >= salaTopo &&
-                novoY < salaBase;
-
-        /*
-         * Se não entrou nem saiu da sala,
-         * não há bloqueio especial.
-         */
-        if (dentroAgora == dentroDepois) {
-            return false;
-        }
-
-        boolean passaPelaPorta = novoX >= portaEsquerda &&
-                novoX < portaDireita &&
-                ((yAtual >= salaBase && novoY < salaBase) ||
-                        (yAtual < salaBase && novoY >= salaBase));
-
-        return !passaPelaPorta;
+        // A colisão depende do andar em que o jogador está.
+        return !mapa.temColisaoNaZona(
+                novoX - metadeLargura,
+                novoY + topoPés,
+                novoX + metadeLargura,
+                novoY + fundoPés,
+                getNivelDoJogador(jogador));
     }
 
     public int getFaseAtual() {

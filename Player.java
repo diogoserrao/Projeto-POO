@@ -59,69 +59,37 @@ public class Player extends Actor {
 
     public void act() {
 
-        boolean movimento = false;
+        int dx = 0;
+        int dy = 0;
 
         if (numeroJogador == 1) {
-
-            // Jogador 1 - WASD
-
-            if (Greenfoot.isKeyDown("w")) {
-                tentarMover(getX(), getY() - velocidade);
-                linhaDirecao = CIMA;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("s")) {
-                tentarMover(getX(), getY() + velocidade);
-                linhaDirecao = BAIXO;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("a")) {
-                tentarMover(getX() - velocidade, getY());
-                linhaDirecao = ESQUERDA;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("d")) {
-                tentarMover(getX() + velocidade, getY());
-                linhaDirecao = DIREITA;
-                movimento = true;
-            }
-
+            if (Greenfoot.isKeyDown("a")) dx -= velocidade;
+            if (Greenfoot.isKeyDown("d")) dx += velocidade;
+            if (Greenfoot.isKeyDown("w")) dy -= velocidade;
+            if (Greenfoot.isKeyDown("s")) dy += velocidade;
         } else {
-
-            // Jogador 2 - Setas
-
-            if (Greenfoot.isKeyDown("up")) {
-                tentarMover(getX(), getY() - velocidade);
-                linhaDirecao = CIMA;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("down")) {
-                tentarMover(getX(), getY() + velocidade);
-                linhaDirecao = BAIXO;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("left")) {
-                tentarMover(getX() - velocidade, getY());
-                linhaDirecao = ESQUERDA;
-                movimento = true;
-            }
-
-            if (Greenfoot.isKeyDown("right")) {
-                tentarMover(getX() + velocidade, getY());
-                linhaDirecao = DIREITA;
-                movimento = true;
-            }
+            if (Greenfoot.isKeyDown("left")) dx -= velocidade;
+            if (Greenfoot.isKeyDown("right")) dx += velocidade;
+            if (Greenfoot.isKeyDown("up")) dy -= velocidade;
+            if (Greenfoot.isKeyDown("down")) dy += velocidade;
         }
+
+        if (dx != 0 || dy != 0) {
+            if (dy < 0) linhaDirecao = CIMA;
+            else if (dy > 0) linhaDirecao = BAIXO;
+            else if (dx < 0) linhaDirecao = ESQUERDA;
+            else linhaDirecao = DIREITA;
+        }
+
+        // Move cada eixo separadamente para deslizar pelas paredes.
+        boolean movimento = false;
+        if (dx != 0) movimento |= tentarMover(getX() + dx, getY());
+        if (dy != 0) movimento |= tentarMover(getX(), getY() + dy);
 
         atualizarAnimacao(movimento);
     }
 
-    private void tentarMover(int x, int y) {
+    private boolean tentarMover(int x, int y) {
 
         MyWorld mundo = (MyWorld) getWorld();
 
@@ -129,7 +97,10 @@ public class Player extends Actor {
             mundo.podeMover(this, x, y)) {
 
             setLocation(x, y);
+            return true;
         }
+
+        return false;
     }
 
     private void atualizarAnimacao(boolean movimento) {
