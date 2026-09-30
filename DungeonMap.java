@@ -51,7 +51,7 @@ public class DungeonMap {
     private static final boolean AGUA_CAMINHAVEL = true;
 
     /** true = pinta a colisão a vermelho por cima do mapa (para depurar). */
-    private static final boolean MOSTRAR_COLISAO = false;
+    private static final boolean MOSTRAR_COLISAO = true;
 
     /** Espessura máxima (em pixels do tileset) das linhas que NÃO contam como parede. */
     private static final int LINHA_FINA = 4;
@@ -99,7 +99,7 @@ public class DungeonMap {
         logica.fill();
 
         carregar();
-        construirMascara();
+        // construirMascara();
         abrirZonasDePassagem();
 
         if (MOSTRAR_COLISAO) {
