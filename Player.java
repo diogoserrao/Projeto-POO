@@ -170,11 +170,4 @@ public class Player extends Actor {
         nivel--;
     }
 
-    public void resetarNivel() {
-        nivel = 0;
-    }
-
-    public int getNumeroJogador() {
-        return numeroJogador;
-    }
 }

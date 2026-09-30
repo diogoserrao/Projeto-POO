@@ -1,7 +1,6 @@
 import greenfoot.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,14 +12,8 @@ import java.awt.Rectangle;
  *
  * COMO A COLISÃO É CONSTRUÍDA
  * ---------------------------
- * 1. Só as layers de "chão + paredes" (ver ehLayerLogica) são desenhadas numa
- *    imagem lógica (1 pixel por pixel do tileset). Objetos, luzes, janelas e
- *    armadilhas ficam de fora, por isso nunca criam obstáculos invisíveis.
- * 2. Cada pixel dessa imagem é classificado pela COR: chão, água ou parede/vazio.
- *    (A layer "Walls" sozinha não chega: há paredes desenhadas noutras layers.)
- * 3. As linhas finas de sombra/rebordo (até LINHA_FINA pixels) são removidas,
- *    para não funcionarem como paredes. Pilares e paredes reais mantêm-se.
- * 4. As zonas "passagem" do Tiled abrem a colisão (escadas, ligações, etc.).
+ * As layers "Colisao" e "Colisao_N" do Tiled definem as células bloqueadas.
+ * As zonas "passagem" são lidas para detetar escadas.
  *
  * NÍVEIS (ANDARES)
  * ----------------
@@ -43,31 +36,12 @@ public class DungeonMap {
     private static final int WORLD_WIDTH = MAP_WIDTH * TILE;
     private static final int WORLD_HEIGHT = MAP_HEIGHT * TILE;
 
-    // Imagem lógica: 1 pixel por pixel do tileset (metade do mundo).
-    private static final int LOGICA_W = MAP_WIDTH * SOURCE_TILE;
-    private static final int LOGICA_H = MAP_HEIGHT * SOURCE_TILE;
-
-    /** true = as poças/piscinas são água pouco funda e dá para atravessar. */
-    private static final boolean AGUA_CAMINHAVEL = true;
-
     /** true = pinta a colisão a vermelho por cima do mapa (para depurar). */
     private static final boolean MOSTRAR_COLISAO = true;
 
-    /** Espessura máxima (em pixels do tileset) das linhas que NÃO contam como parede. */
-    private static final int LINHA_FINA = 4;
-
-    /** Valor de "nível" que ignora as layers Colisao_N. */
-    public static final int SEM_NIVEL = Integer.MIN_VALUE;
-
     private final ArrayList<Rectangle> escadas = new ArrayList<Rectangle>();
-    private final ArrayList<Rectangle> passagens = new ArrayList<Rectangle>();
 
     private final GreenfootImage imagem;
-    private final GreenfootImage logica;
-
-    /* Um bit por pixel do mundo. */
-    private final BitSet colisaoPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
-    private final BitSet aguaPixels = new BitSet(WORLD_WIDTH * WORLD_HEIGHT);
 
     /* Colisão por células (layers "Colisao" e "Colisao_N" do Tiled). */
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
@@ -94,13 +68,7 @@ public class DungeonMap {
         imagem.setColor(new greenfoot.Color(13, 17, 24));
         imagem.fill();
 
-        logica = new GreenfootImage(LOGICA_W, LOGICA_H);
-        logica.setColor(new greenfoot.Color(13, 17, 24));
-        logica.fill();
-
         carregar();
-        // construirMascara();
-        abrirZonasDePassagem();
 
         if (MOSTRAR_COLISAO) {
             depurarColisao();
@@ -113,23 +81,9 @@ public class DungeonMap {
         return imagem;
     }
 
-    public int getFase() {
-        return fase;
-    }
-
     // ------------------------------------------------------------------
     // CONSULTAS DE COLISÃO
     // ------------------------------------------------------------------
-
-    /** Testa um pixel individual (ignora os níveis). */
-    public boolean estaBloqueado(int x, int y) {
-        return temColisaoNaZona(x, y, x, y, SEM_NIVEL);
-    }
-
-    /** Colisão numa área, sem olhar ao andar. */
-    public boolean temColisaoNaZona(int x1, int y1, int x2, int y2) {
-        return temColisaoNaZona(x1, y1, x2, y2, SEM_NIVEL);
-    }
 
     /**
      * Colisão numa área para um jogador que está no andar "nivel".
@@ -139,15 +93,6 @@ public class DungeonMap {
 
         if (x1 < 0 || y1 < 0 || x2 >= WORLD_WIDTH || y2 >= WORLD_HEIGHT) {
             return true;
-        }
-
-        for (int y = y1; y <= y2; y++) {
-            int inicio = y * WORLD_WIDTH + x1;
-            int fim = y * WORLD_WIDTH + x2;
-            int bloqueado = colisaoPixels.nextSetBit(inicio);
-            if (bloqueado >= 0 && bloqueado <= fim) {
-                return true;
-            }
         }
 
         boolean[][] doNivel = colisaoPorNivel.get(nivel);
@@ -163,11 +108,6 @@ public class DungeonMap {
         return false;
     }
 
-    /** Indica se os pés do jogador estão sobre água. */
-    public boolean estaNaAgua(int x, int y) {
-        return existeNoBitSet(aguaPixels, x - 6, y + 18, x + 6, y + 28);
-    }
-
     /** Indica se os pés do jogador estão dentro de uma escada. */
     public boolean estaNaEscada(int x, int y) {
         Rectangle zonaPes = new Rectangle(x - 6, y + 18, 12, 12);
@@ -179,171 +119,8 @@ public class DungeonMap {
         return false;
     }
 
-    public boolean estaNaPassagem(int x, int y) {
-        Rectangle zonaJogador = new Rectangle(x - 6, y + 18, 12, 12);
-        for (Rectangle passagem : passagens) {
-            if (passagem.intersects(zonaJogador)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean existeNoBitSet(BitSet mascara, int x1, int y1, int x2, int y2) {
-
-        x1 = Math.max(0, x1);
-        y1 = Math.max(0, y1);
-        x2 = Math.min(WORLD_WIDTH - 1, x2);
-        y2 = Math.min(WORLD_HEIGHT - 1, y2);
-
-        if (x1 > x2 || y1 > y2) {
-            return false;
-        }
-
-        for (int y = y1; y <= y2; y++) {
-            int inicio = y * WORLD_WIDTH + x1;
-            int fim = y * WORLD_WIDTH + x2 + 1;
-            int primeiro = mascara.nextSetBit(inicio);
-            if (primeiro >= 0 && primeiro < fim) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // ------------------------------------------------------------------
-    // CONSTRUÇÃO DA MÁSCARA
-    // ------------------------------------------------------------------
-
-    /** Classifica cada pixel da imagem lógica: chão, água ou parede/vazio. */
-    private void construirMascara() {
-
-        boolean[][] parede = new boolean[LOGICA_H][LOGICA_W];
-        boolean[][] agua = new boolean[LOGICA_H][LOGICA_W];
-
-        for (int y = 0; y < LOGICA_H; y++) {
-            for (int x = 0; x < LOGICA_W; x++) {
-
-                greenfoot.Color c = logica.getColorAt(x, y);
-                int r = c.getRed();
-                int g = c.getGreen();
-                int b = c.getBlue();
-
-                boolean ehAgua = (b - r) > 60;
-                double luminosidade = 0.3 * r + 0.59 * g + 0.11 * b;
-                boolean chao = !ehAgua && ((g - r) >= 10 || luminosidade >= 145);
-
-                agua[y][x] = ehAgua;
-                parede[y][x] = !ehAgua && !chao;
-            }
-        }
-
-        parede = removerLinhasFinas(parede);
-        agua = removerLinhasFinas(agua);
-
-        for (int y = 0; y < LOGICA_H; y++) {
-            for (int x = 0; x < LOGICA_W; x++) {
-
-                if (agua[y][x]) {
-                    marcar(aguaPixels, x, y);
-                }
-
-                if (parede[y][x] || (!AGUA_CAMINHAVEL && agua[y][x])) {
-                    marcar(colisaoPixels, x, y);
-                }
-            }
-        }
-    }
-
-    /** Cada pixel do tileset ocupa 2x2 pixels no mundo. */
-    private void marcar(BitSet mascara, int sx, int sy) {
-        int wx = sx * 2;
-        int wy = sy * 2;
-        mascara.set(wy * WORLD_WIDTH + wx);
-        mascara.set(wy * WORLD_WIDTH + wx + 1);
-        mascara.set((wy + 1) * WORLD_WIDTH + wx);
-        mascara.set((wy + 1) * WORLD_WIDTH + wx + 1);
-    }
-
-    /**
-     * Abertura morfológica: mantém apenas as zonas onde cabe um quadrado
-     * LINHA_FINA x LINHA_FINA. Remove contornos e sombras finas.
-     */
-    private boolean[][] removerLinhasFinas(boolean[][] m) {
-
-        int h = m.length;
-        int w = m[0].length;
-        int k = LINHA_FINA;
-
-        // 1) Erosão: célula fica ligada se o quadrado k x k a partir dela está todo ligado.
-        boolean[][] erodida = new boolean[h][w];
-
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                boolean todos = true;
-                for (int dy = 0; dy < k && todos; dy++) {
-                    for (int dx = 0; dx < k; dx++) {
-                        int yy = y + dy;
-                        int xx = x + dx;
-                        if (yy < h && xx < w && !m[yy][xx]) {
-                            todos = false;
-                            break;
-                        }
-                    }
-                }
-                erodida[y][x] = todos;
-            }
-        }
-
-        // 2) Dilatação: volta a "engordar" o que sobreviveu.
-        boolean[][] resultado = new boolean[h][w];
-
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                if (!erodida[y][x]) {
-                    continue;
-                }
-                for (int dy = 0; dy < k; dy++) {
-                    for (int dx = 0; dx < k; dx++) {
-                        if (y + dy < h && x + dx < w) {
-                            resultado[y + dy][x + dx] = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return resultado;
-    }
-
-    /** Abre a colisão dentro das zonas "passagem" do Tiled. */
-    private void abrirZonasDePassagem() {
-
-        for (Rectangle passagem : passagens) {
-
-            int xInicial = Math.max(0, passagem.x);
-            int yInicial = Math.max(0, passagem.y);
-            int xFinal = Math.min(WORLD_WIDTH, passagem.x + passagem.width);
-            int yFinal = Math.min(WORLD_HEIGHT, passagem.y + passagem.height);
-
-            for (int y = yInicial; y < yFinal; y++) {
-                int inicio = y * WORLD_WIDTH + xInicial;
-                int fim = y * WORLD_WIDTH + xFinal;
-                if (fim > inicio) {
-                    colisaoPixels.clear(inicio, fim);
-                }
-            }
-        }
-    }
-
     /** Pinta a colisão por cima do mapa (só para depuração). */
     private void depurarColisao() {
-
-        imagem.setColor(new greenfoot.Color(255, 0, 0, 110));
-
-        for (int i = colisaoPixels.nextSetBit(0); i >= 0; i = colisaoPixels.nextSetBit(i + 1)) {
-            imagem.fillRect(i % WORLD_WIDTH, i / WORLD_WIDTH, 1, 1);
-        }
 
         imagem.setColor(new greenfoot.Color(255, 0, 255, 110));
 
@@ -405,7 +182,7 @@ public class DungeonMap {
                     continue;
                 }
 
-                desenharCamada(elemento, tilesets, nome);
+                desenharCamada(elemento, tilesets);
             }
 
         } catch (Exception erro) {
@@ -468,8 +245,6 @@ public class DungeonMap {
             int mundoAltura = (int) Math.round(altura * TILE / SOURCE_TILE);
 
             Rectangle area = new Rectangle(mundoX, mundoY, mundoLargura, mundoAltura);
-            passagens.add(area);
-
             String nome = objeto.getAttribute("name").trim().toLowerCase();
 
             if (nome.startsWith("escada")) {
@@ -526,25 +301,9 @@ public class DungeonMap {
         return resultado;
     }
 
-    // ------------------------------------------------------------------
-    // DESENHO DAS LAYERS
-    // ------------------------------------------------------------------
-
-    /** Layers que definem onde se pode andar (chão, água e paredes). */
-    private boolean ehLayerLogica(String nome) {
-        return nome.equals("water_floor3")
-                || nome.equals("floor2_darker_surface")
-                || nome.equals("floor2_pool")
-                || nome.equals("floor")
-                || nome.equals("floor_darker_surface")
-                || nome.equals("walls");
-    }
-
-    private void desenharCamada(Element layer, ArrayList<Tileset> tilesets, String nome) {
-        boolean logicaDaLayer = ehLayerLogica(nome);
-
+    private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
         for (int[] t : listarTiles(layer)) {
-            desenharTile(t[2], t[0], t[1], tilesets, logicaDaLayer);
+            desenharTile(t[2], t[0], t[1], tilesets);
         }
     }
 
@@ -607,7 +366,7 @@ public class DungeonMap {
         }
     }
 
-    private void desenharTile(int gid, int tx, int ty, ArrayList<Tileset> tilesets, boolean naLogica) {
+    private void desenharTile(int gid, int tx, int ty, ArrayList<Tileset> tilesets) {
 
         Tileset escolhido = null;
 
@@ -646,10 +405,6 @@ public class DungeonMap {
             GreenfootImage tileFinal = new GreenfootImage(tile);
             tileFinal.scale(TILE, TILE);
             imagem.drawImage(tileFinal, px, py);
-
-            if (naLogica) {
-                logica.drawImage(tile, px / 2, py / 2);
-            }
 
         } catch (Exception erro) {
             System.out.println("Erro no tile " + gid + ": " + erro.getMessage());

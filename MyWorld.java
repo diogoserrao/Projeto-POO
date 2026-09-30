@@ -25,9 +25,6 @@ public class MyWorld extends World {
      * Impede que o mesmo jogador mude de andar várias vezes
      * enquanto permanece dentro da mesma escada.
      */
-    private boolean jogador1NaEscadaAnterior;
-    private boolean jogador2NaEscadaAnterior;
-
     private boolean teclaProximaFasePressionada = false;
 
     public MyWorld() {
@@ -43,9 +40,6 @@ public class MyWorld extends World {
          * Quando começamos uma nova fase/mapa,
          * os jogadores começam novamente no nível 0.
          */
-        jogador1NaEscadaAnterior = false;
-        jogador2NaEscadaAnterior = false;
-
         mapa = new DungeonMap(faseAtual);
 
         /*
@@ -162,14 +156,6 @@ public class MyWorld extends World {
         showText(
                 "FASE " + faseAtual + " / " + MAX_FASES,
                 80,
-                25);
-
-        showText(
-                "Jogador 1: andar " +
-                        jogador1.getNivel() +
-                        " | Jogador 2: andar " +
-                        jogador2.getNivel(),
-                330,
                 25);
 
         showText(
@@ -319,28 +305,6 @@ public class MyWorld extends World {
                 novoX + metadeLargura,
                 novoY + fundoPés,
                 getNivelDoJogador(jogador));
-    }
-
-    public int getFaseAtual() {
-        return faseAtual;
-    }
-
-    public int getNivelJogador1() {
-
-        if (jogador1 == null) {
-            return 0;
-        }
-
-        return jogador1.getNivel();
-    }
-
-    public int getNivelJogador2() {
-
-        if (jogador2 == null) {
-            return 0;
-        }
-
-        return jogador2.getNivel();
     }
 
     /**
