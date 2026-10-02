@@ -13,8 +13,8 @@ public class MyWorld extends World {
     private int faseAtual = 1;
     private static final int MAX_FASES = 3;
 
-    private Player jogador1;
-    private Player jogador2;
+    private Personagem jogador1;
+    private Personagem jogador2;
 
     private int ultimoYJogador1;
     private int ultimoYJogador2;
@@ -84,8 +84,8 @@ public class MyWorld extends World {
         /*
          * Um único tipo de classe para os dois jogadores.
          */
-        jogador1 = new Player(1);
-        jogador2 = new Player(2);
+        jogador1 = new Personagem(1);
+        jogador2 = new Personagem(2);
 
         addObject(
                 jogador1,
@@ -132,12 +132,12 @@ public class MyWorld extends World {
     private void adicionarInimigo(int x, int y, int personagem,
             boolean patrulha, boolean horizontal,
             int limiteInicial, int limiteFinal) {
-        addObject(new Enemy(personagem, patrulha, horizontal,
+        addObject(new Personagem(personagem, patrulha, horizontal,
                 limiteInicial, limiteFinal, 2), x, y);
     }
 
     private void adicionarInimigoParado(int x, int y, int personagem) {
-        addObject(new Enemy(personagem), x, y);
+        addObject(new Personagem(personagem, false, true, 0, 0, 1), x, y);
     }
 
     private void atualizarPosicoesAnteriores() {
@@ -219,7 +219,7 @@ public class MyWorld extends World {
     }
 
     private void processarEscadaJogador(
-            Player jogador,
+            Personagem jogador,
             boolean primeiroJogador) {
 
         if (jogador == null) {
@@ -308,15 +308,12 @@ public class MyWorld extends World {
     }
 
     /**
-     * Permite consultar o nível de qualquer Player.
+     * Permite consultar o nível de qualquer Personagem.
      */
     public int getNivelDoJogador(Actor jogador) {
 
-        if (jogador instanceof Player) {
-
-            Player player = (Player) jogador;
-
-            return player.getNivel();
+        if (jogador instanceof Personagem) {
+            return ((Personagem) jogador).getNivel();
         }
 
         return 0;
