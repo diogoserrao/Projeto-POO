@@ -6128,7 +6128,7 @@
  <objectgroup id="36" name="passagem">
   <object id="5" name="escada_1" x="-17.5" y="32.5" width="19" height="44"/>
  </objectgroup>
- <layer id="37" name="Colisao" width="16" height="24">
+ <layer id="37" name="Colisao" width="16" height="24" visible="0">
   <data encoding="csv">
    <chunk x="-16" y="-16" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
