@@ -18,9 +18,9 @@ import java.awt.Rectangle;
  * NÍVEIS (ANDARES)
  * ----------------
  * Layers de tiles opcionais no Tiled, com QUALQUER tile pintado nas células:
- *   "Colisao"     -> bloqueia sempre (todos os andares)
- *   "Colisao_0"   -> bloqueia só quem está no andar 0
- *   "Colisao_1"   -> bloqueia só quem está no andar 1   (Colisao_-1, etc.)
+ * "Colisao" -> bloqueia sempre (todos os andares)
+ * "Colisao_0" -> bloqueia só quem está no andar 0
+ * "Colisao_1" -> bloqueia só quem está no andar 1 (Colisao_-1, etc.)
  * Estas layers nunca são desenhadas no jogo.
  */
 public class DungeonMap {
@@ -42,6 +42,8 @@ public class DungeonMap {
     private final ArrayList<Rectangle> escadas = new ArrayList<Rectangle>();
 
     private final GreenfootImage imagem;
+
+    private final Map<String, Rectangle> interacoes = new HashMap<String, Rectangle>();
 
     /* Colisão por células (layers "Colisao" e "Colisao_N" do Tiled). */
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
@@ -167,9 +169,15 @@ public class DungeonMap {
                 String nome = elemento.getAttribute("name").toLowerCase();
 
                 if ("objectgroup".equals(node.getNodeName())) {
+
                     if (nome.equals("passagem")) {
                         lerPassagens(elemento);
                     }
+
+                    if (nome.equals("interacoesobjetos")) {
+                        lerInteracoes(elemento);
+                    }
+
                     continue;
                 }
 
@@ -190,7 +198,9 @@ public class DungeonMap {
         }
     }
 
-    /** Layers "Colisao" e "Colisao_N": qualquer tile pintado bloqueia essa célula. */
+    /**
+     * Layers "Colisao" e "Colisao_N": qualquer tile pintado bloqueia essa célula.
+     */
     private void lerCamadaColisao(Element layer, String nome) {
 
         boolean[][] destino = colisaoComum;
@@ -251,6 +261,75 @@ public class DungeonMap {
                 escadas.add(area);
             }
         }
+    }
+
+    private void lerInteracoes(Element objectGroup) {
+
+        NodeList objetos = objectGroup.getElementsByTagName("object");
+
+        for (int i = 0; i < objetos.getLength(); i++) {
+
+            Element objeto = (Element) objetos.item(i);
+
+            if (!objeto.hasAttribute("x") || !objeto.hasAttribute("y")) {
+                continue;
+            }
+
+            double x = Double.parseDouble(objeto.getAttribute("x"));
+            double y = Double.parseDouble(objeto.getAttribute("y"));
+            double largura = objeto.hasAttribute("width")
+                    ? Double.parseDouble(objeto.getAttribute("width"))
+                    : SOURCE_TILE;
+            double altura = objeto.hasAttribute("height")
+                    ? Double.parseDouble(objeto.getAttribute("height"))
+                    : SOURCE_TILE;
+            boolean objetoPonto = !objeto.hasAttribute("width")
+                    || !objeto.hasAttribute("height");
+
+            int mundoX = (int) Math.round(
+                    (x * TILE / SOURCE_TILE) - (MIN_X * TILE));
+
+            int mundoY = (int) Math.round(
+                    (y * TILE / SOURCE_TILE) - (MIN_Y * TILE));
+
+            int mundoLargura = objetoPonto
+                    ? 48
+                    : (int) Math.round(largura * TILE / SOURCE_TILE);
+
+            int mundoAltura = objetoPonto
+                    ? 48
+                    : (int) Math.round(altura * TILE / SOURCE_TILE);
+
+            Rectangle area = new Rectangle(
+                    objetoPonto ? mundoX - mundoLargura / 2 : mundoX,
+                    objetoPonto ? mundoY - mundoAltura / 2 : mundoY,
+                    mundoLargura,
+                    mundoAltura);
+
+            String nome = objeto.getAttribute("name").trim();
+
+            if (!nome.isEmpty()) {
+                interacoes.put(nome, area);
+            }
+        }
+    }
+
+    public String getInteracaoEm(int x, int y) {
+
+        Rectangle zonaPes = new Rectangle(
+                x - 12,
+                y + 12,
+                24,
+                24);
+
+        for (Map.Entry<String, Rectangle> entrada : interacoes.entrySet()) {
+
+            if (entrada.getValue().intersects(zonaPes)) {
+                return entrada.getKey();
+            }
+        }
+
+        return null;
     }
 
     private void aplicarAmbiente() {

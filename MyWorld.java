@@ -19,7 +19,7 @@ public class MyWorld extends World {
     private int ultimoYJogador1;
     private int ultimoYJogador2;
 
-     private boolean transicaoEscadaJogador1 = false;
+    private boolean transicaoEscadaJogador1 = false;
     private boolean transicaoEscadaJogador2 = false;
     /*
      * Impede que o mesmo jogador mude de andar várias vezes
@@ -55,7 +55,7 @@ public class MyWorld extends World {
         configurarInimigos();
 
         atualizarPosicoesAnteriores();
-        atualizarInterface();
+        atualizarInterface(null, null);
     }
 
     private void configurarSpawnAtor() {
@@ -151,15 +151,23 @@ public class MyWorld extends World {
         }
     }
 
-    private void atualizarInterface() {
+    private void atualizarInterface(String interacao1, String interacao2) {
 
         showText(
                 "FASE " + faseAtual + " / " + MAX_FASES,
                 80,
                 25);
 
+        String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
+        if (interacao1 != null) {
+            controlos += " | BAÚ P1: " + interacao1;
+        }
+        if (interacao2 != null) {
+            controlos += " | BAÚ P2: " + interacao2;
+        }
+
         showText(
-                "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase",
+                controlos,
                 850,
                 25);
     }
@@ -198,7 +206,10 @@ public class MyWorld extends World {
 
         verificarEscadas();
         atualizarPosicoesAnteriores();
-        atualizarInterface();
+
+        String interacao1 = getInteracaoEm(jogador1);
+        String interacao2 = getInteracaoEm(jogador2);
+        atualizarInterface(interacao1, interacao2);
     }
 
     /**
@@ -317,5 +328,16 @@ public class MyWorld extends World {
         }
 
         return 0;
+    }
+
+    public String getInteracaoEm(Player jogador) {
+
+        if (mapa == null || jogador == null) {
+            return null;
+        }
+
+        return mapa.getInteracaoEm(
+                jogador.getX(),
+                jogador.getY());
     }
 }

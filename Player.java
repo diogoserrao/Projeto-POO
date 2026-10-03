@@ -16,28 +16,43 @@ public class Player extends Personagem {
         int dy = 0;
 
         if (numeroJogador == 1) {
-            if (Greenfoot.isKeyDown("a")) dx -= velocidade;
-            if (Greenfoot.isKeyDown("d")) dx += velocidade;
-            if (Greenfoot.isKeyDown("w")) dy -= velocidade;
-            if (Greenfoot.isKeyDown("s")) dy += velocidade;
+            if (Greenfoot.isKeyDown("a"))
+                dx -= velocidade;
+            if (Greenfoot.isKeyDown("d"))
+                dx += velocidade;
+            if (Greenfoot.isKeyDown("w"))
+                dy -= velocidade;
+            if (Greenfoot.isKeyDown("s"))
+                dy += velocidade;
         } else {
-            if (Greenfoot.isKeyDown("left")) dx -= velocidade;
-            if (Greenfoot.isKeyDown("right")) dx += velocidade;
-            if (Greenfoot.isKeyDown("up")) dy -= velocidade;
-            if (Greenfoot.isKeyDown("down")) dy += velocidade;
+            if (Greenfoot.isKeyDown("left"))
+                dx -= velocidade;
+            if (Greenfoot.isKeyDown("right"))
+                dx += velocidade;
+            if (Greenfoot.isKeyDown("up"))
+                dy -= velocidade;
+            if (Greenfoot.isKeyDown("down"))
+                dy += velocidade;
         }
 
         if (dx != 0 || dy != 0) {
-            if (dy < 0) definirDirecao(CIMA);
-            else if (dy > 0) definirDirecao(BAIXO);
-            else if (dx < 0) definirDirecao(ESQUERDA);
-            else definirDirecao(DIREITA);
+            if (dy < 0)
+                definirDirecao(CIMA);
+            else if (dy > 0)
+                definirDirecao(BAIXO);
+            else if (dx < 0)
+                definirDirecao(ESQUERDA);
+            else
+                definirDirecao(DIREITA);
         }
 
         boolean movimento = false;
-        if (dx != 0) movimento |= tentarMover(getX() + dx, getY());
-        if (dy != 0) movimento |= tentarMover(getX(), getY() + dy);
+        if (dx != 0)
+            movimento |= tentarMover(getX() + dx, getY());
+        if (dy != 0)
+            movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
+
     }
 
     private boolean tentarMover(int x, int y) {
