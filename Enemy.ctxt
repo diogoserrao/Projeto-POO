@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=Enemy
+comment0.text=Um\ inimigo\ pode\ patrulhar\ uma\ zona\ ou\ ficar\ parado.
+comment1.params=personagem\ mexe\ horizontal\ limiteInicial\ limiteFinal\ velocidade
+comment1.target=Enemy(int,\ boolean,\ boolean,\ int,\ int,\ int)
+comment2.params=personagem
+comment2.target=Enemy(int)
+comment3.params=
+comment3.target=void\ act()
+comment4.params=
+comment4.target=boolean\ patrulhar()
+comment5.params=x\ y
+comment5.target=boolean\ podeMover(int,\ int)
+numComments=6
