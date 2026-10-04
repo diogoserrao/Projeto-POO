@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=Controlos
+comment0.text=Configura\u00E7\u00E3o\ das\ teclas\ usadas\ por\ um\ jogador.
+comment1.params=esquerda\ direita\ cima\ baixo
+comment1.target=Controlos(java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String)
+comment2.params=
+comment2.target=java.lang.String\ getEsquerda()
+comment3.params=
+comment3.target=java.lang.String\ getDireita()
+comment4.params=
+comment4.target=java.lang.String\ getCima()
+comment5.params=
+comment5.target=java.lang.String\ getBaixo()
+numComments=6

@@ -1,13 +1,15 @@
 import greenfoot.*;
 
 public class Player extends Personagem {
-    private final int numeroJogador;
+    private final Controlos controlos;
     private final int velocidade = 4;
     private int nivel;
+    private int ultimoY;
+    private boolean emTransicaoDeEscada;
 
-    public Player(int numeroJogador) {
-        super(numeroJogador == 1 ? 2 : 3);
-        this.numeroJogador = numeroJogador;
+    public Player(int skin, Controlos controlos) {
+        super(skin);
+        this.controlos = controlos;
     }
 
     @Override
@@ -15,25 +17,14 @@ public class Player extends Personagem {
         int dx = 0;
         int dy = 0;
 
-        if (numeroJogador == 1) {
-            if (Greenfoot.isKeyDown("a"))
-                dx -= velocidade;
-            if (Greenfoot.isKeyDown("d"))
-                dx += velocidade;
-            if (Greenfoot.isKeyDown("w"))
-                dy -= velocidade;
-            if (Greenfoot.isKeyDown("s"))
-                dy += velocidade;
-        } else {
-            if (Greenfoot.isKeyDown("left"))
-                dx -= velocidade;
-            if (Greenfoot.isKeyDown("right"))
-                dx += velocidade;
-            if (Greenfoot.isKeyDown("up"))
-                dy -= velocidade;
-            if (Greenfoot.isKeyDown("down"))
-                dy += velocidade;
-        }
+        if (Greenfoot.isKeyDown(controlos.getEsquerda()))
+            dx -= velocidade;
+        if (Greenfoot.isKeyDown(controlos.getDireita()))
+            dx += velocidade;
+        if (Greenfoot.isKeyDown(controlos.getCima()))
+            dy -= velocidade;
+        if (Greenfoot.isKeyDown(controlos.getBaixo()))
+            dy += velocidade;
 
         if (dx != 0 || dy != 0) {
             if (dy < 0)
@@ -74,5 +65,21 @@ public class Player extends Personagem {
 
     public void descerNivel() {
         nivel--;
+    }
+
+    public int getUltimoY() {
+        return ultimoY;
+    }
+
+    public void setUltimoY(int ultimoY) {
+        this.ultimoY = ultimoY;
+    }
+
+    public boolean isEmTransicaoDeEscada() {
+        return emTransicaoDeEscada;
+    }
+
+    public void setEmTransicaoDeEscada(boolean emTransicaoDeEscada) {
+        this.emTransicaoDeEscada = emTransicaoDeEscada;
     }
 }

@@ -1,7 +1,9 @@
 #BlueJ class context
 comment0.target=Player
-comment1.params=numeroJogador
-comment1.target=Player(int)
+comment1.params=skin\ controlos
+comment1.target=Player(int,\ Controlos)
+comment10.params=emTransicaoDeEscada
+comment10.target=void\ setEmTransicaoDeEscada(boolean)
 comment2.params=
 comment2.target=void\ act()
 comment3.params=x\ y
@@ -12,4 +14,10 @@ comment5.params=
 comment5.target=void\ subirNivel()
 comment6.params=
 comment6.target=void\ descerNivel()
-numComments=7
+comment7.params=
+comment7.target=int\ getUltimoY()
+comment8.params=ultimoY
+comment8.target=void\ setUltimoY(int)
+comment9.params=
+comment9.target=boolean\ isEmTransicaoDeEscada()
+numComments=11

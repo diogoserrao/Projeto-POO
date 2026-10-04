@@ -1,4 +1,6 @@
 import greenfoot.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyWorld extends World {
 
@@ -13,14 +15,7 @@ public class MyWorld extends World {
     private int faseAtual = 1;
     private static final int MAX_FASES = 3;
 
-    private Player jogador1;
-    private Player jogador2;
-
-    private int ultimoYJogador1;
-    private int ultimoYJogador2;
-
-    private boolean transicaoEscadaJogador1 = false;
-    private boolean transicaoEscadaJogador2 = false;
+    private final List<Player> jogadores = new ArrayList<Player>();
     /*
      * Impede que o mesmo jogador mude de andar várias vezes
      * enquanto permanece dentro da mesma escada.
@@ -54,8 +49,7 @@ public class MyWorld extends World {
         configurarSpawnAtor();
         configurarInimigos();
 
-        atualizarPosicoesAnteriores();
-        atualizarInterface(null, null);
+        atualizarInterface();
     }
 
     private void configurarSpawnAtor() {
@@ -84,24 +78,30 @@ public class MyWorld extends World {
         /*
          * Um único tipo de classe para os dois jogadores.
          */
-        jogador1 = new Player(1);
-        jogador2 = new Player(2);
+        jogadores.clear();
+
+        jogadores.add(new Player(
+                2,
+                new Controlos("a", "d", "w", "s")));
+        jogadores.add(new Player(
+                3,
+                new Controlos("left", "right", "up", "down")));
 
         addObject(
-                jogador1,
+                jogadores.get(0),
                 spawnX,
                 spawnY);
 
         addObject(
-                jogador2,
+                jogadores.get(1),
                 spawnX + 32,
                 spawnY);
+        for (Player jogador : jogadores) {
+            jogador.setUltimoY(jogador.getY());
+        }
     }
 
-    /**
-     * Cria os inimigos da fase. O parâmetro patrulha define se cada inimigo
-     * anda dentro de uma zona ou fica parado.
-     */
+    /** Cria os inimigos da fase. */
     private void configurarInimigos() {
 
         switch (faseAtual) {
@@ -140,18 +140,7 @@ public class MyWorld extends World {
         addObject(new Enemy(personagem), x, y);
     }
 
-    private void atualizarPosicoesAnteriores() {
-
-        if (jogador1 != null) {
-            ultimoYJogador1 = jogador1.getY();
-        }
-
-        if (jogador2 != null) {
-            ultimoYJogador2 = jogador2.getY();
-        }
-    }
-
-    private void atualizarInterface(String interacao1, String interacao2) {
+    private void atualizarInterface() {
 
         showText(
                 "FASE " + faseAtual + " / " + MAX_FASES,
@@ -159,11 +148,11 @@ public class MyWorld extends World {
                 25);
 
         String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
-        if (interacao1 != null) {
-            controlos += " | BAÚ P1: " + interacao1;
-        }
-        if (interacao2 != null) {
-            controlos += " | BAÚ P2: " + interacao2;
+        for (int i = 0; i < jogadores.size(); i++) {
+            String interacao = getInteracaoEm(jogadores.get(i));
+            if (interacao != null) {
+                controlos += " | BAÚ P" + (i + 1) + ": " + interacao;
+            }
         }
 
         showText(
@@ -205,11 +194,7 @@ public class MyWorld extends World {
         teclaProximaFasePressionada = teclaN;
 
         verificarEscadas();
-        atualizarPosicoesAnteriores();
-
-        String interacao1 = getInteracaoEm(jogador1);
-        String interacao2 = getInteracaoEm(jogador2);
-        atualizarInterface(interacao1, interacao2);
+        atualizarInterface();
     }
 
     /**
@@ -220,18 +205,12 @@ public class MyWorld extends World {
      */
     private void verificarEscadas() {
 
-        processarEscadaJogador(
-                jogador1,
-                true);
-
-        processarEscadaJogador(
-                jogador2,
-                false);
+        for (Player jogador : jogadores) {
+            processarEscada(jogador);
+        }
     }
 
-    private void processarEscadaJogador(
-            Player jogador,
-            boolean primeiroJogador) {
+    private void processarEscada(Player jogador) {
 
         if (jogador == null) {
             return;
@@ -239,17 +218,13 @@ public class MyWorld extends World {
 
         int yAtual = jogador.getY();
 
-        int ultimoY = primeiroJogador
-                ? ultimoYJogador1
-                : ultimoYJogador2;
+        int ultimoY = jogador.getUltimoY();
 
         boolean estaNaEscada = mapa.estaNaEscada(
                 jogador.getX(),
                 yAtual);
 
-        boolean transicaoAtiva = primeiroJogador
-                ? transicaoEscadaJogador1
-                : transicaoEscadaJogador2;
+        boolean transicaoAtiva = jogador.isEmTransicaoDeEscada();
 
         /*
          * Só muda de andar quando existe movimento vertical dentro
@@ -266,11 +241,7 @@ public class MyWorld extends World {
                 jogador.subirNivel();
             }
 
-            if (primeiroJogador) {
-                transicaoEscadaJogador1 = true;
-            } else {
-                transicaoEscadaJogador2 = true;
-            }
+            jogador.setEmTransicaoDeEscada(true);
         }
 
         /*
@@ -278,12 +249,10 @@ public class MyWorld extends World {
          */
         if (!estaNaEscada) {
 
-            if (primeiroJogador) {
-                transicaoEscadaJogador1 = false;
-            } else {
-                transicaoEscadaJogador2 = false;
-            }
+            jogador.setEmTransicaoDeEscada(false);
         }
+
+        jogador.setUltimoY(yAtual);
     }
 
     /**
