@@ -82,10 +82,10 @@ public class MyWorld extends World {
 
         jogadores.add(new Player(
                 2,
-                new Controlos("a", "d", "w", "s")));
+                new Controlos("a", "d", "w", "s", "e")));
         jogadores.add(new Player(
                 3,
-                new Controlos("left", "right", "up", "down")));
+                new Controlos("left", "right", "up", "down", "enter")));
 
         addObject(
                 jogadores.get(0),
@@ -149,9 +149,10 @@ public class MyWorld extends World {
 
         String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
         for (int i = 0; i < jogadores.size(); i++) {
-            String interacao = getInteracaoEm(jogadores.get(i));
-            if (interacao != null) {
-                controlos += " | BAÚ P" + (i + 1) + ": " + interacao;
+            Interagivel interagivel = jogadores.get(i).getInteragivelPerto();
+            if (interagivel != null) {
+                controlos += " | P" + (i + 1) + ": "
+                        + interagivel.getDescricao(jogadores.get(i));
             }
         }
 
@@ -299,14 +300,7 @@ public class MyWorld extends World {
         return 0;
     }
 
-    public String getInteracaoEm(Player jogador) {
-
-        if (mapa == null || jogador == null) {
-            return null;
-        }
-
-        return mapa.getInteracaoEm(
-                jogador.getX(),
-                jogador.getY());
+    public DungeonMap getMapa() {
+        return mapa;
     }
 }

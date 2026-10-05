@@ -1,4 +1,5 @@
 import greenfoot.*;
+import java.awt.Rectangle;
 
 public class Player extends Personagem {
     private final Controlos controlos;
@@ -6,6 +7,7 @@ public class Player extends Personagem {
     private int nivel;
     private int ultimoY;
     private boolean emTransicaoDeEscada;
+    private boolean teclaInteracaoPressionada;
 
     public Player(int skin, Controlos controlos) {
         super(skin);
@@ -43,7 +45,55 @@ public class Player extends Personagem {
         if (dy != 0)
             movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
+        processarInteracao();
 
+    }
+
+    private void processarInteracao() {
+        boolean teclaPressionada = Greenfoot.isKeyDown(controlos.getInteragir());
+
+        /* Algumas versões/teclados do Greenfoot identificam ENTER como RETURN. */
+        if ("enter".equals(controlos.getInteragir())) {
+            teclaPressionada |= Greenfoot.isKeyDown("return");
+        }
+
+        if (teclaPressionada && !teclaInteracaoPressionada) {
+            Interagivel interagivel = procurarInteragivelPerto();
+            if (interagivel != null) {
+                interagivel.interagir(this);
+            }
+        }
+
+        teclaInteracaoPressionada = teclaPressionada;
+    }
+
+    private Interagivel procurarInteragivelPerto() {
+        if (!(getWorld() instanceof MyWorld)) {
+            return null;
+        }
+
+        MyWorld mundo = (MyWorld) getWorld();
+        if (mundo.getMapa() == null) {
+            return null;
+        }
+
+        Rectangle areaDosPes = new Rectangle(getX() - 12, getY() + 12, 24, 24);
+
+        for (Interagivel interagivel : mundo.getMapa().getInteragiveis()) {
+            if (interagivel.getArea().intersects(areaDosPes)) {
+                return interagivel;
+            }
+        }
+
+        return null;
+    }
+
+    public Interagivel getInteragivelPerto() {
+        return procurarInteragivelPerto();
+    }
+
+    public String getTeclaInteracao() {
+        return controlos.getInteragir();
     }
 
     private boolean tentarMover(int x, int y) {

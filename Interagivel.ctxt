@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=Interagivel
+comment0.text=Contrato\ dos\ objetos\ com\ os\ quais\ um\ jogador\ pode\ interagir.
+comment1.params=
+comment1.target=java.awt.Rectangle\ getArea()
+comment2.params=
+comment2.target=java.lang.String\ getDescricao()
+comment3.params=jogador
+comment3.target=java.lang.String\ getDescricao(Player)
+comment4.params=jogador
+comment4.target=void\ interagir(Player)
+numComments=5

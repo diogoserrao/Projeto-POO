@@ -37,13 +37,15 @@ public class DungeonMap {
     private static final int WORLD_HEIGHT = MAP_HEIGHT * TILE;
 
     /** true = pinta a colisão a vermelho por cima do mapa (para depurar). */
-    private static final boolean MOSTRAR_COLISAO = true;
+    private static final boolean MOSTRAR_COLISAO = false;
+
+    private static final int TAMANHO_OBJETO_PONTO = 48;
 
     private final ArrayList<Rectangle> escadas = new ArrayList<Rectangle>();
 
     private final GreenfootImage imagem;
 
-    private final Map<String, Rectangle> interacoes = new HashMap<String, Rectangle>();
+    private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
 
     /* Colisão por células (layers "Colisao" e "Colisao_N" do Tiled). */
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
@@ -81,6 +83,10 @@ public class DungeonMap {
 
     public GreenfootImage getImagem() {
         return imagem;
+    }
+
+    public ArrayList<Interagivel> getInteragiveis() {
+        return interagiveis;
     }
 
     // ------------------------------------------------------------------
@@ -244,17 +250,7 @@ public class DungeonMap {
             double y = Double.parseDouble(objeto.getAttribute("y"));
             double largura = Double.parseDouble(objeto.getAttribute("width"));
             double altura = Double.parseDouble(objeto.getAttribute("height"));
-
-            /*
-             * Os objetos do Tiled usam o mapa original (16 px por tile),
-             * o jogo desenha com 32 px por tile.
-             */
-            int mundoX = (int) Math.round((x * TILE / SOURCE_TILE) - (MIN_X * TILE));
-            int mundoY = (int) Math.round((y * TILE / SOURCE_TILE) - (MIN_Y * TILE));
-            int mundoLargura = (int) Math.round(largura * TILE / SOURCE_TILE);
-            int mundoAltura = (int) Math.round(altura * TILE / SOURCE_TILE);
-
-            Rectangle area = new Rectangle(mundoX, mundoY, mundoLargura, mundoAltura);
+            Rectangle area = converterParaMundo(x, y, largura, altura, false);
             String nome = objeto.getAttribute("name").trim().toLowerCase();
 
             if (nome.startsWith("escada")) {
@@ -286,50 +282,32 @@ public class DungeonMap {
             boolean objetoPonto = !objeto.hasAttribute("width")
                     || !objeto.hasAttribute("height");
 
-            int mundoX = (int) Math.round(
-                    (x * TILE / SOURCE_TILE) - (MIN_X * TILE));
-
-            int mundoY = (int) Math.round(
-                    (y * TILE / SOURCE_TILE) - (MIN_Y * TILE));
-
-            int mundoLargura = objetoPonto
-                    ? 48
-                    : (int) Math.round(largura * TILE / SOURCE_TILE);
-
-            int mundoAltura = objetoPonto
-                    ? 48
-                    : (int) Math.round(altura * TILE / SOURCE_TILE);
-
-            Rectangle area = new Rectangle(
-                    objetoPonto ? mundoX - mundoLargura / 2 : mundoX,
-                    objetoPonto ? mundoY - mundoAltura / 2 : mundoY,
-                    mundoLargura,
-                    mundoAltura);
+            Rectangle area = converterParaMundo(x, y, largura, altura, objetoPonto);
 
             String nome = objeto.getAttribute("name").trim();
 
             if (!nome.isEmpty()) {
-                interacoes.put(nome, area);
+                interagiveis.add(new Bau(nome, area));
             }
         }
     }
 
-    public String getInteracaoEm(int x, int y) {
+    private Rectangle converterParaMundo(double x, double y,
+            double largura, double altura, boolean objetoPonto) {
+        int mundoX = (int) Math.round((x * TILE / SOURCE_TILE) - (MIN_X * TILE));
+        int mundoY = (int) Math.round((y * TILE / SOURCE_TILE) - (MIN_Y * TILE));
+        int mundoLargura = objetoPonto
+                ? TAMANHO_OBJETO_PONTO
+                : (int) Math.round(largura * TILE / SOURCE_TILE);
+        int mundoAltura = objetoPonto
+                ? TAMANHO_OBJETO_PONTO
+                : (int) Math.round(altura * TILE / SOURCE_TILE);
 
-        Rectangle zonaPes = new Rectangle(
-                x - 12,
-                y + 12,
-                24,
-                24);
-
-        for (Map.Entry<String, Rectangle> entrada : interacoes.entrySet()) {
-
-            if (entrada.getValue().intersects(zonaPes)) {
-                return entrada.getKey();
-            }
-        }
-
-        return null;
+        return new Rectangle(
+                objetoPonto ? mundoX - mundoLargura / 2 : mundoX,
+                objetoPonto ? mundoY - mundoAltura / 2 : mundoY,
+                mundoLargura,
+                mundoAltura);
     }
 
     private void aplicarAmbiente() {

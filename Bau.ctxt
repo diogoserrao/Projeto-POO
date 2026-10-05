@@ -1,0 +1,18 @@
+#BlueJ class context
+comment0.target=Bau
+comment0.text=Representa\ um\ ba\u00FA\ interag\u00EDvel\ do\ mapa.
+comment1.params=nome\ area
+comment1.target=Bau(java.lang.String,\ java.awt.Rectangle)
+comment2.params=
+comment2.target=void\ abrir()
+comment3.params=
+comment3.target=boolean\ estaAberto()
+comment4.params=
+comment4.target=java.awt.Rectangle\ getArea()
+comment5.params=
+comment5.target=java.lang.String\ getDescricao()
+comment6.params=jogador
+comment6.target=java.lang.String\ getDescricao(Player)
+comment7.params=jogador
+comment7.target=void\ interagir(Player)
+numComments=8
