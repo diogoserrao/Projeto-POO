@@ -107,59 +107,20 @@ public class MyWorld extends World {
 
         ArrayList<ConfiguracaoInimigo> inimigos = mapa.getConfiguracoesInimigos();
 
-        if (inimigos.isEmpty()) {
-            return;
+        for (int i = 0; i < inimigos.size(); i++) {
+            ConfiguracaoInimigo configuracao = inimigos.get(i);
+            Rectangle spawn = configuracao.getSpawn();
+            int spawnX = spawn.x + spawn.width / 2;
+            int spawnY = spawn.y + spawn.height / 2;
+            int personagem = (i % 2) + 1;
+
+            Enemy inimigo = configuracao.temPatrulha()
+                    ? new Enemy(personagem, 2, configuracao.getPatrulha())
+                    : new Enemy(personagem);
+
+            addObject(inimigo, spawnX, spawnY);
         }
 
-        ConfiguracaoInimigo configuracao = inimigos.get(0);
-
-        Rectangle spawn = configuracao.getSpawn();
-
-        int spawnX = spawn.x + spawn.width / 2;
-        int spawnY = spawn.y + spawn.height / 2;
-
-        addObject(
-                new Enemy(
-                        1,
-                        2,
-                        configuracao.getPatrulha()),
-                spawn.x,
-                spawn.y);
-
-        switch (faseAtual) {
-
-            case 1:
-                adicionarInimigo(520, 280, 1, true, true, 460, 640);
-                adicionarInimigo(745, 520, 2, true, false, 450, 590);
-                adicionarInimigoParado(600, 180, 1);
-                adicionarInimigoParado(930, 365, 2);
-                break;
-
-            case 2:
-                adicionarInimigo(420, 250, 1, true, true, 360, 560);
-                adicionarInimigo(820, 690, 2, true, false, 610, 790);
-                adicionarInimigoParado(650, 215, 2);
-                adicionarInimigoParado(1060, 500, 1);
-                break;
-
-            case 3:
-                adicionarInimigo(340, 180, 1, true, true, 260, 470);
-                adicionarInimigo(920, 330, 2, true, false, 250, 470);
-                adicionarInimigoParado(560, 560, 1);
-                adicionarInimigoParado(1040, 720, 2);
-                break;
-        }
-    }
-
-    private void adicionarInimigo(int x, int y, int personagem,
-            boolean patrulha, boolean horizontal,
-            int limiteInicial, int limiteFinal) {
-        addObject(new Enemy(personagem, patrulha, horizontal,
-                limiteInicial, limiteFinal, 2), x, y);
-    }
-
-    private void adicionarInimigoParado(int x, int y, int personagem) {
-        addObject(new Enemy(personagem), x, y);
     }
 
     private void atualizarInterface() {

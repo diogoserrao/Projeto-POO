@@ -259,7 +259,6 @@ public class DungeonMap {
         NodeList objetos = objectGroup.getElementsByTagName("object");
 
         Map<String, Rectangle> patrulhas = new HashMap<String, Rectangle>();
-
         Map<String, Rectangle> spawns = new HashMap<String, Rectangle>();
 
         for (int i = 0; i < objetos.getLength(); i++) {
@@ -320,15 +319,16 @@ public class DungeonMap {
             }
         }
 
-        for (String numero : patrulhas.keySet()) {
-
+        /*
+         * Um spawn sem patrulha representa um inimigo parado. Assim,
+         * todos os Spawn_N definidos no Tiled são válidos por si só.
+         */
+        for (Map.Entry<String, Rectangle> entrada : spawns.entrySet()) {
+            String numero = entrada.getKey();
+            Rectangle spawn = entrada.getValue();
             Rectangle patrulha = patrulhas.get(numero);
-            Rectangle spawn = spawns.get(numero);
 
-            if (spawn != null) {
-                configuracoesInimigos.add(
-                        new ConfiguracaoInimigo(spawn, patrulha));
-            }
+            configuracoesInimigos.add(new ConfiguracaoInimigo(spawn, patrulha));
         }
     }
 

@@ -7,4 +7,6 @@ comment2.params=
 comment2.target=java.awt.Rectangle\ getSpawn()
 comment3.params=
 comment3.target=java.awt.Rectangle\ getPatrulha()
-numComments=4
+comment4.params=
+comment4.target=boolean\ temPatrulha()
+numComments=5

@@ -22,3 +22,6 @@ movem-se apenas dentro da zona configurada para eles e mudam de direção
 quando chegam ao limite ou encontram uma parede. Todos usam sprites da pasta
 images/jogador/PNG, que contém os sprites transparentes do mesmo conjunto
 de personagens, e respeitam a mesma colisão do mapa usada pelos jogadores.
+No Tiled, cada objeto Spawn_N cria um inimigo; se existir também uma
+Patrulha_N com o mesmo número, esse inimigo patrulha essa zona. Um Spawn_N
+sem Patrulha_N cria um inimigo parado.

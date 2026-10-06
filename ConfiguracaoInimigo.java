@@ -20,4 +20,8 @@ public class ConfiguracaoInimigo {
     public Rectangle getPatrulha() {
         return patrulha;
     }
+
+    public boolean temPatrulha() {
+        return patrulha != null;
+    }
 }
