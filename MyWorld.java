@@ -1,6 +1,7 @@
 import greenfoot.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Rectangle;
 
 public class MyWorld extends World {
 
@@ -103,6 +104,27 @@ public class MyWorld extends World {
 
     /** Cria os inimigos da fase. */
     private void configurarInimigos() {
+
+        ArrayList<ConfiguracaoInimigo> inimigos = mapa.getConfiguracoesInimigos();
+
+        if (inimigos.isEmpty()) {
+            return;
+        }
+
+        ConfiguracaoInimigo configuracao = inimigos.get(0);
+
+        Rectangle spawn = configuracao.getSpawn();
+
+        int spawnX = spawn.x + spawn.width / 2;
+        int spawnY = spawn.y + spawn.height / 2;
+
+        addObject(
+                new Enemy(
+                        1,
+                        2,
+                        configuracao.getPatrulha()),
+                spawn.x,
+                spawn.y);
 
         switch (faseAtual) {
 

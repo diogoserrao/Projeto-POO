@@ -47,6 +47,8 @@ public class DungeonMap {
 
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
 
+    private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
+
     /* Colisão por células (layers "Colisao" e "Colisao_N" do Tiled). */
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
     private final Map<Integer, boolean[][]> colisaoPorNivel = new HashMap<Integer, boolean[][]>();
@@ -89,6 +91,10 @@ public class DungeonMap {
         return interagiveis;
     }
 
+    public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() {
+        return configuracoesInimigos;
+    }
+
     // ------------------------------------------------------------------
     // CONSULTAS DE COLISÃO
     // ------------------------------------------------------------------
@@ -123,8 +129,8 @@ public class DungeonMap {
         }
 
         return temColisaoNaZona(pes.x, pes.y,
-                                pes.x + pes.width - 1,
-                                pes.y + pes.height - 1, nivel);
+                pes.x + pes.width - 1,
+                pes.y + pes.height - 1, nivel);
     }
 
     /** Indica se os pés do jogador estão dentro de uma escada. */
@@ -195,6 +201,10 @@ public class DungeonMap {
                         lerInteracoes(elemento);
                     }
 
+                    if (nome.equals("inimigos")) {
+                        lerInimigos(elemento);
+                    }
+
                     continue;
                 }
 
@@ -240,6 +250,84 @@ public class DungeonMap {
             int cy = t[1] - MIN_Y;
             if (cx >= 0 && cy >= 0 && cx < MAP_WIDTH && cy < MAP_HEIGHT) {
                 destino[cx][cy] = true;
+            }
+        }
+    }
+
+    private void lerInimigos(Element objectGroup) {
+
+        NodeList objetos = objectGroup.getElementsByTagName("object");
+
+        Map<String, Rectangle> patrulhas = new HashMap<String, Rectangle>();
+
+        Map<String, Rectangle> spawns = new HashMap<String, Rectangle>();
+
+        for (int i = 0; i < objetos.getLength(); i++) {
+
+            Element objeto = (Element) objetos.item(i);
+
+            if (!objeto.hasAttribute("x")
+                    || !objeto.hasAttribute("y")) {
+                continue;
+            }
+
+            String nome = objeto.getAttribute("name").trim();
+
+            if (nome.isEmpty()) {
+                continue;
+            }
+
+            double x = Double.parseDouble(objeto.getAttribute("x"));
+            double y = Double.parseDouble(objeto.getAttribute("y"));
+
+            boolean ePatrulha = nome.startsWith("Patrulha_");
+
+            double largura = objeto.hasAttribute("width")
+                    ? Double.parseDouble(objeto.getAttribute("width"))
+                    : SOURCE_TILE;
+
+            double altura = objeto.hasAttribute("height")
+                    ? Double.parseDouble(objeto.getAttribute("height"))
+                    : SOURCE_TILE;
+
+            Rectangle area;
+
+            if (ePatrulha) {
+
+                area = converterParaMundo(
+                        x,
+                        y,
+                        largura,
+                        altura,
+                        false);
+
+                patrulhas.put(
+                        nome.substring("Patrulha_".length()),
+                        area);
+
+            } else if (nome.startsWith("Spawn_")) {
+
+                area = converterParaMundo(
+                        x,
+                        y,
+                        SOURCE_TILE,
+                        SOURCE_TILE,
+                        true);
+
+                spawns.put(
+                        nome.substring("Spawn_".length()),
+                        area);
+            }
+        }
+
+        for (String numero : patrulhas.keySet()) {
+
+            Rectangle patrulha = patrulhas.get(numero);
+            Rectangle spawn = spawns.get(numero);
+
+            if (spawn != null) {
+                configuracoesInimigos.add(
+                        new ConfiguracaoInimigo(spawn, patrulha));
             }
         }
     }

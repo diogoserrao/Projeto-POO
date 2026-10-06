@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=ConfiguracaoInimigo
+comment0.text=\r\n\ Guarda\ a\ posi\u00E7\u00E3o\ inicial\ e\ a\ zona\ de\ patrulha\ de\ um\ inimigo.\r\n
+comment1.params=spawn\ patrulha
+comment1.target=ConfiguracaoInimigo(java.awt.Rectangle,\ java.awt.Rectangle)
+comment2.params=
+comment2.target=java.awt.Rectangle\ getSpawn()
+comment3.params=
+comment3.target=java.awt.Rectangle\ getPatrulha()
+numComments=4
