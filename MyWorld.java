@@ -256,50 +256,6 @@ public class MyWorld extends World {
         jogador.setUltimoY(yAtual);
     }
 
-    /**
-     * Testa apenas a caixa dos pés do personagem.
-     *
-     * Mantemos a colisão no DungeonMap, que é a única classe
-     * responsável por saber onde o mapa é sólido.
-     */
-    public boolean podeMover(
-            Actor jogador,
-            int novoX,
-            int novoY) {
-
-        if (mapa == null) {
-            return false;
-        }
-
-        /*
-         * Caixa pequena na zona dos pés.
-         * Evita que o corpo 96x96 do sprite colida com paredes.
-         */
-        final int metadeLargura = 7;
-        final int topoPés = 18;
-        final int fundoPés = 28;
-
-        // A colisão depende do andar em que o jogador está.
-        return !mapa.temColisaoNaZona(
-                novoX - metadeLargura,
-                novoY + topoPés,
-                novoX + metadeLargura,
-                novoY + fundoPés,
-                getNivelDoJogador(jogador));
-    }
-
-    /**
-     * Permite consultar o nível de qualquer Player.
-     */
-    public int getNivelDoJogador(Actor jogador) {
-
-        if (jogador instanceof Player) {
-            return ((Player) jogador).getNivel();
-        }
-
-        return 0;
-    }
-
     public DungeonMap getMapa() {
         return mapa;
     }

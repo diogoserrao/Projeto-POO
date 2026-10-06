@@ -1,4 +1,5 @@
 import greenfoot.*;
+import java.awt.Rectangle;
 
 /** Classe base para jogadores e inimigos. */
 public abstract class Personagem extends Actor {
@@ -8,6 +9,13 @@ public abstract class Personagem extends Actor {
     protected static final int ESQUERDA = 1;
     protected static final int DIREITA = 2;
     protected static final int CIMA = 3;
+
+    private static final int PES_OFFSET_X = 7;
+    private static final int PES_OFFSET_Y = 18;
+    private static final int PES_LARGURA = 15;
+    private static final int PES_ALTURA = 11;
+
+    private int nivel;
 
     private final GreenfootImage walkSpritesheet;
     private final GreenfootImage idleSpritesheet;
@@ -19,14 +27,24 @@ public abstract class Personagem extends Actor {
     private boolean estavaEmMovimento;
 
     protected Personagem(int personagem) {
+        this(personagem, 0);
+    }
+
+    protected Personagem(int personagem, int nivel) {
         this(carregarSpritesheet(personagem, "Walk"),
-             carregarSpritesheet(personagem, "Idle"));
+             carregarSpritesheet(personagem, "Idle"), nivel);
     }
 
     protected Personagem(GreenfootImage walkSpritesheet,
                          GreenfootImage idleSpritesheet) {
+        this(walkSpritesheet, idleSpritesheet, 0);
+    }
+
+    protected Personagem(GreenfootImage walkSpritesheet,
+                         GreenfootImage idleSpritesheet, int nivel) {
         this.walkSpritesheet = walkSpritesheet;
         this.idleSpritesheet = idleSpritesheet;
+        this.nivel = nivel;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
         mostrarFrame();
@@ -69,5 +87,30 @@ public abstract class Personagem extends Actor {
                          -linhaDirecao * FRAME_SIZE);
         imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
         setImage(imagem);
+    }
+
+    public int getNivel() {
+        return nivel;
+    }
+
+    public void setNivel(int nivel) {
+        this.nivel = nivel;
+    }
+
+    public void subirNivel() {
+        nivel++;
+    }
+
+    public void descerNivel() {
+        nivel--;
+    }
+
+    public Rectangle getPes() {
+        return getPes(getX(), getY());
+    }
+
+    public Rectangle getPes(int x, int y) {
+        return new Rectangle(x - PES_OFFSET_X, y + PES_OFFSET_Y,
+                             PES_LARGURA, PES_ALTURA);
     }
 }

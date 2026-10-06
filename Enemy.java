@@ -1,3 +1,5 @@
+import greenfoot.*;
+
 /** Um inimigo pode patrulhar uma zona ou ficar parado. */
 public class Enemy extends Personagem {
     private final boolean mexe;
@@ -9,7 +11,14 @@ public class Enemy extends Personagem {
 
     public Enemy(int personagem, boolean mexe, boolean horizontal,
                  int limiteInicial, int limiteFinal, int velocidade) {
-        super(personagem);
+        this(personagem, mexe, horizontal, limiteInicial, limiteFinal,
+             velocidade, 0);
+    }
+
+    public Enemy(int personagem, boolean mexe, boolean horizontal,
+                 int limiteInicial, int limiteFinal, int velocidade,
+                 int nivel) {
+        super(personagem, nivel);
         this.mexe = mexe;
         this.horizontal = horizontal;
         this.limiteInicial = Math.min(limiteInicial, limiteFinal);
@@ -18,7 +27,7 @@ public class Enemy extends Personagem {
     }
 
     public Enemy(int personagem) {
-        this(personagem, false, true, 0, 0, 1);
+        this(personagem, false, true, 0, 0, 1, 0);
     }
 
     @Override
@@ -54,6 +63,7 @@ public class Enemy extends Personagem {
         if (!(getWorld() instanceof MyWorld)) {
             return false;
         }
-        return ((MyWorld) getWorld()).podeMover(this, x, y);
+        DungeonMap mapa = ((MyWorld) getWorld()).getMapa();
+        return mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel());
     }
 }

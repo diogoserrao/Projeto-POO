@@ -4,13 +4,16 @@ import java.awt.Rectangle;
 public class Player extends Personagem {
     private final Controlos controlos;
     private final int velocidade = 4;
-    private int nivel;
     private int ultimoY;
     private boolean emTransicaoDeEscada;
     private boolean teclaInteracaoPressionada;
 
     public Player(int skin, Controlos controlos) {
-        super(skin);
+        this(skin, controlos, 0);
+    }
+
+    public Player(int skin, Controlos controlos, int nivel) {
+        super(skin, nivel);
         this.controlos = controlos;
     }
 
@@ -97,24 +100,17 @@ public class Player extends Personagem {
     }
 
     private boolean tentarMover(int x, int y) {
+        if (!(getWorld() instanceof MyWorld)) {
+            return false;
+        }
+
         MyWorld mundo = (MyWorld) getWorld();
-        if (mundo != null && mundo.podeMover(this, x, y)) {
+        DungeonMap mapa = mundo.getMapa();
+        if (mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel())) {
             setLocation(x, y);
             return true;
         }
         return false;
-    }
-
-    public int getNivel() {
-        return nivel;
-    }
-
-    public void subirNivel() {
-        nivel++;
-    }
-
-    public void descerNivel() {
-        nivel--;
     }
 
     public int getUltimoY() {

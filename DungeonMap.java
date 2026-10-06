@@ -116,6 +116,17 @@ public class DungeonMap {
         return false;
     }
 
+    /** Indica se a caixa dos pés está bloqueada no nível indicado. */
+    public boolean estaBloqueado(Rectangle pes, int nivel) {
+        if (pes == null) {
+            return true;
+        }
+
+        return temColisaoNaZona(pes.x, pes.y,
+                                pes.x + pes.width - 1,
+                                pes.y + pes.height - 1, nivel);
+    }
+
     /** Indica se os pés do jogador estão dentro de uma escada. */
     public boolean estaNaEscada(int x, int y) {
         Rectangle zonaPes = new Rectangle(x - 6, y + 18, 12, 12);
