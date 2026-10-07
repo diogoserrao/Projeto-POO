@@ -72,6 +72,11 @@ public abstract class Personagem extends Actor {
         mostrarFrame();
     }
 
+    /** Devolve a direcao para sistemas que precisam de consultar o olhar. */
+    public int getDirecao() {
+        return linhaDirecao;
+    }
+
     protected void atualizarAnimacao(boolean movimento) {
         if (movimento != estavaEmMovimento) {
             frame = 0;

@@ -1,6 +1,7 @@
 import greenfoot.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.awt.Rectangle;
 import java.awt.Point;
 
@@ -247,5 +248,10 @@ public class MyWorld extends World {
 
     public DungeonMap getMapa() {
         return mapa;
+    }
+
+    /** Lista de jogadores disponivel para sistemas do mundo, como a IA. */
+    public List<Player> getJogadores() {
+        return Collections.unmodifiableList(jogadores);
     }
 }
