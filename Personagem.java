@@ -9,6 +9,7 @@ public abstract class Personagem extends Actor {
     protected static final int ESQUERDA = 1;
     protected static final int DIREITA = 2;
     protected static final int CIMA = 3;
+    private static final int IDLE_FRAMES_CIMA = 4;
 
     private static final int PES_OFFSET_X = 7;
     private static final int PES_OFFSET_Y = 18;
@@ -59,7 +60,13 @@ public abstract class Personagem extends Actor {
     }
 
     protected void definirDirecao(int direcao) {
+        if (linhaDirecao == direcao) {
+            return;
+        }
+
         linhaDirecao = direcao;
+        frame %= numeroFramesAnimacao(estavaEmMovimento);
+        mostrarFrame();
     }
 
     protected void atualizarAnimacao(boolean movimento) {
@@ -73,10 +80,17 @@ public abstract class Personagem extends Actor {
         contadorAnimacao++;
         if (contadorAnimacao >= (movimento ? 5 : 12)) {
             contadorAnimacao = 0;
-            int numeroFrames = movimento ? walkFrames : idleFrames;
+            int numeroFrames = numeroFramesAnimacao(movimento);
             frame = (frame + 1) % numeroFrames;
             mostrarFrame();
         }
+    }
+
+    private int numeroFramesAnimacao(boolean movimento) {
+        if (movimento) {
+            return walkFrames;
+        }
+        return linhaDirecao == CIMA ? IDLE_FRAMES_CIMA : idleFrames;
     }
 
     protected void mostrarFrame() {
