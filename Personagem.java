@@ -15,8 +15,10 @@ public abstract class Personagem extends Actor {
     private static final int PES_OFFSET_Y = 18;
     private static final int PES_LARGURA = 15;
     private static final int PES_ALTURA = 11;
+    private static final int MAX_VIDAS = 3;
 
     private int nivel;
+    private int vidas;
 
     private final GreenfootImage walkSpritesheet;
     private final GreenfootImage idleSpritesheet;
@@ -46,6 +48,7 @@ public abstract class Personagem extends Actor {
         this.walkSpritesheet = walkSpritesheet;
         this.idleSpritesheet = idleSpritesheet;
         this.nivel = nivel;
+        this.vidas = MAX_VIDAS;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
         mostrarFrame();
@@ -117,6 +120,35 @@ public abstract class Personagem extends Actor {
 
     public void descerNivel() {
         nivel--;
+    }
+
+    /** Devolve o número de vidas/corações atuais deste personagem. */
+    public int getVidas() {
+        return vidas;
+    }
+
+    /** Devolve o número máximo de vidas/corações deste personagem. */
+    public int getMaxVidas() {
+        return MAX_VIDAS;
+    }
+
+    /** Indica se este personagem ainda tem pelo menos uma vida. */
+    public boolean estaVivo() {
+        return vidas > 0;
+    }
+
+    /** Retira exatamente uma vida, sem permitir valores negativos. */
+    public void perderVida() {
+        if (vidas > 0) {
+            vidas--;
+        }
+    }
+
+    /** Recupera exatamente uma vida, sem ultrapassar o máximo. */
+    public void ganharVida() {
+        if (vidas < MAX_VIDAS) {
+            vidas++;
+        }
     }
 
     public Rectangle getPes() {

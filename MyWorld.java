@@ -101,8 +101,18 @@ public class MyWorld extends World {
     private void atualizarInterface() {
 
         showText(
+                formatarVidas(0),
+                150,
+                25);
+
+        showText(
                 "FASE " + faseAtual + " / " + MAX_FASES,
-                80,
+                getWidth() / 2,
+                25);
+
+        showText(
+                formatarVidas(1),
+                getWidth() - 150,
                 25);
 
         String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
@@ -116,8 +126,29 @@ public class MyWorld extends World {
 
         showText(
                 controlos,
-                850,
-                25);
+                getWidth() / 2,
+                getHeight() - 20);
+    }
+
+    /**
+     * Usa apenas caracteres ASCII para funcionar independentemente da fonte
+     * disponível no Greenfoot: [X] representa um coração cheio e [ ] um vazio.
+     */
+    private String formatarVidas(int indiceJogador) {
+        if (indiceJogador < 0 || indiceJogador >= jogadores.size()) {
+            return "P" + (indiceJogador + 1) + ": [ ] [ ] [ ]";
+        }
+
+        Player jogador = jogadores.get(indiceJogador);
+        String coracoes = "";
+        for (int i = 0; i < jogador.getMaxVidas(); i++) {
+            coracoes += i < jogador.getVidas() ? "[X]" : "[ ]";
+            if (i < jogador.getMaxVidas() - 1) {
+                coracoes += " ";
+            }
+        }
+
+        return "P" + (indiceJogador + 1) + ": " + coracoes;
     }
 
     public void proximaFase() {
