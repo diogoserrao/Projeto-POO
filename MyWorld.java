@@ -2,6 +2,7 @@ import greenfoot.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Rectangle;
+import java.awt.Point;
 
 public class MyWorld extends World {
 
@@ -55,30 +56,10 @@ public class MyWorld extends World {
 
     private void configurarSpawnAtor() {
 
-        int spawnX = 220;
-        int spawnY = 280;
+        List<Point> spawns = mapa.getSpawnsJogadores();
+        Point p1 = spawns.size() > 0 ? spawns.get(0) : new Point(220, 280);
+        Point p2 = spawns.size() > 1 ? spawns.get(1) : new Point(p1.x + 32, p1.y);
 
-        switch (faseAtual) {
-
-            case 1:
-                spawnX = 220;
-                spawnY = 280;
-                break;
-
-            case 2:
-                spawnX = 200;
-                spawnY = 320;
-                break;
-
-            case 3:
-                spawnX = 200;
-                spawnY = 200;
-                break;
-        }
-
-        /*
-         * Um único tipo de classe para os dois jogadores.
-         */
         jogadores.clear();
 
         jogadores.add(new Player(
@@ -88,15 +69,9 @@ public class MyWorld extends World {
                 3,
                 new Controlos("left", "right", "up", "down", "enter")));
 
-        addObject(
-                jogadores.get(0),
-                spawnX,
-                spawnY);
+        addObject(jogadores.get(0), p1.x, p1.y);
+        addObject(jogadores.get(1), p2.x, p2.y);
 
-        addObject(
-                jogadores.get(1),
-                spawnX + 32,
-                spawnY);
         for (Player jogador : jogadores) {
             jogador.setUltimoY(jogador.getY());
         }

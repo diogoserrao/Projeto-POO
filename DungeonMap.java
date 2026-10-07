@@ -3,6 +3,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.awt.Point;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import java.awt.Rectangle;
@@ -48,6 +51,8 @@ public class DungeonMap {
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
 
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
+
+    private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
 
     /* Colisão por células (layers "Colisao" e "Colisao_N" do Tiled). */
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
@@ -203,6 +208,10 @@ public class DungeonMap {
 
                     if (nome.equals("inimigos")) {
                         lerInimigos(elemento);
+                    }
+
+                    if ("jogadores".equalsIgnoreCase(nome)) {
+                        lerSpawnJogadores(elemento);
                     }
 
                     continue;
@@ -565,5 +574,33 @@ public class DungeonMap {
         } catch (Exception erro) {
             System.out.println("Erro no tile " + gid + ": " + erro.getMessage());
         }
+    }
+
+    private void lerSpawnJogadores(Element objectGroup) {
+
+        NodeList objetos = objectGroup.getElementsByTagName("object");
+        TreeMap<String, Point> porNome = new TreeMap<String, Point>();
+
+        for (int i = 0; i < objetos.getLength(); i++) {
+
+            Element objeto = (Element) objetos.item(i);
+
+            if (!objeto.hasAttribute("x") || !objeto.hasAttribute("y")) {
+                continue;
+            }
+
+            double x = Double.parseDouble(objeto.getAttribute("x"));
+            double y = Double.parseDouble(objeto.getAttribute("y"));
+            Rectangle area = converterParaMundo(x, y, 0, 0, true);
+
+            porNome.put(objeto.getAttribute("name").trim(),
+                    new Point(area.x + area.width / 2, area.y + area.height / 2));
+        }
+
+        spawnsJogadores.addAll(porNome.values());
+    }
+
+    public ArrayList<Point> getSpawnsJogadores() {
+        return spawnsJogadores;
     }
 }
