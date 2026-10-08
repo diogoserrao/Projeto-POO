@@ -19,6 +19,7 @@ public class MyWorld extends World {
     private static final int MAX_FASES = 3;
 
     private final List<Player> jogadores = new ArrayList<Player>();
+    private Hud hud;
     /*
      * Impede que o mesmo jogador mude de andar várias vezes
      * enquanto permanece dentro da mesma escada.
@@ -50,9 +51,15 @@ public class MyWorld extends World {
         removeObjects(getObjects(null));
 
         configurarSpawnAtor();
+        hud = new Hud(this, jogadores, new java.util.function.IntSupplier() {
+            @Override
+            public int getAsInt() {
+                return faseAtual;
+            }
+        }, MAX_FASES);
         configurarInimigos();
 
-        atualizarInterface();
+        hud.atualizar();
     }
 
     private void configurarSpawnAtor() {
@@ -73,9 +80,6 @@ public class MyWorld extends World {
         addObject(jogadores.get(0), p1.x, p1.y);
         addObject(jogadores.get(1), p2.x, p2.y);
 
-        for (Player jogador : jogadores) {
-            jogador.setUltimoY(jogador.getY());
-        }
     }
 
     /** Cria os inimigos da fase. */
@@ -98,59 +102,6 @@ public class MyWorld extends World {
             addObject(inimigo, spawnX, spawnY);
         }
 
-    }
-
-    private void atualizarInterface() {
-
-        showText(
-                formatarVidas(0),
-                150,
-                25);
-
-        showText(
-                "FASE " + faseAtual + " / " + MAX_FASES,
-                getWidth() / 2,
-                25);
-
-        showText(
-                formatarVidas(1),
-                getWidth() - 150,
-                25);
-
-        String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
-        for (int i = 0; i < jogadores.size(); i++) {
-            Interagivel interagivel = jogadores.get(i).getInteragivelPerto();
-            if (interagivel != null) {
-                controlos += " | P" + (i + 1) + ": "
-                        + interagivel.getDescricao(jogadores.get(i));
-            }
-        }
-
-        showText(
-                controlos,
-                getWidth() / 2,
-                getHeight() - 20);
-    }
-
-    /**
-     * Usa apenas caracteres ASCII para funcionar independentemente da fonte
-     * disponível no Greenfoot: [X] representa um coração cheio e [ ] um vazio.
-     */
-    private String formatarVidas(int indiceJogador) {
-        if (indiceJogador < 0 || indiceJogador >= jogadores.size()) {
-            return "P" + (indiceJogador + 1) + ": [ ] [ ] [ ]";
-        }
-
-        Player jogador = jogadores.get(indiceJogador);
-        String coracoes = "";
-        for (int i = 0; i < jogador.getMaxVidas(); i++) {
-            coracoes += i < jogador.getVidas() ? "[X]" : "[ ]";
-            if (i < jogador.getMaxVidas() - 1) {
-                coracoes += " ";
-            }
-        }
-
-        return "P" + (indiceJogador + 1) + ": " + coracoes;
     }
 
     public void proximaFase() {
@@ -186,7 +137,7 @@ public class MyWorld extends World {
         teclaProximaFasePressionada = teclaN;
 
         verificarEscadas();
-        atualizarInterface();
+        hud.atualizar();
     }
 
     /**
@@ -198,53 +149,8 @@ public class MyWorld extends World {
     private void verificarEscadas() {
 
         for (Player jogador : jogadores) {
-            processarEscada(jogador);
+            jogador.atualizarEscada(mapa);
         }
-    }
-
-    private void processarEscada(Player jogador) {
-
-        if (jogador == null) {
-            return;
-        }
-
-        int yAtual = jogador.getY();
-
-        int ultimoY = jogador.getUltimoY();
-
-        boolean estaNaEscada = mapa.estaNaEscada(
-                jogador.getX(),
-                yAtual);
-
-        boolean transicaoAtiva = jogador.isEmTransicaoDeEscada();
-
-        /*
-         * Só muda de andar quando existe movimento vertical dentro
-         * da escada. Entrar ou permanecer parado na escada não muda
-         * o nível.
-         */
-        if (estaNaEscada &&
-                yAtual != ultimoY &&
-                !transicaoAtiva) {
-
-            if (yAtual > ultimoY) {
-                jogador.descerNivel();
-            } else {
-                jogador.subirNivel();
-            }
-
-            jogador.setEmTransicaoDeEscada(true);
-        }
-
-        /*
-         * Quando o jogador sai da escada, permite uma nova transição.
-         */
-        if (!estaNaEscada) {
-
-            jogador.setEmTransicaoDeEscada(false);
-        }
-
-        jogador.setUltimoY(yAtual);
     }
 
     public DungeonMap getMapa() {

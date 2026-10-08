@@ -111,6 +111,16 @@ public abstract class Personagem extends Actor {
         setImage(imagem);
     }
 
+    /** Devolve o mapa do mundo atual, quando este disponibiliza um mapa. */
+    protected DungeonMap getMapa() {
+        World mundo = getWorld();
+        if (!(mundo instanceof MyWorld)) {
+            return null;
+        }
+
+        return ((MyWorld) mundo).getMapa();
+    }
+
     public int getNivel() {
         return nivel;
     }

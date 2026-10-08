@@ -40,11 +40,12 @@ public class Enemy extends Personagem {
 
     /** Escolhe o jogador vivo, visivel e mais proximo. */
     private Player encontrarAlvo() {
-        if (!(getWorld() instanceof MyWorld)) {
+        World mundo = getWorld();
+        if (mundo == null) {
             return null;
         }
 
-        List<Player> jogadores = ((MyWorld) getWorld()).getJogadores();
+        List<Player> jogadores = mundo.getObjects(Player.class);
         Player maisProximo = null;
         double menorDistancia = Double.MAX_VALUE;
 
@@ -106,11 +107,7 @@ public class Enemy extends Personagem {
 
     /** Percorre a linha entre os atores e consulta a colisao do nivel atual. */
     private boolean temLinhaDeVisao(Player jogador) {
-        if (!(getWorld() instanceof MyWorld)) {
-            return false;
-        }
-
-        DungeonMap mapa = ((MyWorld) getWorld()).getMapa();
+        DungeonMap mapa = getMapa();
         if (mapa == null) {
             return false;
         }
@@ -174,10 +171,7 @@ public class Enemy extends Personagem {
     }
 
     public boolean podeMoverPara(int x, int y) {
-        if (!(getWorld() instanceof MyWorld)) {
-            return false;
-        }
-        DungeonMap mapa = ((MyWorld) getWorld()).getMapa();
+        DungeonMap mapa = getMapa();
         return mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel());
     }
 

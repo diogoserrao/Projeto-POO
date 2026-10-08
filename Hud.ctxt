@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=Hud
+comment0.text=Responsavel\ pelos\ textos\ e\ informacao\ visual\ do\ mundo.
+comment1.params=mundo\ jogadores\ faseAtual\ maxFases
+comment1.target=Hud(greenfoot.World,\ java.util.List,\ java.util.function.IntSupplier,\ int)
+comment2.params=
+comment2.target=void\ atualizar()
+comment2.text=Atualiza\ todos\ os\ textos\ do\ HUD\ sem\ conhecer\ a\ logica\ do\ jogo.
+comment3.params=indice
+comment3.target=int\ posicaoJogador(int)
+comment4.params=jogador\ indiceJogador
+comment4.target=java.lang.String\ formatarVidas(Player,\ int)
+comment4.text=Usa\ a\ mesma\ representacao\ visual\ de\ vidas\ existente\ no\ jogo.
+numComments=5

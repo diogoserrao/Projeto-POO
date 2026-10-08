@@ -71,18 +71,14 @@ public class Player extends Personagem {
     }
 
     private Interagivel procurarInteragivelPerto() {
-        if (!(getWorld() instanceof MyWorld)) {
-            return null;
-        }
-
-        MyWorld mundo = (MyWorld) getWorld();
-        if (mundo.getMapa() == null) {
+        DungeonMap mapa = getMapa();
+        if (mapa == null) {
             return null;
         }
 
         Rectangle areaDosPes = new Rectangle(getX() - 12, getY() + 12, 24, 24);
 
-        for (Interagivel interagivel : mundo.getMapa().getInteragiveis()) {
+        for (Interagivel interagivel : mapa.getInteragiveis()) {
             if (interagivel.getArea().intersects(areaDosPes)) {
                 return interagivel;
             }
@@ -100,12 +96,7 @@ public class Player extends Personagem {
     }
 
     private boolean tentarMover(int x, int y) {
-        if (!(getWorld() instanceof MyWorld)) {
-            return false;
-        }
-
-        MyWorld mundo = (MyWorld) getWorld();
-        DungeonMap mapa = mundo.getMapa();
+        DungeonMap mapa = getMapa();
         if (mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel())) {
             setLocation(x, y);
             return true;
@@ -113,19 +104,34 @@ public class Player extends Personagem {
         return false;
     }
 
-    public int getUltimoY() {
-        return ultimoY;
-    }
+    /** Atualiza a transicao de escada deste jogador. */
+    public void atualizarEscada(DungeonMap mapa) {
+        if (mapa == null) {
+            return;
+        }
 
-    public void setUltimoY(int ultimoY) {
-        this.ultimoY = ultimoY;
-    }
+        int yAtual = getY();
+        boolean estaNaEscada = mapa.estaNaEscada(getX(), yAtual);
 
-    public boolean isEmTransicaoDeEscada() {
-        return emTransicaoDeEscada;
-    }
+        /*
+         * So muda de andar quando existe movimento vertical dentro da escada.
+         * Entrar ou permanecer parado na escada nao muda o nivel.
+         */
+        if (estaNaEscada && yAtual != ultimoY && !emTransicaoDeEscada) {
+            if (yAtual > ultimoY) {
+                descerNivel();
+            } else {
+                subirNivel();
+            }
 
-    public void setEmTransicaoDeEscada(boolean emTransicaoDeEscada) {
-        this.emTransicaoDeEscada = emTransicaoDeEscada;
+            emTransicaoDeEscada = true;
+        }
+
+        /* Quando sai da escada, permite uma nova transicao. */
+        if (!estaNaEscada) {
+            emTransicaoDeEscada = false;
+        }
+
+        ultimoY = yAtual;
     }
 }
