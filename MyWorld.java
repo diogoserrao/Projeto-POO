@@ -90,9 +90,10 @@ public class MyWorld extends World {
             int spawnY = spawn.y + spawn.height / 2;
             int personagem = (i % 2) + 1;
 
-            Enemy inimigo = configuracao.temPatrulha()
-                    ? new Enemy(personagem, 2, configuracao.getPatrulha())
-                    : new Enemy(personagem);
+            Movimento movimento = configuracao.temPatrulha()
+                    ? new PatrulhaZona(configuracao.getPatrulha(), 2)
+                    : new Parado();
+            Enemy inimigo = new Enemy(personagem, movimento);
 
             addObject(inimigo, spawnX, spawnY);
         }

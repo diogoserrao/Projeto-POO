@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Parado
+comment0.text=Comportamento\ de\ um\ inimigo\ que\ permanece\ parado.
+comment1.params=inimigo
+comment1.target=boolean\ mover(Enemy)
+numComments=2

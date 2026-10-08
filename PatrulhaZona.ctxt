@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=PatrulhaZona
+comment0.text=Move\ um\ inimigo\ para\ a\ frente\ e\ para\ tras\ dentro\ de\ uma\ zona.
+comment1.params=zona\ velocidade
+comment1.target=PatrulhaZona(java.awt.Rectangle,\ int)
+comment2.params=inimigo
+comment2.target=boolean\ mover(Enemy)
+comment3.params=inimigo
+comment3.target=boolean\ patrulharZona(Enemy)
+comment4.params=inimigo\ limite
+comment4.target=boolean\ patrulharAte(Enemy,\ int)
+comment4.text=Move\ ate\ ao\ extremo\ sem\ o\ ultrapassar\ e\ gere\ a\ pausa\ da\ viragem.
+comment5.params=
+comment5.target=void\ iniciarPausa()
+comment6.params=
+comment6.target=int\ direcaoDoSentido()
+numComments=7

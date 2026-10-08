@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=Movimento
+comment0.text=Define\ um\ comportamento\ de\ movimento\ para\ um\ inimigo.
+comment1.params=inimigo
+comment1.target=boolean\ mover(Enemy)
+comment1.text=\r\n\ Tenta\ mover\ o\ inimigo.\r\n\r\n\ @return\ true\ quando\ o\ inimigo\ se\ moveu;\ false\ caso\ contrario\r\n
+numComments=2

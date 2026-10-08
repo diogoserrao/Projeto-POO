@@ -2,71 +2,26 @@ import greenfoot.*;
 import java.awt.Rectangle;
 import java.util.List;
 
-/** Um inimigo pode patrulhar uma zona ou ficar parado. */
+/** Um inimigo delega o movimento para a implementacao recebida. */
 public class Enemy extends Personagem {
     private static final int RAIO_VISAO = 100;
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
     private static final boolean MOSTRAR_VISAO = true;
-    private static final int TEMPO_PAUSA_NA_EXTREMIDADE = 8;
-    private static final int DISTANCIA_DESACELERACAO = 4;
-
-    private enum EstadoPatrulha {
-        MOVENDO,
-        PAUSANDO
-    }
-
-    private final boolean mexe;
-    private final boolean horizontal;
-    private final int limiteInicial;
-    private final int limiteFinal;
-    private final int velocidade;
-    private final Rectangle patrulha;
-    private int sentido = 1;
+    private final Movimento movimento;
     private int contadorAtaque;
-    private EstadoPatrulha estadoPatrulha = EstadoPatrulha.MOVENDO;
-    private int contadorPausa;
 
-    public Enemy(
-            int personagem,
-            int velocidade,
-            Rectangle patrulha) {
-
+    public Enemy(int personagem, Movimento movimento) {
         super(personagem);
-
-        this.mexe = true;
-        this.horizontal = patrulha.width >= patrulha.height;
-        this.limiteInicial = 0;
-        this.limiteFinal = 0;
-        this.velocidade = Math.max(1, velocidade);
-        this.patrulha = patrulha;
-    }
-
-    public Enemy(int personagem, boolean mexe, boolean horizontal,
-            int limiteInicial, int limiteFinal, int velocidade) {
-        this(personagem, mexe, horizontal, limiteInicial, limiteFinal,
-                velocidade, 0);
-    }
-
-    public Enemy(int personagem, boolean mexe, boolean horizontal,
-            int limiteInicial, int limiteFinal, int velocidade,
-            int nivel) {
-        super(personagem, nivel);
-        this.patrulha = null;
-        this.mexe = mexe;
-        this.horizontal = horizontal;
-        this.limiteInicial = Math.min(limiteInicial, limiteFinal);
-        this.limiteFinal = Math.max(limiteInicial, limiteFinal);
-        this.velocidade = Math.max(1, velocidade);
-    }
-
-    public Enemy(int personagem) {
-        this(personagem, false, true, 0, 0, 1, 0);
+        if (movimento == null) {
+            throw new IllegalArgumentException("O movimento nao pode ser null");
+        }
+        this.movimento = movimento;
     }
 
     @Override
     public void act() {
-        boolean estaAMover = mexe && patrulhar();
+        boolean estaAMover = movimento.mover(this);
         atualizarAnimacao(estaAMover);
         atualizarAtaque();
     }
@@ -218,15 +173,7 @@ public class Enemy extends Personagem {
         }
     }
 
-    private boolean patrulhar() {
-        if (patrulha != null) {
-            return patrulharZona();
-        }
-
-        return patrulharEntreLimites(limiteInicial, limiteFinal);
-    }
-
-    private boolean podeMover(int x, int y) {
+    public boolean podeMoverPara(int x, int y) {
         if (!(getWorld() instanceof MyWorld)) {
             return false;
         }
@@ -234,79 +181,11 @@ public class Enemy extends Personagem {
         return mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel());
     }
 
-    private boolean patrulharZona() {
-        int limite = horizontal
-                ? (sentido > 0 ? patrulha.x + patrulha.width : patrulha.x)
-                : (sentido > 0 ? patrulha.y + patrulha.height : patrulha.y);
-        return patrulharAte(limite);
+    public void moverPara(int x, int y) {
+        setLocation(x, y);
     }
 
-    private boolean patrulharEntreLimites(int inicio, int fim) {
-        int limite = horizontal
-                ? (sentido > 0 ? fim : inicio)
-                : (sentido > 0 ? fim : inicio);
-        return patrulharAte(limite);
-    }
-
-    /** Move ate ao extremo sem o ultrapassar e gere a pausa da viragem. */
-    private boolean patrulharAte(int limite) {
-        if (estadoPatrulha == EstadoPatrulha.PAUSANDO) {
-            contadorPausa--;
-            if (contadorPausa <= 0) {
-                sentido *= -1;
-                estadoPatrulha = EstadoPatrulha.MOVENDO;
-                definirDirecao(direcaoDoSentido());
-            }
-            return false;
-        }
-
-        int novoX = getX();
-        int novoY = getY();
-        int atual = horizontal ? novoX : novoY;
-        int distancia = Math.abs(limite - atual);
-
-        definirDirecao(direcaoDoSentido());
-
-        if (distancia == 0) {
-            iniciarPausa();
-            return false;
-        }
-
-        int passo = velocidade;
-        if (distancia <= DISTANCIA_DESACELERACAO) {
-            passo = Math.max(1, velocidade / 2);
-        }
-        passo = Math.min(passo, distancia);
-
-        if (horizontal) {
-            novoX += sentido * passo;
-        } else {
-            novoY += sentido * passo;
-        }
-
-        if (!podeMover(novoX, novoY)) {
-            iniciarPausa();
-            return false;
-        }
-
-        setLocation(novoX, novoY);
-
-        if (passo == distancia) {
-            iniciarPausa();
-            return false;
-        }
-        return true;
-    }
-
-    private void iniciarPausa() {
-        estadoPatrulha = EstadoPatrulha.PAUSANDO;
-        contadorPausa = TEMPO_PAUSA_NA_EXTREMIDADE;
-    }
-
-    private int direcaoDoSentido() {
-        if (horizontal) {
-            return sentido > 0 ? DIREITA : ESQUERDA;
-        }
-        return sentido > 0 ? BAIXO : CIMA;
+    public void definirDirecaoMovimento(int direcao) {
+        definirDirecao(direcao);
     }
 }
