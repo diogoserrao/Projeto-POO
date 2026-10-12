@@ -59,6 +59,8 @@ public class DungeonMap {
     private final Map<Integer, boolean[][]> colisaoPorNivel = new HashMap<Integer, boolean[][]>();
 
     private final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
+    private static final Map<String, GreenfootImage> tilesCache =
+            new HashMap<String, GreenfootImage>();
 
     private final int fase;
 
@@ -553,13 +555,6 @@ public class DungeonMap {
                 folhasCache.put(escolhido.imagePath, folha);
             }
 
-            int local = gid - escolhido.firstGid;
-            int sx = (local % escolhido.columns) * SOURCE_TILE;
-            int sy = (local / escolhido.columns) * SOURCE_TILE;
-
-            GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
-            tile.drawImage(folha, -sx, -sy);
-
             int px = (tx - MIN_X) * TILE;
             int py = (ty - MIN_Y) * TILE;
 
@@ -567,8 +562,18 @@ public class DungeonMap {
                 return;
             }
 
-            GreenfootImage tileFinal = new GreenfootImage(tile);
-            tileFinal.scale(TILE, TILE);
+            String chave = escolhido.imagePath + "#" + gid;
+            GreenfootImage tileFinal = tilesCache.get(chave);
+            if (tileFinal == null) {
+                int local = gid - escolhido.firstGid;
+                int sx = (local % escolhido.columns) * SOURCE_TILE;
+                int sy = (local / escolhido.columns) * SOURCE_TILE;
+                GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
+                tile.drawImage(folha, -sx, -sy);
+                tileFinal = new GreenfootImage(tile);
+                tileFinal.scale(TILE, TILE);
+                tilesCache.put(chave, tileFinal);
+            }
             imagem.drawImage(tileFinal, px, py);
 
         } catch (Exception erro) {

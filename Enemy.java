@@ -8,7 +8,12 @@ public class Enemy extends Personagem {
     private static final int COOLDOWN_ATAQUE = 60;
     private static final int VIDAS_INIMIGO = 3;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
-    private static final boolean MOSTRAR_VISAO = true;
+    /*
+     * O cone de visão era redesenhado numa imagem 204x204 em cada frame de
+     * animação de todos os inimigos. Mantemos a lógica de visão, mas não
+     * renderizamos esta indicação durante o jogo.
+     */
+    private static final boolean MOSTRAR_VISAO = false;
     private static final double COSENO_MEIO_CONE = Math.cos(
             Math.toRadians(ANGULO_VISAO / 2.0));
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
@@ -165,6 +170,46 @@ public class Enemy extends Personagem {
                 * COSENO_MEIO_CONE;
     }
 
+    /**
+     * Verifica se este inimigo pode receber um golpe deste jogador.
+     * O ataque depende da proximidade e da direção do jogador, não do lado
+     * para o qual o inimigo está virado.
+     */
+    public boolean podeSerAtacadoPor(Player jogador) {
+        if (jogador == null || !estaVivo() || estaEmMorte()
+                || jogador.getNivel() != getNivel()) {
+            return false;
+        }
+
+        int dx = getX() - jogador.getX();
+        int dy = getY() - jogador.getY();
+        int distanciaQuadrada = dx * dx + dy * dy;
+        if (distanciaQuadrada == 0 || distanciaQuadrada > 90 * 90) {
+            return false;
+        }
+
+        double direcaoX = 0;
+        double direcaoY = 0;
+        switch (jogador.getDirecao()) {
+        case DIREITA:
+            direcaoX = 1;
+            break;
+        case ESQUERDA:
+            direcaoX = -1;
+            break;
+        case CIMA:
+            direcaoY = -1;
+            break;
+        default:
+            direcaoY = 1;
+            break;
+        }
+
+        double produto = dx * direcaoX + dy * direcaoY;
+        return produto > 0 && produto * produto >= distanciaQuadrada
+                * COSENO_MEIO_CONE * COSENO_MEIO_CONE;
+    }
+
     /** Escolhe o jogador vivo, visivel e mais proximo. */
     private Player encontrarAlvo() {
         World mundo = getWorld();
@@ -176,7 +221,8 @@ public class Enemy extends Personagem {
             return null;
         }
 
-        List<Player> jogadores = ((MyWorld) mundo).getJogadores();
+        /* Consulta os atores que estão realmente no mundo. */
+        List<Player> jogadores = mundo.getObjects(Player.class);
         Player maisProximo = null;
         double menorDistanciaQuadrado = Double.MAX_VALUE;
 

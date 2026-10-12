@@ -106,7 +106,7 @@ public class Player extends Personagem {
         double menorDistanciaQuadrado = Double.MAX_VALUE;
 
         for (Enemy inimigo : inimigos) {
-            if (inimigo.estaDeCostasPara(this)) {
+            if (inimigo.podeSerAtacadoPor(this)) {
                 double dx = inimigo.getX() - getX();
                 double dy = inimigo.getY() - getY();
                 double distanciaQuadrado = dx * dx + dy * dy;

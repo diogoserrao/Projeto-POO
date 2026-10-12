@@ -1,5 +1,7 @@
 import greenfoot.*;
 import java.awt.Rectangle;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Classe base para jogadores e inimigos. */
 public abstract class Personagem extends Actor {
@@ -16,6 +18,8 @@ public abstract class Personagem extends Actor {
     private static final int PES_LARGURA = 15;
     private static final int PES_ALTURA = 11;
     private static final int MAX_VIDAS = 3;
+    private static final Map<String, GreenfootImage> SPRITESHEETS =
+            new HashMap<String, GreenfootImage>();
 
     private int nivel;
     private int vidas;
@@ -84,8 +88,14 @@ public abstract class Personagem extends Actor {
                                                        String animacao) {
         String pasta = "jogador/PNG/Swordsman_lvl" + personagem
             + "/With_shadow/";
-        return new GreenfootImage(pasta + "Swordsman_lvl" + personagem
-            + "_" + animacao + "_with_shadow.png");
+        String caminho = pasta + "Swordsman_lvl" + personagem
+            + "_" + animacao + "_with_shadow.png";
+        GreenfootImage spritesheet = SPRITESHEETS.get(caminho);
+        if (spritesheet == null) {
+            spritesheet = new GreenfootImage(caminho);
+            SPRITESHEETS.put(caminho, spritesheet);
+        }
+        return spritesheet;
     }
 
     protected void definirDirecao(int direcao) {
