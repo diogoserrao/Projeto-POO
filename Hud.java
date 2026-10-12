@@ -30,7 +30,17 @@ public class Hud {
                 mundo.getWidth() / 2,
                 25);
 
-        String controlos = "WASD: Jogador 1 | Setas: Jogador 2 | N: Próxima Fase";
+        String controlos = "";
+        for (int i = 0; i < jogadores.size(); i++) {
+            if (!controlos.isEmpty()) {
+                controlos += " | ";
+            }
+            controlos += formatarControlos(jogadores.get(i), i);
+        }
+        if (!controlos.isEmpty()) {
+            controlos += " | ";
+        }
+        controlos += "N: Próxima Fase";
         String interacoes = "";
         for (int i = 0; i < jogadores.size(); i++) {
             Interagivel interagivel = jogadores.get(i).getInteragivelPerto();
@@ -47,6 +57,28 @@ public class Hud {
                 mundo.getHeight() - 20);
         mundo.showText(interacoes, mundo.getWidth() / 2,
                 mundo.getHeight() - 44);
+    }
+
+    private String formatarControlos(Player jogador, int indiceJogador) {
+        Controlos controlos = jogador.getControlos();
+        String nome;
+        if ("a".equals(controlos.getEsquerda())
+                && "d".equals(controlos.getDireita())
+                && "w".equals(controlos.getCima())
+                && "s".equals(controlos.getBaixo())) {
+            nome = "WASD";
+        } else if ("left".equals(controlos.getEsquerda())
+                && "right".equals(controlos.getDireita())
+                && "up".equals(controlos.getCima())
+                && "down".equals(controlos.getBaixo())) {
+            nome = "Setas";
+        } else {
+            nome = "Cima: " + controlos.getCima()
+                    + ", Baixo: " + controlos.getBaixo()
+                    + ", Esquerda: " + controlos.getEsquerda()
+                    + ", Direita: " + controlos.getDireita();
+        }
+        return nome + ": Jogador " + (indiceJogador + 1);
     }
 
     private int posicaoJogador(int indice) {

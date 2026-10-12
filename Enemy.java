@@ -1,5 +1,4 @@
 import greenfoot.*;
-import java.awt.Rectangle;
 import java.util.List;
 
 /** Um inimigo delega o movimento para a implementacao recebida. */
@@ -23,10 +22,16 @@ public class Enemy extends Personagem {
     public void act() {
         boolean estaAMover = movimento.mover(this);
         atualizarAnimacao(estaAMover);
-        atualizarAtaque();
+        detetarEAtacarJogador();
     }
 
-    private void atualizarAtaque() {
+    /**
+     * Deteta o jogador válido mais próximo e aplica-lhe dano.
+     *
+     * Este método pertence à classe Enemy, por isso é executado por todos os
+     * inimigos, independentemente do movimento que cada um utiliza.
+     */
+    public void detetarEAtacarJogador() {
         if (contadorAtaque > 0) {
             contadorAtaque--;
         }
@@ -58,8 +63,7 @@ public class Enemy extends Personagem {
             double distancia = distanciaA(jogador);
             if (distancia <= RAIO_VISAO
                     && distancia < menorDistancia
-                    && estaNoConeDeVisao(jogador)
-                    && temLinhaDeVisao(jogador)) {
+                    && estaNoConeDeVisao(jogador)) {
                 maisProximo = jogador;
                 menorDistancia = distancia;
             }
@@ -79,8 +83,9 @@ public class Enemy extends Personagem {
         double dy = jogador.getY() - getY();
         double comprimento = Math.sqrt(dx * dx + dy * dy);
 
+        // Um alvo no mesmo ponto nao tem uma direcao relativa bem definida.
         if (comprimento == 0) {
-            return true;
+            return false;
         }
 
         double direcaoX = 0;
@@ -103,26 +108,6 @@ public class Enemy extends Personagem {
         double produto = (dx * direcaoX + dy * direcaoY) / comprimento;
         double angulo = Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, produto))));
         return angulo <= ANGULO_VISAO / 2.0;
-    }
-
-    /** Percorre a linha entre os atores e consulta a colisao do nivel atual. */
-    private boolean temLinhaDeVisao(Player jogador) {
-        DungeonMap mapa = getMapa();
-        if (mapa == null) {
-            return false;
-        }
-
-        double distancia = distanciaA(jogador);
-        int passos = Math.max(1, (int) Math.ceil(distancia / 4.0));
-        for (int passo = 1; passo < passos; passo++) {
-            double fracao = (double) passo / passos;
-            int x = (int) Math.round(getX() + (jogador.getX() - getX()) * fracao);
-            int y = (int) Math.round(getY() + (jogador.getY() - getY()) * fracao);
-            if (mapa.estaBloqueado(new Rectangle(x, y, 1, 1), getNivel())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /** Acrescenta o cone a seguir ao frame normal, sem afetar colisoes. */
@@ -181,5 +166,25 @@ public class Enemy extends Personagem {
 
     public void definirDirecaoMovimento(int direcao) {
         definirDirecao(direcao);
+    }
+
+    public void definirDirecaoInicial(int direcao) {
+        definirDirecao(direcao);
+    }
+
+    /** Orienta o cone inicial para um jogador sem alterar o movimento. */
+    public void orientarPara(Player jogador) {
+        if (jogador == null) {
+            return;
+        }
+
+        int diferencaX = jogador.getX() - getX();
+        int diferencaY = jogador.getY() - getY();
+
+        if (Math.abs(diferencaX) >= Math.abs(diferencaY)) {
+            definirDirecaoInicial(diferencaX >= 0 ? DIREITA : ESQUERDA);
+        } else {
+            definirDirecaoInicial(diferencaY >= 0 ? BAIXO : CIMA);
+        }
     }
 }

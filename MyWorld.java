@@ -100,8 +100,27 @@ public class MyWorld extends World {
             Enemy inimigo = new Enemy(personagem, movimento);
 
             addObject(inimigo, spawnX, spawnY);
+            inimigo.orientarPara(jogadorMaisProximo(inimigo));
         }
 
+    }
+
+    private Player jogadorMaisProximo(Enemy inimigo) {
+        Player maisProximo = null;
+        double menorDistancia = Double.MAX_VALUE;
+
+        for (Player jogador : jogadores) {
+            double dx = jogador.getX() - inimigo.getX();
+            double dy = jogador.getY() - inimigo.getY();
+            double distancia = Math.sqrt(dx * dx + dy * dy);
+
+            if (distancia < menorDistancia) {
+                menorDistancia = distancia;
+                maisProximo = jogador;
+            }
+        }
+
+        return maisProximo;
     }
 
     public void proximaFase() {

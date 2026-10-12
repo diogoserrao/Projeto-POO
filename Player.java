@@ -95,6 +95,10 @@ public class Player extends Personagem {
         return controlos.getInteragir();
     }
 
+    public Controlos getControlos() {
+        return controlos;
+    }
+
     private boolean tentarMover(int x, int y) {
         DungeonMap mapa = getMapa();
         if (mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel())) {
