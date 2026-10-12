@@ -25,6 +25,7 @@ public class MyWorld extends World {
      * enquanto permanece dentro da mesma escada.
      */
     private boolean teclaProximaFasePressionada = false;
+    private boolean jogoTerminou = false;
 
     public MyWorld() {
         super(1280, 960, 1, false);
@@ -141,6 +142,10 @@ public class MyWorld extends World {
     @Override
     public void act() {
 
+        if (jogoTerminou) {
+            return;
+        }
+
         /*
          * A tecla N fica disponível como teste para mudar de
          * Dungeon1 -> Dungeon2 -> Dungeon3.
@@ -157,6 +162,31 @@ public class MyWorld extends World {
 
         verificarEscadas();
         hud.atualizar();
+        verificarDerrota();
+    }
+
+    /** Verifica a condição cooperativa de derrota apenas uma vez. */
+    private void verificarDerrota() {
+        for (Player jogador : jogadores) {
+            if (!jogador.estaVivo()) {
+                terminarJogo();
+                return;
+            }
+        }
+    }
+
+    /** Muda para o ecrã de derrota e bloqueia a lógica desta partida. */
+    public void terminarJogo() {
+        if (jogoTerminou) {
+            return;
+        }
+        jogoTerminou = true;
+        Greenfoot.setWorld(new GameOverWorld());
+    }
+
+    /** Permite aos atores parar imediatamente quando a partida terminou. */
+    public boolean estaEmGameOver() {
+        return jogoTerminou;
     }
 
     /**

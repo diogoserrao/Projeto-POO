@@ -19,6 +19,11 @@ public class Player extends Personagem {
 
     @Override
     public void act() {
+        World mundo = getWorld();
+        if (mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver()) {
+            return;
+        }
+
         int dx = 0;
         int dy = 0;
 

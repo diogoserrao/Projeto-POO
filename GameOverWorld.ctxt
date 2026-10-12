@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=GameOverWorld
+comment0.text=Ecr\u00E3\ apresentado\ quando\ um\ dos\ agentes\ fica\ sem\ vidas.
+comment1.params=
+comment1.target=GameOverWorld()
+comment2.params=
+comment2.target=void\ act()
+comment3.params=
+comment3.target=void\ desenharEcr\u00E3()
+comment4.params=imagem\ texto\ centroX\ centroY\ fonte\ cor
+comment4.target=void\ desenharTexto(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int,\ greenfoot.Font,\ greenfoot.Color)
+numComments=5

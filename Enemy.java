@@ -20,6 +20,11 @@ public class Enemy extends Personagem {
 
     @Override
     public void act() {
+        World mundo = getWorld();
+        if (mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver()) {
+            return;
+        }
+
         boolean estaAMover = movimento.mover(this);
         atualizarAnimacao(estaAMover);
         detetarEAtacarJogador();
@@ -32,6 +37,7 @@ public class Enemy extends Personagem {
      * inimigos, independentemente do movimento que cada um utiliza.
      */
     public void detetarEAtacarJogador() {
+        World mundo = getWorld();
         if (contadorAtaque > 0) {
             contadorAtaque--;
         }
@@ -40,6 +46,10 @@ public class Enemy extends Personagem {
         if (alvo != null && contadorAtaque == 0) {
             alvo.perderVida();
             contadorAtaque = COOLDOWN_ATAQUE;
+
+            if (!alvo.estaVivo() && mundo instanceof MyWorld) {
+                ((MyWorld) mundo).terminarJogo();
+            }
         }
     }
 
