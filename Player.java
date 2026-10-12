@@ -1,6 +1,9 @@
 import greenfoot.*;
 import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Player extends Personagem {
     private final Controlos controlos;
@@ -8,6 +11,7 @@ public class Player extends Personagem {
     private int ultimoY;
     private boolean emTransicaoDeEscada;
     private boolean teclaInteracaoPressionada;
+    private final Set<String> chaves = new HashSet<String>();
 
     public Player(int skin, Controlos controlos) {
         this(skin, controlos, 0);
@@ -153,6 +157,23 @@ public class Player extends Personagem {
 
     public Controlos getControlos() {
         return controlos;
+    }
+
+    /** Adiciona uma chave apenas ao inventário deste jogador. */
+    public void adicionarChave(String tipo) {
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            chaves.add(tipo.trim().toLowerCase());
+        }
+    }
+
+    /** Indica se este jogador possui uma chave do tipo indicado. */
+    public boolean temChave(String tipo) {
+        return tipo != null && chaves.contains(tipo.trim().toLowerCase());
+    }
+
+    /** Devolve uma visão apenas de leitura das chaves deste jogador. */
+    public Set<String> getChaves() {
+        return Collections.unmodifiableSet(chaves);
     }
 
     private boolean tentarMover(int x, int y) {

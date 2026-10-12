@@ -47,8 +47,11 @@ public class DungeonMap {
     private final ArrayList<Rectangle> escadas = new ArrayList<Rectangle>();
 
     private final GreenfootImage imagem;
+    private GreenfootImage imagemBase;
 
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
+    private final Map<Chave, ArrayList<int[]>> tilesDasChaves =
+            new HashMap<Chave, ArrayList<int[]>>();
 
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
 
@@ -63,6 +66,7 @@ public class DungeonMap {
             new HashMap<String, GreenfootImage>();
 
     private final int fase;
+    private final ArrayList<Tileset> tilesetsAtuais = new ArrayList<Tileset>();
 
     private static class Tileset {
         int firstGid;
@@ -88,6 +92,8 @@ public class DungeonMap {
         }
 
         aplicarAmbiente();
+        imagemBase = new GreenfootImage(imagem);
+        redesenharChavesVisuais();
     }
 
     public GreenfootImage getImagem() {
@@ -96,6 +102,14 @@ public class DungeonMap {
 
     public ArrayList<Interagivel> getInteragiveis() {
         return interagiveis;
+    }
+
+    /** Remove um objeto interagível que deixou de existir no mapa. */
+    public void removerInteragivel(Interagivel interagivel) {
+        interagiveis.remove(interagivel);
+        if (interagivel instanceof Chave) {
+            redesenharChavesVisuais();
+        }
     }
 
     public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() {
@@ -185,7 +199,26 @@ public class DungeonMap {
             Element mapa = doc.getDocumentElement();
 
             ArrayList<Tileset> tilesets = lerTilesets(mapa);
+            tilesetsAtuais.clear();
+            tilesetsAtuais.addAll(tilesets);
             NodeList filhos = mapa.getChildNodes();
+
+            /*
+             * O objectgroup aparece depois das layers no TMX atual. As
+             * chaves precisam de ser conhecidas antes de desenhar a layer
+             * Objects, para que os seus tiles não fiquem presos no fundo.
+             */
+            for (int i = 0; i < filhos.getLength(); i++) {
+                Node node = filhos.item(i);
+                if (node instanceof Element
+                        && "objectgroup".equals(node.getNodeName())) {
+                    Element elemento = (Element) node;
+                    String nome = elemento.getAttribute("name").trim();
+                    if ("interacoesobjetos".equalsIgnoreCase(nome)) {
+                        lerInteracoes(elemento);
+                    }
+                }
+            }
 
             for (int i = 0; i < filhos.getLength(); i++) {
 
@@ -202,10 +235,6 @@ public class DungeonMap {
 
                     if (nome.equals("passagem")) {
                         lerPassagens(elemento);
-                    }
-
-                    if (nome.equals("interacoesobjetos")) {
-                        lerInteracoes(elemento);
                     }
 
                     if (nome.equals("inimigos")) {
@@ -396,8 +425,22 @@ public class DungeonMap {
 
             String nome = objeto.getAttribute("name").trim();
 
-            if (!nome.isEmpty()) {
+            if (nome.isEmpty()) {
+                continue;
+            }
+
+            String tipo = nome.toLowerCase();
+            if (tipo.equals("bau_1") || tipo.equals("bau_2")
+                    || tipo.equals("bau_3") || tipo.equals("bau_4")) {
                 interagiveis.add(new Bau(nome, area));
+            } else if (tipo.equals("chave_1") || tipo.equals("chave_2")) {
+                Chave chave = new Chave(nome, area);
+                interagiveis.add(chave);
+                tilesDasChaves.put(chave, new ArrayList<int[]>());
+            } else if (tipo.equals("alavanca_1") || tipo.equals("alavanca_2")) {
+                interagiveis.add(new Alavanca(nome, area));
+            } else {
+                System.out.println("Objeto interativo desconhecido ignorado: " + nome);
             }
         }
     }
@@ -421,6 +464,11 @@ public class DungeonMap {
     }
 
     private void aplicarAmbiente() {
+        aplicarAmbienteNaZona(imagem, 0, 0, imagem.getWidth(), imagem.getHeight());
+    }
+
+    private void aplicarAmbienteNaZona(GreenfootImage destino,
+            int x, int y, int largura, int altura) {
         greenfoot.Color cor;
 
         if (fase == 2) {
@@ -431,8 +479,8 @@ public class DungeonMap {
             cor = new greenfoot.Color(8, 8, 18, 25);
         }
 
-        imagem.setColor(cor);
-        imagem.fillRect(0, 0, imagem.getWidth(), imagem.getHeight());
+        destino.setColor(cor);
+        destino.fillRect(x, y, largura, altura);
     }
 
     private ArrayList<Tileset> lerTilesets(Element mapa) {
@@ -469,8 +517,64 @@ public class DungeonMap {
     }
 
     private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
+        boolean eCamadaDeObjetos = "objects".equalsIgnoreCase(layer.getAttribute("name"));
         for (int[] t : listarTiles(layer)) {
+            if (eCamadaDeObjetos && guardarTileDeChave(t)) {
+                continue;
+            }
             desenharTile(t[2], t[0], t[1], tilesets);
+        }
+    }
+
+    /** Guarda os tiles das chaves para os desenhar fora da imagem-base. */
+    private boolean guardarTileDeChave(int[] tile) {
+        int tileX = tile[0];
+        int tileY = tile[1];
+
+        for (Map.Entry<Chave, ArrayList<int[]>> entrada : tilesDasChaves.entrySet()) {
+            Chave chave = entrada.getKey();
+            int ancoraX = (int) Math.floor(chave.getArea().getCenterX() / TILE + MIN_X);
+            int ancoraY = (int) Math.floor(chave.getArea().getCenterY() / TILE + MIN_Y);
+
+            /* Os sprites das chaves ocupam no máximo uma área de 3x3 tiles. */
+            if (Math.abs(tileX - ancoraX) <= 2 && Math.abs(tileY - ancoraY) <= 2) {
+                entrada.getValue().add(new int[] { tileX, tileY, tile[2] });
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Repõe o fundo e redesenha apenas as chaves ainda disponíveis. */
+    private void redesenharChavesVisuais() {
+        if (imagemBase == null) {
+            return;
+        }
+
+        imagem.drawImage(imagemBase, 0, 0);
+        for (Map.Entry<Chave, ArrayList<int[]>> entrada : tilesDasChaves.entrySet()) {
+            if (entrada.getKey().estaRecolhida()) {
+                continue;
+            }
+            int minX = Integer.MAX_VALUE;
+            int minY = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE;
+            int maxY = Integer.MIN_VALUE;
+            for (int[] tile : entrada.getValue()) {
+                desenharTile(tile[2], tile[0], tile[1], tilesetsAtuais);
+                minX = Math.min(minX, tile[0]);
+                minY = Math.min(minY, tile[1]);
+                maxX = Math.max(maxX, tile[0]);
+                maxY = Math.max(maxY, tile[1]);
+            }
+            if (minX != Integer.MAX_VALUE) {
+                aplicarAmbienteNaZona(imagem,
+                        (minX - MIN_X) * TILE,
+                        (minY - MIN_Y) * TILE,
+                        (maxX - minX + 1) * TILE,
+                        (maxY - minY + 1) * TILE);
+            }
         }
     }
 
