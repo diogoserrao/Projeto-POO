@@ -22,13 +22,20 @@ public abstract class Personagem extends Actor {
 
     private final GreenfootImage walkSpritesheet;
     private final GreenfootImage idleSpritesheet;
+    private final GreenfootImage attackSpritesheet;
+    private final GreenfootImage deathSpritesheet;
     private final int walkFrames;
     private final int idleFrames;
+    private final int attackFrames;
+    private final int deathFrames;
     private final GreenfootImage[][][] imagensAnimacao;
     private int frame;
     private int linhaDirecao = BAIXO;
     private int contadorAnimacao;
     private boolean estavaEmMovimento;
+    private boolean emAtaque;
+    private boolean emMorte;
+    private boolean terminouMorte;
 
     protected Personagem(int personagem) {
         this(personagem, 0);
@@ -36,25 +43,40 @@ public abstract class Personagem extends Actor {
 
     protected Personagem(int personagem, int nivel) {
         this(carregarSpritesheet(personagem, "Walk"),
-             carregarSpritesheet(personagem, "Idle"), nivel);
+             carregarSpritesheet(personagem, "Idle"),
+             carregarSpritesheet(personagem, "attack"),
+             carregarSpritesheet(personagem, "Death"), nivel);
     }
 
     protected Personagem(GreenfootImage walkSpritesheet,
                          GreenfootImage idleSpritesheet) {
-        this(walkSpritesheet, idleSpritesheet, 0);
+        this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
+             idleSpritesheet, 0);
     }
 
     protected Personagem(GreenfootImage walkSpritesheet,
                          GreenfootImage idleSpritesheet, int nivel) {
+        this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
+             idleSpritesheet, nivel);
+    }
+
+    private Personagem(GreenfootImage walkSpritesheet,
+                       GreenfootImage idleSpritesheet,
+                       GreenfootImage attackSpritesheet,
+                       GreenfootImage deathSpritesheet, int nivel) {
         this.walkSpritesheet = walkSpritesheet;
         this.idleSpritesheet = idleSpritesheet;
+        this.attackSpritesheet = attackSpritesheet;
+        this.deathSpritesheet = deathSpritesheet;
         this.nivel = nivel;
         this.vidas = MAX_VIDAS;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
-        int maiorNumeroFrames = Math.max(walkFrames,
-                Math.max(idleFrames, IDLE_FRAMES_CIMA));
-        this.imagensAnimacao = new GreenfootImage[2][4][maiorNumeroFrames];
+        this.attackFrames = attackSpritesheet.getWidth() / FRAME_SIZE;
+        this.deathFrames = deathSpritesheet.getWidth() / FRAME_SIZE;
+        int maiorNumeroFrames = Math.max(walkFrames, Math.max(idleFrames,
+                Math.max(attackFrames, Math.max(deathFrames, IDLE_FRAMES_CIMA))));
+        this.imagensAnimacao = new GreenfootImage[4][4][maiorNumeroFrames];
         mostrarFrame();
     }
 
@@ -67,6 +89,9 @@ public abstract class Personagem extends Actor {
     }
 
     protected void definirDirecao(int direcao) {
+        if (emMorte) {
+            return;
+        }
         if (linhaDirecao == direcao) {
             return;
         }
@@ -82,6 +107,10 @@ public abstract class Personagem extends Actor {
     }
 
     protected void atualizarAnimacao(boolean movimento) {
+        if (emAtaque || emMorte) {
+            atualizarAnimacaoEspecial();
+            return;
+        }
         if (movimento != estavaEmMovimento) {
             frame = 0;
             contadorAnimacao = 0;
@@ -106,12 +135,19 @@ public abstract class Personagem extends Actor {
     }
 
     protected void mostrarFrame() {
-        int tipoAnimacao = estavaEmMovimento ? 1 : 0;
+        int tipoAnimacao = emMorte ? 3 : emAtaque ? 2
+                : estavaEmMovimento ? 1 : 0;
         GreenfootImage imagem = imagensAnimacao[tipoAnimacao][linhaDirecao][frame];
 
         if (imagem == null) {
-            GreenfootImage spritesheet = estavaEmMovimento
-                    ? walkSpritesheet : idleSpritesheet;
+            GreenfootImage spritesheet;
+            if (emMorte) {
+                spritesheet = deathSpritesheet;
+            } else if (emAtaque) {
+                spritesheet = attackSpritesheet;
+            } else {
+                spritesheet = estavaEmMovimento ? walkSpritesheet : idleSpritesheet;
+            }
             imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
             imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
                     -linhaDirecao * FRAME_SIZE);
@@ -120,6 +156,62 @@ public abstract class Personagem extends Actor {
         }
 
         setImage(imagem);
+    }
+
+    /** Começa uma animação de ataque que é reproduzida uma única vez. */
+    protected void iniciarAtaque() {
+        if (emMorte || emAtaque) {
+            return;
+        }
+        emAtaque = true;
+        frame = 0;
+        contadorAnimacao = 0;
+        mostrarFrame();
+    }
+
+    /** Começa a animação de morte e mantém o último frame visível no fim. */
+    public void iniciarMorte() {
+        if (emMorte) {
+            return;
+        }
+        emMorte = true;
+        emAtaque = false;
+        estavaEmMovimento = false;
+        frame = 0;
+        contadorAnimacao = 0;
+        terminouMorte = false;
+        mostrarFrame();
+    }
+
+    public boolean estaEmMorte() {
+        return emMorte;
+    }
+
+    protected boolean estaEmAtaque() {
+        return emAtaque;
+    }
+
+    public boolean terminouMorte() {
+        return terminouMorte;
+    }
+
+    private void atualizarAnimacaoEspecial() {
+        contadorAnimacao++;
+        if (contadorAnimacao < 5) {
+            return;
+        }
+        contadorAnimacao = 0;
+        int total = emMorte ? deathFrames : attackFrames;
+        if (frame < total - 1) {
+            frame++;
+            mostrarFrame();
+        } else if (emAtaque) {
+            emAtaque = false;
+            frame = 0;
+            mostrarFrame();
+        } else {
+            terminouMorte = true;
+        }
     }
 
     /** Devolve o mapa do mundo atual, quando este disponibiliza um mapa. */

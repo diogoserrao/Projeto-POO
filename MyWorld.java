@@ -170,7 +170,7 @@ public class MyWorld extends World {
     private void verificarDerrota() {
         for (Player jogador : jogadores) {
             if (!jogador.estaVivo()) {
-                terminarJogo();
+                jogador.iniciarMorte();
                 return;
             }
         }

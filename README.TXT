@@ -10,7 +10,8 @@ VERSÃO ou DATA: 23/09/2026
 COMO INICIAR O PROJETO: Abrir a pasta no Greenfoot, compilar e executar MyWorld.
 AUTORES: Projeto POO
 INSTRUÇÕES PARA O USUÁRIO:
-Zag usa WASD e Zig usa as setas. A colisão é calculada pela grelha do mapa,
+Zag usa WASD e Zig usa as setas. E/Enter servem para interagir e atacar.
+Os ataques só acertam inimigos pelas costas. A colisão é calculada pela grelha do mapa,
 considerando apenas a zona dos pés dos personagens. Pressione N para avançar
 para a fase seguinte. Dungeon2.tmx e Dungeon3.tmx podem ser adicionados em
 images/mundo/Tiled_files; na sua ausência o mapa base é reutilizado com um

@@ -1,5 +1,6 @@
 import greenfoot.*;
 import java.awt.Rectangle;
+import java.util.List;
 
 public class Player extends Personagem {
     private final Controlos controlos;
@@ -21,6 +22,22 @@ public class Player extends Personagem {
     public void act() {
         World mundo = getWorld();
         if (mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver()) {
+            return;
+        }
+
+        if (!estaVivo()) {
+            if (!estaEmMorte()) {
+                iniciarMorte();
+            }
+            atualizarAnimacao(false);
+            if (terminouMorte() && mundo instanceof MyWorld) {
+                ((MyWorld) mundo).terminarJogo();
+            }
+            return;
+        }
+
+        if (estaEmAtaque()) {
+            atualizarAnimacao(false);
             return;
         }
 
@@ -66,13 +83,47 @@ public class Player extends Personagem {
         }
 
         if (teclaPressionada && !teclaInteracaoPressionada) {
-            Interagivel interagivel = procurarInteragivelPerto();
-            if (interagivel != null) {
-                interagivel.interagir(this);
+            if (!atacarInimigoPelasCostas()) {
+                Interagivel interagivel = procurarInteragivelPerto();
+                if (interagivel != null) {
+                    interagivel.interagir(this);
+                }
             }
         }
 
         teclaInteracaoPressionada = teclaPressionada;
+    }
+
+    /** Ataca o inimigo mais próximo, mas apenas se estiver atrás dele. */
+    private boolean atacarInimigoPelasCostas() {
+        World mundo = getWorld();
+        if (mundo == null) {
+            return false;
+        }
+
+        List<Enemy> inimigos = mundo.getObjects(Enemy.class);
+        Enemy alvo = null;
+        double menorDistanciaQuadrado = Double.MAX_VALUE;
+
+        for (Enemy inimigo : inimigos) {
+            if (inimigo.estaDeCostasPara(this)) {
+                double dx = inimigo.getX() - getX();
+                double dy = inimigo.getY() - getY();
+                double distanciaQuadrado = dx * dx + dy * dy;
+                if (distanciaQuadrado < menorDistanciaQuadrado) {
+                    menorDistanciaQuadrado = distanciaQuadrado;
+                    alvo = inimigo;
+                }
+            }
+        }
+
+        if (alvo == null) {
+            return false;
+        }
+
+        iniciarAtaque();
+        alvo.receberAtaque();
+        return true;
     }
 
     private Interagivel procurarInteragivelPerto() {

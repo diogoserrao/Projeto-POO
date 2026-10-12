@@ -6,12 +6,16 @@ public class Enemy extends Personagem {
     private static final int RAIO_VISAO = 100;
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
+    private static final int VIDAS_INIMIGO = 3;
+    private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
     private static final boolean MOSTRAR_VISAO = true;
     private static final double COSENO_MEIO_CONE = Math.cos(
             Math.toRadians(ANGULO_VISAO / 2.0));
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
     private final Movimento movimento;
     private int contadorAtaque;
+    private int contadorInvulnerabilidade;
+    private int vidasInimigo = VIDAS_INIMIGO;
 
     public Enemy(int personagem, Movimento movimento) {
         super(personagem);
@@ -28,8 +32,24 @@ public class Enemy extends Personagem {
             return;
         }
 
-        boolean estaAMover = movimento.mover(this);
-        atualizarAnimacao(estaAMover);
+        if (estaEmMorte()) {
+            atualizarAnimacao(false);
+            if (terminouMorte() && mundo != null) {
+                mundo.removeObject(this);
+            }
+            return;
+        }
+
+        if (contadorInvulnerabilidade > 0) {
+            contadorInvulnerabilidade--;
+        }
+
+        if (!estaEmAtaque()) {
+            boolean estaAMover = movimento.mover(this);
+            atualizarAnimacao(estaAMover);
+        } else {
+            atualizarAnimacao(false);
+        }
         detetarEAtacarJogador();
     }
 
@@ -47,13 +67,102 @@ public class Enemy extends Personagem {
 
         Player alvo = encontrarAlvo();
         if (alvo != null && contadorAtaque == 0) {
+            iniciarAtaque();
             alvo.perderVida();
             contadorAtaque = COOLDOWN_ATAQUE;
 
             if (!alvo.estaVivo() && mundo instanceof MyWorld) {
-                ((MyWorld) mundo).terminarJogo();
+                alvo.iniciarMorte();
             }
         }
+    }
+
+    /** Recebe um golpe do jogador e inicia a morte quando perde a última vida. */
+    public void receberAtaque() {
+        if (!estaVivo() || estaEmMorte() || contadorInvulnerabilidade > 0) {
+            return;
+        }
+
+        vidasInimigo--;
+        contadorInvulnerabilidade = INVULNERABILIDADE_APOS_GOLPE;
+        if (vidasInimigo <= 0) {
+            iniciarMorte();
+        }
+    }
+
+    /** Devolve as vidas próprias do inimigo, usadas pelos ataques do jogador. */
+    @Override
+    public boolean estaVivo() {
+        return vidasInimigo > 0;
+    }
+
+    @Override
+    public int getVidas() {
+        return vidasInimigo;
+    }
+
+    /** Indica se o jogador está atrás deste inimigo e a uma distância válida. */
+    public boolean estaDeCostasPara(Player jogador) {
+        if (jogador == null || !estaVivo() || estaEmMorte()
+                || jogador.getNivel() != getNivel()) {
+            return false;
+        }
+
+        double dx = jogador.getX() - getX();
+        double dy = jogador.getY() - getY();
+        double distanciaQuadrado = dx * dx + dy * dy;
+        if (distanciaQuadrado == 0 || distanciaQuadrado > 90 * 90) {
+            return false;
+        }
+
+        double frenteX = 0;
+        double frenteY = 0;
+        switch (getDirecao()) {
+        case DIREITA:
+            frenteX = 1;
+            break;
+        case ESQUERDA:
+            frenteX = -1;
+            break;
+        case CIMA:
+            frenteY = -1;
+            break;
+        default:
+            frenteY = 1;
+            break;
+        }
+
+        // O jogador tem de estar no cone traseiro do inimigo.
+        double produtoTraseiro = dx * frenteX + dy * frenteY;
+        if (produtoTraseiro >= -Math.sqrt(distanciaQuadrado)
+                * COSENO_MEIO_CONE) {
+            return false;
+        }
+
+        // E tem de estar virado para o inimigo para poder desferir o golpe.
+        double paraInimigoX = -dx;
+        double paraInimigoY = -dy;
+        double direcaoJogadorX = 0;
+        double direcaoJogadorY = 0;
+        switch (jogador.getDirecao()) {
+        case DIREITA:
+            direcaoJogadorX = 1;
+            break;
+        case ESQUERDA:
+            direcaoJogadorX = -1;
+            break;
+        case CIMA:
+            direcaoJogadorY = -1;
+            break;
+        default:
+            direcaoJogadorY = 1;
+            break;
+        }
+
+        double produtoFrontal = paraInimigoX * direcaoJogadorX
+                + paraInimigoY * direcaoJogadorY;
+        return produtoFrontal >= Math.sqrt(distanciaQuadrado)
+                * COSENO_MEIO_CONE;
     }
 
     /** Escolhe o jogador vivo, visivel e mais proximo. */
