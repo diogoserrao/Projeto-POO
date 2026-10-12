@@ -7,6 +7,9 @@ public class Enemy extends Personagem {
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
     private static final boolean MOSTRAR_VISAO = true;
+    private static final double COSENO_MEIO_CONE = Math.cos(
+            Math.toRadians(ANGULO_VISAO / 2.0));
+    private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
     private final Movimento movimento;
     private int contadorAtaque;
 
@@ -60,9 +63,13 @@ public class Enemy extends Personagem {
             return null;
         }
 
-        List<Player> jogadores = mundo.getObjects(Player.class);
+        if (!(mundo instanceof MyWorld)) {
+            return null;
+        }
+
+        List<Player> jogadores = ((MyWorld) mundo).getJogadores();
         Player maisProximo = null;
-        double menorDistancia = Double.MAX_VALUE;
+        double menorDistanciaQuadrado = Double.MAX_VALUE;
 
         for (Player jogador : jogadores) {
             if (jogador == null || !jogador.estaVivo()
@@ -70,31 +77,24 @@ public class Enemy extends Personagem {
                 continue;
             }
 
-            double distancia = distanciaA(jogador);
-            if (distancia <= RAIO_VISAO
-                    && distancia < menorDistancia
-                    && estaNoConeDeVisao(jogador)) {
+            double dx = jogador.getX() - getX();
+            double dy = jogador.getY() - getY();
+            double distanciaQuadrado = dx * dx + dy * dy;
+            if (distanciaQuadrado <= RAIO_VISAO_QUADRADO
+                    && distanciaQuadrado < menorDistanciaQuadrado
+                    && estaNoConeDeVisao(dx, dy, distanciaQuadrado)) {
                 maisProximo = jogador;
-                menorDistancia = distancia;
+                menorDistanciaQuadrado = distanciaQuadrado;
             }
         }
 
         return maisProximo;
     }
 
-    private double distanciaA(Player jogador) {
-        double dx = jogador.getX() - getX();
-        double dy = jogador.getY() - getY();
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    private boolean estaNoConeDeVisao(Player jogador) {
-        double dx = jogador.getX() - getX();
-        double dy = jogador.getY() - getY();
-        double comprimento = Math.sqrt(dx * dx + dy * dy);
-
+    private boolean estaNoConeDeVisao(double dx, double dy,
+            double distanciaQuadrado) {
         // Um alvo no mesmo ponto nao tem uma direcao relativa bem definida.
-        if (comprimento == 0) {
+        if (distanciaQuadrado == 0) {
             return false;
         }
 
@@ -115,9 +115,10 @@ public class Enemy extends Personagem {
             break;
         }
 
-        double produto = (dx * direcaoX + dy * direcaoY) / comprimento;
-        double angulo = Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, produto))));
-        return angulo <= ANGULO_VISAO / 2.0;
+        double produto = dx * direcaoX + dy * direcaoY;
+        return produto > 0
+                && produto * produto >= distanciaQuadrado
+                        * COSENO_MEIO_CONE * COSENO_MEIO_CONE;
     }
 
     /** Acrescenta o cone a seguir ao frame normal, sem afetar colisoes. */

@@ -24,6 +24,7 @@ public abstract class Personagem extends Actor {
     private final GreenfootImage idleSpritesheet;
     private final int walkFrames;
     private final int idleFrames;
+    private final GreenfootImage[][][] imagensAnimacao;
     private int frame;
     private int linhaDirecao = BAIXO;
     private int contadorAnimacao;
@@ -51,6 +52,9 @@ public abstract class Personagem extends Actor {
         this.vidas = MAX_VIDAS;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
+        int maiorNumeroFrames = Math.max(walkFrames,
+                Math.max(idleFrames, IDLE_FRAMES_CIMA));
+        this.imagensAnimacao = new GreenfootImage[2][4][maiorNumeroFrames];
         mostrarFrame();
     }
 
@@ -102,12 +106,19 @@ public abstract class Personagem extends Actor {
     }
 
     protected void mostrarFrame() {
-        GreenfootImage spritesheet = estavaEmMovimento
-            ? walkSpritesheet : idleSpritesheet;
-        GreenfootImage imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
-        imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
-                         -linhaDirecao * FRAME_SIZE);
-        imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
+        int tipoAnimacao = estavaEmMovimento ? 1 : 0;
+        GreenfootImage imagem = imagensAnimacao[tipoAnimacao][linhaDirecao][frame];
+
+        if (imagem == null) {
+            GreenfootImage spritesheet = estavaEmMovimento
+                    ? walkSpritesheet : idleSpritesheet;
+            imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
+            imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
+                    -linhaDirecao * FRAME_SIZE);
+            imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
+            imagensAnimacao[tipoAnimacao][linhaDirecao][frame] = imagem;
+        }
+
         setImage(imagem);
     }
 

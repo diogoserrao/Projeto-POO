@@ -19,6 +19,7 @@ public class MyWorld extends World {
     private static final int MAX_FASES = 3;
 
     private final List<Player> jogadores = new ArrayList<Player>();
+    private final List<Player> jogadoresVisiveis = Collections.unmodifiableList(jogadores);
     private Hud hud;
     /*
      * Impede que o mesmo jogador mude de andar várias vezes
@@ -208,6 +209,6 @@ public class MyWorld extends World {
 
     /** Lista de jogadores disponivel para sistemas do mundo, como a IA. */
     public List<Player> getJogadores() {
-        return Collections.unmodifiableList(jogadores);
+        return jogadoresVisiveis;
     }
 }
