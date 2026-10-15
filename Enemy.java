@@ -8,12 +8,6 @@ public class Enemy extends Personagem {
     private static final int COOLDOWN_ATAQUE = 60;
     private static final int VIDAS_INIMIGO = 3;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
-    /*
-     * O cone de visão era redesenhado numa imagem 204x204 em cada frame de
-     * animação de todos os inimigos. Mantemos a lógica de visão, mas não
-     * renderizamos esta indicação durante o jogo.
-     */
-    private static final boolean MOSTRAR_VISAO = false;
     private static final double COSENO_MEIO_CONE = Math.cos(
             Math.toRadians(ANGULO_VISAO / 2.0));
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
@@ -106,70 +100,6 @@ public class Enemy extends Personagem {
         return vidasInimigo;
     }
 
-    /** Indica se o jogador está atrás deste inimigo e a uma distância válida. */
-    public boolean estaDeCostasPara(Player jogador) {
-        if (jogador == null || !estaVivo() || estaEmMorte()
-                || jogador.getNivel() != getNivel()) {
-            return false;
-        }
-
-        double dx = jogador.getX() - getX();
-        double dy = jogador.getY() - getY();
-        double distanciaQuadrado = dx * dx + dy * dy;
-        if (distanciaQuadrado == 0 || distanciaQuadrado > 90 * 90) {
-            return false;
-        }
-
-        double frenteX = 0;
-        double frenteY = 0;
-        switch (getDirecao()) {
-        case DIREITA:
-            frenteX = 1;
-            break;
-        case ESQUERDA:
-            frenteX = -1;
-            break;
-        case CIMA:
-            frenteY = -1;
-            break;
-        default:
-            frenteY = 1;
-            break;
-        }
-
-        // O jogador tem de estar no cone traseiro do inimigo.
-        double produtoTraseiro = dx * frenteX + dy * frenteY;
-        if (produtoTraseiro >= -Math.sqrt(distanciaQuadrado)
-                * COSENO_MEIO_CONE) {
-            return false;
-        }
-
-        // E tem de estar virado para o inimigo para poder desferir o golpe.
-        double paraInimigoX = -dx;
-        double paraInimigoY = -dy;
-        double direcaoJogadorX = 0;
-        double direcaoJogadorY = 0;
-        switch (jogador.getDirecao()) {
-        case DIREITA:
-            direcaoJogadorX = 1;
-            break;
-        case ESQUERDA:
-            direcaoJogadorX = -1;
-            break;
-        case CIMA:
-            direcaoJogadorY = -1;
-            break;
-        default:
-            direcaoJogadorY = 1;
-            break;
-        }
-
-        double produtoFrontal = paraInimigoX * direcaoJogadorX
-                + paraInimigoY * direcaoJogadorY;
-        return produtoFrontal >= Math.sqrt(distanciaQuadrado)
-                * COSENO_MEIO_CONE;
-    }
-
     /**
      * Verifica se este inimigo pode receber um golpe deste jogador.
      * O ataque depende da proximidade e da direção do jogador, não do lado
@@ -188,22 +118,8 @@ public class Enemy extends Personagem {
             return false;
         }
 
-        double direcaoX = 0;
-        double direcaoY = 0;
-        switch (jogador.getDirecao()) {
-        case DIREITA:
-            direcaoX = 1;
-            break;
-        case ESQUERDA:
-            direcaoX = -1;
-            break;
-        case CIMA:
-            direcaoY = -1;
-            break;
-        default:
-            direcaoY = 1;
-            break;
-        }
+        double direcaoX = jogador.getDirecao().getDx();
+        double direcaoY = jogador.getDirecao().getDy();
 
         double produto = dx * direcaoX + dy * direcaoY;
         return produto > 0 && produto * produto >= distanciaQuadrada
@@ -253,72 +169,13 @@ public class Enemy extends Personagem {
             return false;
         }
 
-        double direcaoX = 0;
-        double direcaoY = 0;
-        switch (getDirecao()) {
-        case DIREITA:
-            direcaoX = 1;
-            break;
-        case ESQUERDA:
-            direcaoX = -1;
-            break;
-        case CIMA:
-            direcaoY = -1;
-            break;
-        default:
-            direcaoY = 1;
-            break;
-        }
+        double direcaoX = getDirecao().getDx();
+        double direcaoY = getDirecao().getDy();
 
         double produto = dx * direcaoX + dy * direcaoY;
         return produto > 0
                 && produto * produto >= distanciaQuadrado
                         * COSENO_MEIO_CONE * COSENO_MEIO_CONE;
-    }
-
-    /** Acrescenta o cone a seguir ao frame normal, sem afetar colisoes. */
-    @Override
-    protected void mostrarFrame() {
-        super.mostrarFrame();
-        if (!MOSTRAR_VISAO) {
-            return;
-        }
-
-        GreenfootImage personagem = getImage();
-        int tamanho = RAIO_VISAO * 2 + 4;
-        GreenfootImage imagem = new GreenfootImage(tamanho, tamanho);
-        int centro = tamanho / 2;
-        int[] xs = new int[23];
-        int[] ys = new int[23];
-        xs[0] = centro;
-        ys[0] = centro;
-        double direcao = direcaoEmGraus();
-        for (int i = 0; i <= 21; i++) {
-            double graus = Math.toRadians(direcao - ANGULO_VISAO / 2.0
-                    + ANGULO_VISAO * i / 21.0);
-            xs[i + 1] = centro + (int) Math.round(Math.cos(graus) * RAIO_VISAO);
-            ys[i + 1] = centro + (int) Math.round(Math.sin(graus) * RAIO_VISAO);
-        }
-        imagem.setColor(new greenfoot.Color(255, 220, 70, 45));
-        imagem.fillPolygon(xs, ys, xs.length);
-        imagem.setColor(new greenfoot.Color(255, 220, 70, 150));
-        imagem.drawPolygon(xs, ys, xs.length);
-        imagem.drawImage(personagem, centro - personagem.getWidth() / 2,
-                centro - personagem.getHeight() / 2);
-        setImage(imagem);
-    }
-
-    private double direcaoEmGraus() {
-        switch (getDirecao()) {
-        case DIREITA:
-            return 0;
-        case CIMA:
-            return -90;
-        case ESQUERDA:
-            return 180;
-        default:
-            return 90;
-        }
     }
 
     public boolean podeMoverPara(int x, int y) {
@@ -330,11 +187,11 @@ public class Enemy extends Personagem {
         setLocation(x, y);
     }
 
-    public void definirDirecaoMovimento(int direcao) {
+    public void definirDirecaoMovimento(Direcao direcao) {
         definirDirecao(direcao);
     }
 
-    public void definirDirecaoInicial(int direcao) {
+    public void definirDirecaoInicial(Direcao direcao) {
         definirDirecao(direcao);
     }
 
@@ -348,9 +205,11 @@ public class Enemy extends Personagem {
         int diferencaY = jogador.getY() - getY();
 
         if (Math.abs(diferencaX) >= Math.abs(diferencaY)) {
-            definirDirecaoInicial(diferencaX >= 0 ? DIREITA : ESQUERDA);
+            definirDirecaoInicial(diferencaX >= 0
+                    ? Direcao.DIREITA : Direcao.ESQUERDA);
         } else {
-            definirDirecaoInicial(diferencaY >= 0 ? BAIXO : CIMA);
+            definirDirecaoInicial(diferencaY >= 0
+                    ? Direcao.BAIXO : Direcao.CIMA);
         }
     }
 }

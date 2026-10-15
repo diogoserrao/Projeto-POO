@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=Direcao
+comment0.text=Dire\u00E7\u00F5es\ l\u00F3gicas\ usadas\ pelo\ movimento\ e\ pela\ anima\u00E7\u00E3o\ dos\ personagens.
+comment1.params=dx\ dy
+comment1.target=Direcao(int,\ int)
+comment2.params=
+comment2.target=int\ getDx()
+comment3.params=
+comment3.target=int\ getDy()
+numComments=4

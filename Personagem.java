@@ -7,10 +7,6 @@ import java.util.Map;
 public abstract class Personagem extends Actor {
     protected static final int FRAME_SIZE = 64;
     protected static final int DISPLAY_SIZE = 96;
-    protected static final int BAIXO = 0;
-    protected static final int ESQUERDA = 1;
-    protected static final int DIREITA = 2;
-    protected static final int CIMA = 3;
     private static final int IDLE_FRAMES_CIMA = 4;
 
     private static final int PES_OFFSET_X = 7;
@@ -34,7 +30,7 @@ public abstract class Personagem extends Actor {
     private final int deathFrames;
     private final GreenfootImage[][][] imagensAnimacao;
     private int frame;
-    private int linhaDirecao = BAIXO;
+    private Direcao linhaDirecao = Direcao.BAIXO;
     private int contadorAnimacao;
     private boolean estavaEmMovimento;
     private boolean emAtaque;
@@ -80,7 +76,8 @@ public abstract class Personagem extends Actor {
         this.deathFrames = deathSpritesheet.getWidth() / FRAME_SIZE;
         int maiorNumeroFrames = Math.max(walkFrames, Math.max(idleFrames,
                 Math.max(attackFrames, Math.max(deathFrames, IDLE_FRAMES_CIMA))));
-        this.imagensAnimacao = new GreenfootImage[4][4][maiorNumeroFrames];
+        this.imagensAnimacao = new GreenfootImage[4][Direcao.values().length]
+                [maiorNumeroFrames];
         mostrarFrame();
     }
 
@@ -98,7 +95,7 @@ public abstract class Personagem extends Actor {
         return spritesheet;
     }
 
-    protected void definirDirecao(int direcao) {
+    protected void definirDirecao(Direcao direcao) {
         if (emMorte) {
             return;
         }
@@ -112,7 +109,7 @@ public abstract class Personagem extends Actor {
     }
 
     /** Devolve a direcao para sistemas que precisam de consultar o olhar. */
-    public int getDirecao() {
+    public Direcao getDirecao() {
         return linhaDirecao;
     }
 
@@ -141,13 +138,15 @@ public abstract class Personagem extends Actor {
         if (movimento) {
             return walkFrames;
         }
-        return linhaDirecao == CIMA ? IDLE_FRAMES_CIMA : idleFrames;
+        return linhaDirecao == Direcao.CIMA ? IDLE_FRAMES_CIMA : idleFrames;
     }
 
     protected void mostrarFrame() {
         int tipoAnimacao = emMorte ? 3 : emAtaque ? 2
                 : estavaEmMovimento ? 1 : 0;
-        GreenfootImage imagem = imagensAnimacao[tipoAnimacao][linhaDirecao][frame];
+        int linhaSpritesheet = linhaDirecao.ordinal();
+        GreenfootImage imagem = imagensAnimacao[tipoAnimacao][linhaSpritesheet]
+                [frame];
 
         if (imagem == null) {
             GreenfootImage spritesheet;
@@ -160,9 +159,9 @@ public abstract class Personagem extends Actor {
             }
             imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
             imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
-                    -linhaDirecao * FRAME_SIZE);
+                    -linhaSpritesheet * FRAME_SIZE);
             imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
-            imagensAnimacao[tipoAnimacao][linhaDirecao][frame] = imagem;
+            imagensAnimacao[tipoAnimacao][linhaSpritesheet][frame] = imagem;
         }
 
         setImage(imagem);

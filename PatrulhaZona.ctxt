@@ -13,5 +13,5 @@ comment4.text=Move\ ate\ ao\ extremo\ sem\ o\ ultrapassar\ e\ gere\ a\ pausa\ da
 comment5.params=
 comment5.target=void\ iniciarPausa()
 comment6.params=
-comment6.target=int\ direcaoDoSentido()
+comment6.target=Direcao\ direcaoDoSentido()
 numComments=7

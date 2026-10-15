@@ -95,10 +95,10 @@ public class PatrulhaZona implements Movimento {
         contadorPausa = TEMPO_PAUSA_NA_EXTREMIDADE;
     }
 
-    private int direcaoDoSentido() {
+    private Direcao direcaoDoSentido() {
         if (horizontal) {
-            return sentido > 0 ? Personagem.DIREITA : Personagem.ESQUERDA;
+            return sentido > 0 ? Direcao.DIREITA : Direcao.ESQUERDA;
         }
-        return sentido > 0 ? Personagem.BAIXO : Personagem.CIMA;
+        return sentido > 0 ? Direcao.BAIXO : Direcao.CIMA;
     }
 }

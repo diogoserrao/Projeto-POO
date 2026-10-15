@@ -59,13 +59,13 @@ public class Player extends Personagem {
 
         if (dx != 0 || dy != 0) {
             if (dy < 0)
-                definirDirecao(CIMA);
+                definirDirecao(Direcao.CIMA);
             else if (dy > 0)
-                definirDirecao(BAIXO);
+                definirDirecao(Direcao.BAIXO);
             else if (dx < 0)
-                definirDirecao(ESQUERDA);
+                definirDirecao(Direcao.ESQUERDA);
             else
-                definirDirecao(DIREITA);
+                definirDirecao(Direcao.DIREITA);
         }
 
         boolean movimento = false;

@@ -6,24 +6,13 @@ public class Aleatorio implements Movimento {
 
     @Override
     public boolean mover(Enemy inimigo) {
-        int direcao = Greenfoot.getRandomNumber(4);
+        Direcao[] direcoes = Direcao.values();
+        Direcao direcao = direcoes[Greenfoot.getRandomNumber(direcoes.length)];
         int novoX = inimigo.getX();
         int novoY = inimigo.getY();
 
-        switch (direcao) {
-        case Personagem.CIMA:
-            novoY -= VELOCIDADE;
-            break;
-        case Personagem.ESQUERDA:
-            novoX -= VELOCIDADE;
-            break;
-        case Personagem.DIREITA:
-            novoX += VELOCIDADE;
-            break;
-        default:
-            novoY += VELOCIDADE;
-            break;
-        }
+        novoX += direcao.getDx() * VELOCIDADE;
+        novoY += direcao.getDy() * VELOCIDADE;
 
         inimigo.definirDirecaoMovimento(direcao);
         if (!inimigo.podeMoverPara(novoX, novoY)) {
