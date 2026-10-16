@@ -41,7 +41,8 @@ public class MyWorld extends World {
          * Quando começamos uma nova fase/mapa,
          * os jogadores começam novamente no nível 0.
          */
-        mapa = new DungeonMap(faseAtual);
+        CarregadorTiled carregador = new CarregadorTiled(faseAtual);
+        mapa = new DungeonMap(carregador.getDados());
 
         /*
          * IMPORTANTE:
