@@ -14,6 +14,7 @@ public abstract class Personagem extends Actor {
     private static final int PES_LARGURA = 15;
     private static final int PES_ALTURA = 11;
     private static final int MAX_VIDAS = 3;
+    private static final int DURACAO_FLASH_DANO = 8;
     private static final Map<String, GreenfootImage> SPRITESHEETS =
             new HashMap<String, GreenfootImage>();
 
@@ -36,6 +37,7 @@ public abstract class Personagem extends Actor {
     private boolean emAtaque;
     private boolean emMorte;
     private boolean terminouMorte;
+    private int contadorFlashDano;
 
     protected Personagem(int personagem) {
         this(personagem, 0);
@@ -114,6 +116,13 @@ public abstract class Personagem extends Actor {
     }
 
     protected void atualizarAnimacao(boolean movimento) {
+        if (contadorFlashDano > 0) {
+            contadorFlashDano--;
+            if (contadorFlashDano == 0) {
+                mostrarFrame();
+            }
+        }
+
         if (emAtaque || emMorte) {
             atualizarAnimacaoEspecial();
             return;
@@ -164,7 +173,39 @@ public abstract class Personagem extends Actor {
             imagensAnimacao[tipoAnimacao][linhaSpritesheet][frame] = imagem;
         }
 
-        setImage(imagem);
+        if (contadorFlashDano > 0) {
+            setImage(tingirDeVermelho(imagem));
+        } else {
+            setImage(imagem);
+        }
+    }
+
+    /** Inicia o efeito visual de dano e atualiza imediatamente a imagem. */
+    protected void iniciarFlashDano() {
+        contadorFlashDano = DURACAO_FLASH_DANO;
+        mostrarFrame();
+    }
+
+    /** Cria uma cópia avermelhada sem alterar a imagem original da animação. */
+    private GreenfootImage tingirDeVermelho(GreenfootImage original) {
+        GreenfootImage tingida = new GreenfootImage(original);
+
+        for (int x = 0; x < tingida.getWidth(); x++) {
+            for (int y = 0; y < tingida.getHeight(); y++) {
+                Color originalPixel = tingida.getColorAt(x, y);
+                if (originalPixel.getAlpha() > 0) {
+                    int vermelho = Math.min(255,
+                            originalPixel.getRed() + 120);
+                    int verde = originalPixel.getGreen() / 2;
+                    int azul = originalPixel.getBlue() / 2;
+                    Color cor = new Color(vermelho, verde, azul,
+                            originalPixel.getAlpha());
+                    tingida.setColorAt(x, y, cor);
+                }
+            }
+        }
+
+        return tingida;
     }
 
     /** Começa uma animação de ataque que é reproduzida uma única vez. */
@@ -268,6 +309,7 @@ public abstract class Personagem extends Actor {
     public void perderVida() {
         if (vidas > 0) {
             vidas--;
+            iniciarFlashDano();
         }
     }
 

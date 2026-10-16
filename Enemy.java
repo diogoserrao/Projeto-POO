@@ -6,6 +6,7 @@ public class Enemy extends Personagem {
     private static final int RAIO_VISAO = 100;
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
+    private static final boolean MOSTRAR_VISAO = true;
     private static final int VIDAS_INIMIGO = 3;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
     private static final double COSENO_MEIO_CONE = Math.cos(
@@ -83,9 +84,59 @@ public class Enemy extends Personagem {
         }
 
         vidasInimigo--;
+        iniciarFlashDano();
         contadorInvulnerabilidade = INVULNERABILIDADE_APOS_GOLPE;
         if (vidasInimigo <= 0) {
             iniciarMorte();
+        }
+    }
+
+    /** Acrescenta o cone ao frame atual sem alterar a imagem da animacao. */
+    @Override
+    protected void mostrarFrame() {
+        super.mostrarFrame();
+        if (!MOSTRAR_VISAO) {
+            return;
+        }
+
+        GreenfootImage personagem = getImage();
+        int tamanho = RAIO_VISAO * 2 + 4;
+        GreenfootImage imagem = new GreenfootImage(tamanho, tamanho);
+        int centro = tamanho / 2;
+        int[] xs = new int[23];
+        int[] ys = new int[23];
+        xs[0] = centro;
+        ys[0] = centro;
+        double direcao = direcaoEmGraus();
+
+        for (int i = 0; i <= 21; i++) {
+            double graus = Math.toRadians(direcao - ANGULO_VISAO / 2.0
+                    + ANGULO_VISAO * i / 21.0);
+            xs[i + 1] = centro + (int) Math.round(
+                    Math.cos(graus) * RAIO_VISAO);
+            ys[i + 1] = centro + (int) Math.round(
+                    Math.sin(graus) * RAIO_VISAO);
+        }
+
+        imagem.setColor(new Color(255, 220, 70, 45));
+        imagem.fillPolygon(xs, ys, xs.length);
+        imagem.setColor(new Color(255, 220, 70, 150));
+        imagem.drawPolygon(xs, ys, xs.length);
+        imagem.drawImage(personagem, centro - personagem.getWidth() / 2,
+                centro - personagem.getHeight() / 2);
+        setImage(imagem);
+    }
+
+    private double direcaoEmGraus() {
+        switch (getDirecao()) {
+        case DIREITA:
+            return 0;
+        case CIMA:
+            return -90;
+        case ESQUERDA:
+            return 180;
+        default:
+            return 90;
         }
     }
 
