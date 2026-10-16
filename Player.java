@@ -91,6 +91,8 @@ public class Player extends Personagem {
                 Interagivel interagivel = procurarInteragivelPerto();
                 if (interagivel != null) {
                     interagivel.interagir(this);
+                } else {
+                    iniciarAtaque();
                 }
             }
         }
