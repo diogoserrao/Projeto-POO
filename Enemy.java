@@ -14,6 +14,8 @@ public class Enemy extends Personagem {
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
     private static final double COSENO_MEIO_CONE = Math.cos(
             Math.toRadians(ANGULO_VISAO / 2.0));
+    private static final double COSENO_MEIO_CONE_GOLPE = Math.cos(
+            Math.toRadians(45.0));
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
     private final Movimento movimento;
     private int contadorAtaque;
@@ -131,16 +133,8 @@ public class Enemy extends Personagem {
     }
 
     private double direcaoEmGraus() {
-        switch (getDirecao()) {
-        case DIREITA:
-            return 0;
-        case CIMA:
-            return -90;
-        case ESQUERDA:
-            return 180;
-        default:
-            return 90;
-        }
+        return Math.toDegrees(Math.atan2(getDirecao().getDy(),
+                getDirecao().getDx()));
     }
 
     /** Devolve as vidas próprias do inimigo, usadas pelos ataques do jogador. */
@@ -164,20 +158,9 @@ public class Enemy extends Personagem {
             return false;
         }
 
-        int dx = getX() - jogador.getX();
-        int dy = getY() - jogador.getY();
-        int distanciaQuadrada = dx * dx + dy * dy;
-        if (distanciaQuadrada == 0
-                || distanciaQuadrada > ALCANCE_GOLPE_QUADRADO) {
-            return false;
-        }
-
-        double direcaoX = jogador.getDirecao().getDx();
-        double direcaoY = jogador.getDirecao().getDy();
-
-        double produto = dx * direcaoX + dy * direcaoY;
-        return produto > 0 && produto * produto >= distanciaQuadrada
-                * COSENO_MEIO_CONE * COSENO_MEIO_CONE;
+        return estaNoCone(getX() - jogador.getX(), getY() - jogador.getY(),
+                jogador.getDirecao().ordinal(), ALCANCE_GOLPE_QUADRADO,
+                COSENO_MEIO_CONE_GOLPE);
     }
 
     /** Escolhe o jogador vivo, visivel e mais proximo. */
@@ -202,7 +185,8 @@ public class Enemy extends Personagem {
             double distanciaQuadrado = dx * dx + dy * dy;
             if (distanciaQuadrado <= RAIO_VISAO_QUADRADO
                     && distanciaQuadrado < menorDistanciaQuadrado
-                    && estaNoConeDeVisao(dx, dy, distanciaQuadrado)) {
+                    && estaNoCone(dx, dy, getDirecao().ordinal(),
+                            RAIO_VISAO_QUADRADO, COSENO_MEIO_CONE)) {
                 maisProximo = jogador;
                 menorDistanciaQuadrado = distanciaQuadrado;
             }
@@ -211,20 +195,38 @@ public class Enemy extends Personagem {
         return maisProximo;
     }
 
-    private boolean estaNoConeDeVisao(double dx, double dy,
-            double distanciaQuadrado) {
-        // Um alvo no mesmo ponto nao tem uma direcao relativa bem definida.
-        if (distanciaQuadrado == 0) {
+    private static boolean estaNoCone(double dx, double dy, int direcao,
+            double raioQuadrado, double cosenoMeioCone) {
+        double distanciaQuadrado = dx * dx + dy * dy;
+        if (distanciaQuadrado == 0 || distanciaQuadrado > raioQuadrado) {
             return false;
         }
 
-        double direcaoX = getDirecao().getDx();
-        double direcaoY = getDirecao().getDy();
+        int frenteX;
+        int frenteY;
+        switch (direcao) {
+        case 2: // Direcao.DIREITA.ordinal()
+            frenteX = 1;
+            frenteY = 0;
+            break;
+        case 1: // Direcao.ESQUERDA.ordinal()
+            frenteX = -1;
+            frenteY = 0;
+            break;
+        case 3: // Direcao.CIMA.ordinal()
+            frenteX = 0;
+            frenteY = -1;
+            break;
+        default:
+            frenteX = 0;
+            frenteY = 1;
+            break;
+        }
 
-        double produto = dx * direcaoX + dy * direcaoY;
+        double produto = dx * frenteX + dy * frenteY;
         return produto > 0
                 && produto * produto >= distanciaQuadrado
-                        * COSENO_MEIO_CONE * COSENO_MEIO_CONE;
+                        * cosenoMeioCone * cosenoMeioCone;
     }
 
     public boolean podeMoverPara(int x, int y) {
