@@ -25,13 +25,11 @@ public class CarregadorTiled {
     private final int fase;
     private final GreenfootImage imagem;
     private GreenfootImage imagemBase;
-    private final ArrayList<Rectangle> escadas = new ArrayList<Rectangle>();
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
     private final Map<Chave, ArrayList<int[]>> tilesDasChaves = new HashMap<Chave, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
-    private final Map<Integer, boolean[][]> colisaoPorNivel = new HashMap<Integer, boolean[][]>();
     private final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
     private static final Map<String, GreenfootImage> tilesCache = new HashMap<String, GreenfootImage>();
     private final ArrayList<Tileset> tilesetsAtuais = new ArrayList<Tileset>();
@@ -55,39 +53,35 @@ public class CarregadorTiled {
     }
 
     public DadosMapa getDados() {
-        return new DadosMapa(imagem, imagemBase, escadas, interagiveis, tilesDasChaves,
-                configuracoesInimigos, spawnsJogadores, colisaoComum, colisaoPorNivel,
+        return new DadosMapa(imagem, imagemBase, interagiveis, tilesDasChaves,
+                configuracoesInimigos, spawnsJogadores, colisaoComum,
                 tilesetsAtuais, fase);
     }
 
     public static final class DadosMapa {
         final GreenfootImage imagem;
         final GreenfootImage imagemBase;
-        final ArrayList<Rectangle> escadas;
         final ArrayList<Interagivel> interagiveis;
         final Map<Chave, ArrayList<int[]>> tilesDasChaves;
         final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
         final ArrayList<Point> spawnsJogadores;
         final boolean[][] colisaoComum;
-        final Map<Integer, boolean[][]> colisaoPorNivel;
         final ArrayList<Tileset> tilesets;
         final int fase;
 
         DadosMapa(GreenfootImage imagem, GreenfootImage imagemBase,
-                ArrayList<Rectangle> escadas, ArrayList<Interagivel> interagiveis,
+                ArrayList<Interagivel> interagiveis,
                 Map<Chave, ArrayList<int[]>> tilesDasChaves,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> spawnsJogadores, boolean[][] colisaoComum,
-                Map<Integer, boolean[][]> colisaoPorNivel, ArrayList<Tileset> tilesets, int fase) {
+                ArrayList<Tileset> tilesets, int fase) {
             this.imagem = imagem;
             this.imagemBase = imagemBase;
-            this.escadas = escadas;
             this.interagiveis = interagiveis;
             this.tilesDasChaves = tilesDasChaves;
             this.configuracoesInimigos = configuracoesInimigos;
             this.spawnsJogadores = spawnsJogadores;
             this.colisaoComum = colisaoComum;
-            this.colisaoPorNivel = colisaoPorNivel;
             this.tilesets = tilesets;
             this.fase = fase;
         }
@@ -115,14 +109,13 @@ public class CarregadorTiled {
                 Element elemento = (Element) node;
                 String nome = elemento.getAttribute("name").toLowerCase();
                 if ("objectgroup".equals(node.getNodeName())) {
-                    if (nome.equals("passagem")) lerPassagens(elemento);
                     if (nome.equals("inimigos")) lerInimigos(elemento);
                     if (nome.equals("jogadores")) lerSpawnJogadores(elemento);
                     continue;
                 }
                 if (!"layer".equals(node.getNodeName())) continue;
-                if (nome.equals("colisao") || nome.startsWith("colisao_")) {
-                    lerCamadaColisao(elemento, nome);
+                if (nome.equals("colisao")) {
+                    lerCamadaColisao(elemento);
                 } else {
                     desenharCamada(elemento, tilesets);
                 }
@@ -132,21 +125,10 @@ public class CarregadorTiled {
         }
     }
 
-    private void lerCamadaColisao(Element layer, String nome) {
-        boolean[][] destino = colisaoComum;
-        if (nome.startsWith("colisao_")) {
-            try {
-                int nivel = Integer.parseInt(nome.substring("colisao_".length()).trim());
-                destino = colisaoPorNivel.get(nivel);
-                if (destino == null) {
-                    destino = new boolean[MAP_WIDTH][MAP_HEIGHT];
-                    colisaoPorNivel.put(nivel, destino);
-                }
-            } catch (NumberFormatException erro) { return; }
-        }
+    private void lerCamadaColisao(Element layer) {
         for (int[] t : listarTiles(layer)) {
             int cx = t[0] - MIN_X, cy = t[1] - MIN_Y;
-            if (cx >= 0 && cy >= 0 && cx < MAP_WIDTH && cy < MAP_HEIGHT) destino[cx][cy] = true;
+            if (cx >= 0 && cy >= 0 && cx < MAP_WIDTH && cy < MAP_HEIGHT) colisaoComum[cx][cy] = true;
         }
     }
 
@@ -171,16 +153,6 @@ public class CarregadorTiled {
         }
         for (Map.Entry<String, Rectangle> entrada : spawns.entrySet()) {
             configuracoesInimigos.add(new ConfiguracaoInimigo(entrada.getValue(), patrulhas.get(entrada.getKey())));
-        }
-    }
-
-    private void lerPassagens(Element grupo) {
-        NodeList objetos = grupo.getElementsByTagName("object");
-        for (int i = 0; i < objetos.getLength(); i++) {
-            Element objeto = (Element) objetos.item(i);
-            if (!objeto.hasAttribute("x") || !objeto.hasAttribute("y") || !objeto.hasAttribute("width") || !objeto.hasAttribute("height")) continue;
-            Rectangle area = converterParaMundo(Double.parseDouble(objeto.getAttribute("x")), Double.parseDouble(objeto.getAttribute("y")), Double.parseDouble(objeto.getAttribute("width")), Double.parseDouble(objeto.getAttribute("height")), false);
-            if (objeto.getAttribute("name").trim().toLowerCase().startsWith("escada")) escadas.add(area);
         }
     }
 
@@ -330,9 +302,7 @@ public class CarregadorTiled {
     private void depurarColisao() {
         imagem.setColor(new greenfoot.Color(255, 0, 255, 110));
         for (int cx = 0; cx < MAP_WIDTH; cx++) for (int cy = 0; cy < MAP_HEIGHT; cy++) {
-            boolean porNivel = false;
-            for (boolean[][] grelha : colisaoPorNivel.values()) porNivel |= grelha[cx][cy];
-            if (colisaoComum[cx][cy] || porNivel) imagem.fillRect(cx * TILE, cy * TILE, TILE, TILE);
+            if (colisaoComum[cx][cy]) imagem.fillRect(cx * TILE, cy * TILE, TILE, TILE);
         }
     }
 

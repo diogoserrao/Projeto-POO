@@ -9,22 +9,13 @@ public class MyWorld extends World {
 
     private DungeonMap mapa;
 
-    /*
-     * "Fase" representa os mapas Dungeon1, Dungeon2 e Dungeon3.
-     *
-     * "Nivel" representa o andar dentro da própria masmorra.
-     * Cada jogador tem o seu próprio nível.
-     */
+    /* "Fase" representa os mapas Dungeon1, Dungeon2 e Dungeon3. */
     private int faseAtual = 1;
     private static final int MAX_FASES = 3;
 
     private final List<Player> jogadores = new ArrayList<Player>();
     private final List<Player> jogadoresVisiveis = Collections.unmodifiableList(jogadores);
     private Hud hud;
-    /*
-     * Impede que o mesmo jogador mude de andar várias vezes
-     * enquanto permanece dentro da mesma escada.
-     */
     private boolean teclaProximaFasePressionada = false;
     private boolean jogoTerminou = false;
 
@@ -37,10 +28,6 @@ public class MyWorld extends World {
 
         this.faseAtual = fase;
 
-        /*
-         * Quando começamos uma nova fase/mapa,
-         * os jogadores começam novamente no nível 0.
-         */
         CarregadorTiled carregador = new CarregadorTiled(faseAtual);
         mapa = new DungeonMap(carregador.getDados());
 
@@ -162,7 +149,6 @@ public class MyWorld extends World {
 
         teclaProximaFasePressionada = teclaN;
 
-        verificarEscadas();
         hud.atualizar();
         verificarDerrota();
     }
@@ -189,19 +175,6 @@ public class MyWorld extends World {
     /** Permite aos atores parar imediatamente quando a partida terminou. */
     public boolean estaEmGameOver() {
         return jogoTerminou;
-    }
-
-    /**
-     * Verifica se um jogador está a atravessar uma escada.
-     *
-     * A posição da escada vem diretamente do Tiled. A alteração
-     * de nível acontece apenas uma vez por passagem pela escada.
-     */
-    private void verificarEscadas() {
-
-        for (Player jogador : jogadores) {
-            jogador.atualizarEscada(mapa);
-        }
     }
 
     public DungeonMap getMapa() {

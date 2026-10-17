@@ -28,7 +28,7 @@ public class Enemy extends Personagem {
     @Override
     public void act() {
         World mundo = getWorld();
-        if (mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver()) {
+        if (mundoEstaEmGameOver()) {
             return;
         }
 
@@ -60,7 +60,6 @@ public class Enemy extends Personagem {
      * inimigos, independentemente do movimento que cada um utiliza.
      */
     public void detetarEAtacarJogador() {
-        World mundo = getWorld();
         if (contadorAtaque > 0) {
             contadorAtaque--;
         }
@@ -71,7 +70,7 @@ public class Enemy extends Personagem {
             alvo.perderVida();
             contadorAtaque = COOLDOWN_ATAQUE;
 
-            if (!alvo.estaVivo() && mundo instanceof MyWorld) {
+            if (!alvo.estaVivo()) {
                 alvo.iniciarMorte();
             }
         }
@@ -157,8 +156,7 @@ public class Enemy extends Personagem {
      * para o qual o inimigo está virado.
      */
     public boolean podeSerAtacadoPor(Player jogador) {
-        if (jogador == null || !estaVivo() || estaEmMorte()
-                || jogador.getNivel() != getNivel()) {
+        if (jogador == null || !estaVivo() || estaEmMorte()) {
             return false;
         }
 
@@ -184,18 +182,13 @@ public class Enemy extends Personagem {
             return null;
         }
 
-        if (!(mundo instanceof MyWorld)) {
-            return null;
-        }
-
         /* Consulta os atores que estão realmente no mundo. */
         List<Player> jogadores = mundo.getObjects(Player.class);
         Player maisProximo = null;
         double menorDistanciaQuadrado = Double.MAX_VALUE;
 
         for (Player jogador : jogadores) {
-            if (jogador == null || !jogador.estaVivo()
-                    || jogador.getNivel() != getNivel()) {
+            if (jogador == null || !jogador.estaVivo()) {
                 continue;
             }
 
@@ -231,7 +224,7 @@ public class Enemy extends Personagem {
 
     public boolean podeMoverPara(int x, int y) {
         DungeonMap mapa = getMapa();
-        return mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel());
+        return mapa != null && !mapa.estaBloqueado(getPes(x, y));
     }
 
     public void moverPara(int x, int y) {

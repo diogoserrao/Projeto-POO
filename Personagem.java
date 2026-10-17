@@ -18,7 +18,6 @@ public abstract class Personagem extends Actor {
     private static final Map<String, GreenfootImage> SPRITESHEETS =
             new HashMap<String, GreenfootImage>();
 
-    private int nivel;
     private int vidas;
 
     private final GreenfootImage walkSpritesheet;
@@ -40,37 +39,26 @@ public abstract class Personagem extends Actor {
     private int contadorFlashDano;
 
     protected Personagem(int personagem) {
-        this(personagem, 0);
-    }
-
-    protected Personagem(int personagem, int nivel) {
         this(carregarSpritesheet(personagem, "Walk"),
              carregarSpritesheet(personagem, "Idle"),
              carregarSpritesheet(personagem, "attack"),
-             carregarSpritesheet(personagem, "Death"), nivel);
+             carregarSpritesheet(personagem, "Death"));
     }
 
     protected Personagem(GreenfootImage walkSpritesheet,
                          GreenfootImage idleSpritesheet) {
         this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
-             idleSpritesheet, 0);
-    }
-
-    protected Personagem(GreenfootImage walkSpritesheet,
-                         GreenfootImage idleSpritesheet, int nivel) {
-        this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
-             idleSpritesheet, nivel);
+             idleSpritesheet);
     }
 
     private Personagem(GreenfootImage walkSpritesheet,
                        GreenfootImage idleSpritesheet,
                        GreenfootImage attackSpritesheet,
-                       GreenfootImage deathSpritesheet, int nivel) {
+                       GreenfootImage deathSpritesheet) {
         this.walkSpritesheet = walkSpritesheet;
         this.idleSpritesheet = idleSpritesheet;
         this.attackSpritesheet = attackSpritesheet;
         this.deathSpritesheet = deathSpritesheet;
-        this.nivel = nivel;
         this.vidas = MAX_VIDAS;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
@@ -274,20 +262,18 @@ public abstract class Personagem extends Actor {
         return ((MyWorld) mundo).getMapa();
     }
 
-    public int getNivel() {
-        return nivel;
+    /** Consulta o estado de fim de jogo sem duplicar dependências nas subclasses. */
+    protected boolean mundoEstaEmGameOver() {
+        World mundo = getWorld();
+        return mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver();
     }
 
-    public void setNivel(int nivel) {
-        this.nivel = nivel;
-    }
-
-    public void subirNivel() {
-        nivel++;
-    }
-
-    public void descerNivel() {
-        nivel--;
+    /** Termina a partida quando este personagem pertence ao mundo do jogo. */
+    protected void terminarJogoNoMundo() {
+        World mundo = getWorld();
+        if (mundo instanceof MyWorld) {
+            ((MyWorld) mundo).terminarJogo();
+        }
     }
 
     /** Devolve o número de vidas/corações atuais deste personagem. */

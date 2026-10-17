@@ -8,24 +8,17 @@ import java.util.Set;
 public class Player extends Personagem {
     private final Controlos controlos;
     private final int velocidade = 4;
-    private int ultimoY;
-    private boolean emTransicaoDeEscada;
     private boolean teclaInteracaoPressionada;
     private final Set<String> chaves = new HashSet<String>();
 
     public Player(int skin, Controlos controlos) {
-        this(skin, controlos, 0);
-    }
-
-    public Player(int skin, Controlos controlos, int nivel) {
-        super(skin, nivel);
+        super(skin);
         this.controlos = controlos;
     }
 
     @Override
     public void act() {
-        World mundo = getWorld();
-        if (mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver()) {
+        if (mundoEstaEmGameOver()) {
             return;
         }
 
@@ -34,8 +27,8 @@ public class Player extends Personagem {
                 iniciarMorte();
             }
             atualizarAnimacao(false);
-            if (terminouMorte() && mundo instanceof MyWorld) {
-                ((MyWorld) mundo).terminarJogo();
+            if (terminouMorte()) {
+                terminarJogoNoMundo();
             }
             return;
         }
@@ -180,41 +173,11 @@ public class Player extends Personagem {
 
     private boolean tentarMover(int x, int y) {
         DungeonMap mapa = getMapa();
-        if (mapa != null && !mapa.estaBloqueado(getPes(x, y), getNivel())) {
+        if (mapa != null && !mapa.estaBloqueado(getPes(x, y))) {
             setLocation(x, y);
             return true;
         }
         return false;
     }
 
-    /** Atualiza a transicao de escada deste jogador. */
-    public void atualizarEscada(DungeonMap mapa) {
-        if (mapa == null) {
-            return;
-        }
-
-        int yAtual = getY();
-        boolean estaNaEscada = mapa.estaNaEscada(getX(), yAtual);
-
-        /*
-         * So muda de andar quando existe movimento vertical dentro da escada.
-         * Entrar ou permanecer parado na escada nao muda o nivel.
-         */
-        if (estaNaEscada && yAtual != ultimoY && !emTransicaoDeEscada) {
-            if (yAtual > ultimoY) {
-                descerNivel();
-            } else {
-                subirNivel();
-            }
-
-            emTransicaoDeEscada = true;
-        }
-
-        /* Quando sai da escada, permite uma nova transicao. */
-        if (!estaNaEscada) {
-            emTransicaoDeEscada = false;
-        }
-
-        ultimoY = yAtual;
-    }
 }

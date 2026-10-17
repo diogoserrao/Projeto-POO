@@ -1,12 +1,10 @@
 #BlueJ class context
 comment0.target=DungeonMap
-comment0.text=Consultas\ de\ runtime\ sobre\ os\ dados\ j\u00E1\ preparados\ pelo\ CarregadorTiled.
+comment0.text=Consultas\ de\ runtime\ sobre\ o\ mapa\ de\ uma\ \u00FAnica\ camada\ de\ colis\u00E3o.
 comment1.params=
 comment1.target=DungeonMap()
-comment10.params=pes\ nivel
-comment10.target=boolean\ estaBloqueado(java.awt.Rectangle,\ int)
-comment11.params=x\ y
-comment11.target=boolean\ estaNaEscada(int,\ int)
+comment10.params=pes
+comment10.target=boolean\ estaBloqueado(java.awt.Rectangle)
 comment2.params=fase
 comment2.target=DungeonMap(int)
 comment3.params=dados
@@ -23,6 +21,6 @@ comment7.params=
 comment7.target=java.util.ArrayList\ getConfiguracoesInimigos()
 comment8.params=
 comment8.target=java.util.ArrayList\ getSpawnsJogadores()
-comment9.params=x1\ y1\ x2\ y2\ nivel
-comment9.target=boolean\ temColisaoNaZona(int,\ int,\ int,\ int,\ int)
-numComments=12
+comment9.params=x1\ y1\ x2\ y2
+comment9.target=boolean\ temColisaoNaZona(int,\ int,\ int,\ int)
+numComments=11
