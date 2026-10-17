@@ -44,13 +44,15 @@ public class Enemy extends Personagem {
             contadorInvulnerabilidade--;
         }
 
-        if (!estaEmAtaque()) {
+        Player alvo = encontrarAlvo();
+
+        if (!estaEmAtaque() && alvo == null) {
             boolean estaAMover = movimento.mover(this);
             atualizarAnimacao(estaAMover);
         } else {
             atualizarAnimacao(false);
         }
-        detetarEAtacarJogador();
+        detetarEAtacarJogador(alvo);
     }
 
     /**
@@ -59,12 +61,11 @@ public class Enemy extends Personagem {
      * Este método pertence à classe Enemy, por isso é executado por todos os
      * inimigos, independentemente do movimento que cada um utiliza.
      */
-    public void detetarEAtacarJogador() {
+    public void detetarEAtacarJogador(Player alvo) {
         if (contadorAtaque > 0) {
             contadorAtaque--;
         }
 
-        Player alvo = encontrarAlvo();
         if (alvo != null && contadorAtaque == 0) {
             iniciarAtaque();
             alvo.perderVida();
