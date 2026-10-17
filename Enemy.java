@@ -3,7 +3,10 @@ import java.util.List;
 
 /** Um inimigo delega o movimento para a implementacao recebida. */
 public class Enemy extends Personagem {
-    private static final int RAIO_VISAO = 100;
+    private static final int RAIO_VISAO = 60;
+    private static final int ALCANCE_GOLPE = RAIO_VISAO;
+    private static final int ALCANCE_GOLPE_QUADRADO =
+            ALCANCE_GOLPE * ALCANCE_GOLPE;
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
     private static final boolean MOSTRAR_VISAO = true;
@@ -164,7 +167,8 @@ public class Enemy extends Personagem {
         int dx = getX() - jogador.getX();
         int dy = getY() - jogador.getY();
         int distanciaQuadrada = dx * dx + dy * dy;
-        if (distanciaQuadrada == 0 || distanciaQuadrada > 90 * 90) {
+        if (distanciaQuadrada == 0
+                || distanciaQuadrada > ALCANCE_GOLPE_QUADRADO) {
             return false;
         }
 
