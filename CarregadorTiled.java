@@ -28,6 +28,7 @@ public class CarregadorTiled {
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
     private final Map<Chave, ArrayList<int[]>> tilesDasChaves = new HashMap<Chave, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
+    private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
     private final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
@@ -54,7 +55,7 @@ public class CarregadorTiled {
 
     public DadosMapa getDados() {
         return new DadosMapa(imagem, imagemBase, interagiveis, tilesDasChaves,
-                configuracoesInimigos, spawnsJogadores, colisaoComum,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
                 tilesetsAtuais, fase);
     }
 
@@ -64,6 +65,7 @@ public class CarregadorTiled {
         final ArrayList<Interagivel> interagiveis;
         final Map<Chave, ArrayList<int[]>> tilesDasChaves;
         final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
+        final ArrayList<Point> posicoesPedras;
         final ArrayList<Point> spawnsJogadores;
         final boolean[][] colisaoComum;
         final ArrayList<Tileset> tilesets;
@@ -73,6 +75,7 @@ public class CarregadorTiled {
                 ArrayList<Interagivel> interagiveis,
                 Map<Chave, ArrayList<int[]>> tilesDasChaves,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
+                ArrayList<Point> posicoesPedras,
                 ArrayList<Point> spawnsJogadores, boolean[][] colisaoComum,
                 ArrayList<Tileset> tilesets, int fase) {
             this.imagem = imagem;
@@ -80,6 +83,7 @@ public class CarregadorTiled {
             this.interagiveis = interagiveis;
             this.tilesDasChaves = tilesDasChaves;
             this.configuracoesInimigos = configuracoesInimigos;
+            this.posicoesPedras = posicoesPedras;
             this.spawnsJogadores = spawnsJogadores;
             this.colisaoComum = colisaoComum;
             this.tilesets = tilesets;
@@ -110,6 +114,7 @@ public class CarregadorTiled {
                 String nome = elemento.getAttribute("name").toLowerCase();
                 if ("objectgroup".equals(node.getNodeName())) {
                     if (nome.equals("inimigos")) lerInimigos(elemento);
+                    if (nome.equals("pedras") || nome.equals("pedra")) lerPedras(elemento);
                     if (nome.equals("jogadores")) lerSpawnJogadores(elemento);
                     continue;
                 }
@@ -153,6 +158,19 @@ public class CarregadorTiled {
         }
         for (Map.Entry<String, Rectangle> entrada : spawns.entrySet()) {
             configuracoesInimigos.add(new ConfiguracaoInimigo(entrada.getValue(), patrulhas.get(entrada.getKey())));
+        }
+    }
+
+    private void lerPedras(Element grupo) {
+        NodeList objetos = grupo.getElementsByTagName("object");
+        for (int i = 0; i < objetos.getLength(); i++) {
+            Element objeto = (Element) objetos.item(i);
+            if (!objeto.hasAttribute("x") || !objeto.hasAttribute("y")) continue;
+
+            double x = Double.parseDouble(objeto.getAttribute("x"));
+            double y = Double.parseDouble(objeto.getAttribute("y"));
+            Rectangle area = converterParaMundo(x, y, SOURCE_TILE, SOURCE_TILE, true);
+            posicoesPedras.add(new Point((int) area.getCenterX(), (int) area.getCenterY()));
         }
     }
 

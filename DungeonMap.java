@@ -19,6 +19,7 @@ public class DungeonMap {
     private final ArrayList<Interagivel> interagiveis;
     private final Map<Chave, ArrayList<int[]>> tilesDasChaves;
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
+    private final ArrayList<Point> posicoesPedras;
     private final ArrayList<Point> spawnsJogadores;
     private final boolean[][] colisaoComum;
     private final ArrayList<CarregadorTiled.Tileset> tilesets;
@@ -34,6 +35,7 @@ public class DungeonMap {
         interagiveis = dados.interagiveis;
         tilesDasChaves = dados.tilesDasChaves;
         configuracoesInimigos = dados.configuracoesInimigos;
+        posicoesPedras = dados.posicoesPedras;
         spawnsJogadores = dados.spawnsJogadores;
         colisaoComum = dados.colisaoComum;
         tilesets = dados.tilesets;
@@ -53,12 +55,13 @@ public class DungeonMap {
         if (interagivel instanceof Chave) {
             CarregadorTiled.redesenharChaves(new CarregadorTiled.DadosMapa(
                     imagem, imagemBase, interagiveis, tilesDasChaves,
-                    configuracoesInimigos, spawnsJogadores, colisaoComum,
+                    configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
                     tilesets, fase));
         }
     }
 
     public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() { return configuracoesInimigos; }
+    public ArrayList<Point> getPosicoesPedras() { return posicoesPedras; }
     public ArrayList<Point> getSpawnsJogadores() { return spawnsJogadores; }
 
     public boolean temColisaoNaZona(int x1, int y1, int x2, int y2) {

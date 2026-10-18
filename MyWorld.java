@@ -48,6 +48,7 @@ public class MyWorld extends World {
             }
         }, MAX_FASES);
         configurarInimigos();
+        configurarPedras();
 
         hud.atualizar();
     }
@@ -93,6 +94,12 @@ public class MyWorld extends World {
             inimigo.orientarPara(jogadorMaisProximo(inimigo));
         }
 
+    }
+
+    private void configurarPedras() {
+        for (Point posicao : mapa.getPosicoesPedras()) {
+            addObject(new Pedra(), posicao.x, posicao.y);
+        }
     }
 
     private Player jogadorMaisProximo(Enemy inimigo) {
