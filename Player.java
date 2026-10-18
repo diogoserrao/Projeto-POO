@@ -180,7 +180,7 @@ public class Player extends Personagem {
         }
 
         iniciarAtaque();
-        alvo.receberAtaque();
+        alvo.receberAtaque(this);
         return true;
     }
 

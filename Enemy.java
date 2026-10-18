@@ -96,6 +96,28 @@ public class Enemy extends Personagem {
         }
     }
 
+    /** Recebe um golpe do jogador, eliminando imediatamente um golpe pelas costas. */
+    public void receberAtaque(Player atacante) {
+        if (!estaVivo() || estaEmMorte()) {
+            return;
+        }
+
+        if (estaDeCostasPara(atacante)) {
+            vidasInimigo = 0;
+            iniciarMorte();
+        } else {
+            receberAtaque();
+        }
+    }
+
+    private boolean estaDeCostasPara(Player jogador) {
+        // As direcoes opostas formam os pares 0<->3 e 1<->2, por isso calcula-se 3 - direcao.
+        int direcaoOposta = 3 - getDirecao().ordinal();
+        return estaNoCone(jogador.getX() - getX(), jogador.getY() - getY(),
+                direcaoOposta, ALCANCE_GOLPE_QUADRADO,
+                COSENO_MEIO_CONE_GOLPE);
+    }
+
     /** Acrescenta o cone ao frame atual sem alterar a imagem da animacao. */
     @Override
     protected void mostrarFrame() {
