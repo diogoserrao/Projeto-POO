@@ -62,10 +62,10 @@ public class MyWorld extends World {
 
         jogadores.add(new Player(
                 2,
-                new Controlos("a", "d", "w", "s", "e")));
+                new Controlos("a", "d", "w", "s", "e", "q")));
         jogadores.add(new Player(
                 3,
-                new Controlos("left", "right", "up", "down", "enter")));
+                new Controlos("left", "right", "up", "down", "enter", "shift")));
 
         addObject(jogadores.get(0), p1.x, p1.y);
         addObject(jogadores.get(1), p2.x, p2.y);
