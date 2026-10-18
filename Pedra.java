@@ -162,6 +162,6 @@ public class Pedra extends Actor implements Interagivel {
     }
 
     public boolean fazDistracao() {
-        return estado != Estado.POR_RECOLHER;
+        return estado == Estado.ATERRADA;
     }
 }

@@ -12,14 +12,20 @@ public class Enemy extends Personagem {
     private static final boolean MOSTRAR_VISAO = true;
     private static final int VIDAS_INIMIGO = 3;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
+    private static final int DURACAO_DISTRACAO = 180;
+    private static final int RAIO_DETECAO_PEDRAS = RAIO_VISAO;
     private static final double COSENO_MEIO_CONE = Math.cos(
             Math.toRadians(ANGULO_VISAO / 2.0));
     private static final double COSENO_MEIO_CONE_GOLPE = Math.cos(
             Math.toRadians(45.0));
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
+    private static final double RAIO_DETECAO_PEDRAS_QUADRADO =
+            RAIO_DETECAO_PEDRAS * RAIO_DETECAO_PEDRAS;
     private final Movimento movimento;
     private int contadorAtaque;
     private int contadorInvulnerabilidade;
+    private int contadorDistracao;
+    private Pedra ultimaPedraVista;
     private int vidasInimigo = VIDAS_INIMIGO;
 
     public Enemy(int personagem, Movimento movimento) {
@@ -49,15 +55,58 @@ public class Enemy extends Personagem {
             contadorInvulnerabilidade--;
         }
 
+        verificarPedras();
         Player alvo = encontrarAlvo();
 
-        if (!estaEmAtaque() && alvo == null) {
+        if (!estaEmAtaque() && alvo == null && contadorDistracao == 0) {
             boolean estaAMover = movimento.mover(this);
             atualizarAnimacao(estaAMover);
         } else {
             atualizarAnimacao(false);
         }
         detetarEAtacarJogador(alvo);
+    }
+
+    /** Atualiza a distração provocada pela primeira pedra nova no cone de visão. */
+    private void verificarPedras() {
+        if (contadorDistracao > 0) {
+            contadorDistracao--;
+        }
+
+        World mundo = getWorld();
+        if (mundo == null) {
+            return;
+        }
+
+        List<Pedra> pedras = mundo.getObjects(Pedra.class);
+        for (Pedra pedra : pedras) {
+            if (pedra == null || pedra == ultimaPedraVista
+                    || !pedra.fazDistracao()) {
+                continue;
+            }
+
+            int dx = pedra.getX() - getX();
+            int dy = pedra.getY() - getY();
+            double distanciaQuadrado = dx * dx + dy * dy;
+            if (distanciaQuadrado <= RAIO_DETECAO_PEDRAS_QUADRADO
+                    && distanciaQuadrado > 0) {
+                ultimaPedraVista = pedra;
+                contadorDistracao = DURACAO_DISTRACAO;
+                orientarPara(dx, dy);
+                break;
+            }
+        }
+    }
+
+    /** Orienta o inimigo para uma posição relativa, sem iniciar movimento. */
+    private void orientarPara(int dx, int dy) {
+        if (Math.abs(dx) >= Math.abs(dy)) {
+            definirDirecaoMovimento(dx > 0
+                    ? Direcao.DIREITA : Direcao.ESQUERDA);
+        } else {
+            definirDirecaoMovimento(dy > 0
+                    ? Direcao.BAIXO : Direcao.CIMA);
+        }
     }
 
     /**
