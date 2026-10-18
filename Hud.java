@@ -78,7 +78,8 @@ public class Hud {
                     + ", Esquerda: " + controlos.getEsquerda()
                     + ", Direita: " + controlos.getDireita();
         }
-        return nome + ": Jogador " + (indiceJogador + 1);
+        return nome + ", Lançar: " + controlos.getLancar()
+                + ": Jogador " + (indiceJogador + 1);
     }
 
     private int posicaoJogador(int indice) {
@@ -101,6 +102,7 @@ public class Hud {
             }
         }
 
-        return "P" + (indiceJogador + 1) + ": " + coracoes;
+        return "P" + (indiceJogador + 1) + ": " + coracoes
+                + " Pedras: " + jogador.getPedras();
     }
 }

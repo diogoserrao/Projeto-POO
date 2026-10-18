@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Player extends Personagem {
+    private static final int MAX_PEDRAS = 3;
     private final Controlos controlos;
     private final int velocidade = 4;
     private boolean teclaInteracaoPressionada;
@@ -70,6 +71,7 @@ public class Player extends Personagem {
             movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
         processarInteracao();
+        recolherPedras();
         processarLancamento();
 
     }
@@ -119,12 +121,35 @@ public class Player extends Personagem {
         }
 
         Direcao direcao = getDirecao();
-        int distanciaInicial = 40;
+        int distanciaInicial = 20;
         int x = getX() + direcao.getDx() * distanciaInicial;
         int y = getY() + direcao.getDy() * distanciaInicial;
 
+        DungeonMap mapa = getMapa();
+        if (mapa != null && mapa.temColisaoNaZona(x - 4, y - 4,
+                x + 4, y + 4)) {
+            return;
+        }
+
         pedras--;
         mundo.addObject(new Pedra(direcao), x, y);
+    }
+
+    /** Recolhe automaticamente as pedras disponíveis que estão próximas. */
+    private void recolherPedras() {
+        if (pedras >= MAX_PEDRAS) {
+            return;
+        }
+
+        List<Pedra> pedrasPerto = getObjectsInRange(24, Pedra.class);
+        for (Pedra pedra : pedrasPerto) {
+            if (pedras >= MAX_PEDRAS) {
+                break;
+            }
+            if (pedra.estaPorRecolher()) {
+                pedra.interagir(this);
+            }
+        }
     }
 
     /** Ataca o inimigo mais próximo, mas apenas se estiver atrás dele. */
@@ -168,7 +193,8 @@ public class Player extends Personagem {
         Rectangle areaDosPes = new Rectangle(getX() - 12, getY() + 12, 24, 24);
 
         for (Interagivel interagivel : mapa.getInteragiveis()) {
-            if (interagivel.getArea().intersects(areaDosPes)) {
+            if (!(interagivel instanceof Pedra)
+                    && interagivel.getArea().intersects(areaDosPes)) {
                 return interagivel;
             }
         }
@@ -212,7 +238,9 @@ public class Player extends Personagem {
 
     /** Adiciona uma pedra ao inventário deste jogador. */
     public void adicionarPedra() {
-        pedras++;
+        if (pedras < MAX_PEDRAS) {
+            pedras++;
+        }
     }
 
     /** Indica se este jogador ainda pode lançar uma pedra. */
