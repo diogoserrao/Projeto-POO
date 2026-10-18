@@ -3,7 +3,7 @@ import java.util.List;
 
 /** Um inimigo delega o movimento para a implementacao recebida. */
 public class Enemy extends Personagem {
-    private static final int RAIO_VISAO = 120;
+    private static final int RAIO_VISAO = 100;
     private static final int ALCANCE_GOLPE = RAIO_VISAO;
     private static final int ALCANCE_GOLPE_QUADRADO =
             ALCANCE_GOLPE * ALCANCE_GOLPE;
