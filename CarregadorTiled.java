@@ -31,7 +31,7 @@ public class CarregadorTiled {
     private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
-    private final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
+    private static final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
     private static final Map<String, GreenfootImage> tilesCache = new HashMap<String, GreenfootImage>();
     private final ArrayList<Tileset> tilesetsAtuais = new ArrayList<Tileset>();
 
@@ -233,16 +233,22 @@ public class CarregadorTiled {
     }
 
     private boolean guardarTileDeChave(int[] tile) {
+        Chave chaveMaisProxima = null;
+        int menorDistancia = Integer.MAX_VALUE;
         for (Map.Entry<Chave, ArrayList<int[]>> entrada : tilesDasChaves.entrySet()) {
             Chave chave = entrada.getKey();
             int ancoraX = (int) Math.floor(chave.getArea().getCenterX() / TILE + MIN_X);
             int ancoraY = (int) Math.floor(chave.getArea().getCenterY() / TILE + MIN_Y);
-            if (Math.abs(tile[0] - ancoraX) <= 2 && Math.abs(tile[1] - ancoraY) <= 2) {
-                entrada.getValue().add(new int[] { tile[0], tile[1], tile[2] });
-                return true;
+            int distancia = Math.abs(tile[0] - ancoraX) + Math.abs(tile[1] - ancoraY);
+            if (Math.abs(tile[0] - ancoraX) <= 2 && Math.abs(tile[1] - ancoraY) <= 2
+                    && distancia < menorDistancia) {
+                chaveMaisProxima = chave;
+                menorDistancia = distancia;
             }
         }
-        return false;
+        if (chaveMaisProxima == null) return false;
+        tilesDasChaves.get(chaveMaisProxima).add(new int[] { tile[0], tile[1], tile[2] });
+        return true;
     }
 
     private ArrayList<int[]> listarTiles(Element layer) {
@@ -277,20 +283,10 @@ public class CarregadorTiled {
         for (Tileset t : tilesets) if (t.firstGid <= gid && (escolhido == null || t.firstGid > escolhido.firstGid)) escolhido = t;
         if (escolhido == null) return;
         try {
-            GreenfootImage folha = folhasCache.get(escolhido.imagePath);
-            if (folha == null) { folha = new GreenfootImage(escolhido.imagePath); folhasCache.put(escolhido.imagePath, folha); }
             int px = (tx - MIN_X) * TILE, py = (ty - MIN_Y) * TILE;
             if (px < 0 || py < 0 || px >= WORLD_WIDTH || py >= WORLD_HEIGHT) return;
-            String chave = escolhido.imagePath + "#" + gid;
-            GreenfootImage tileFinal = tilesCache.get(chave);
-            if (tileFinal == null) {
-                int local = gid - escolhido.firstGid;
-                GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
-                tile.drawImage(folha, -(local % escolhido.columns) * SOURCE_TILE, -(local / escolhido.columns) * SOURCE_TILE);
-                tileFinal = new GreenfootImage(tile);
-                tileFinal.scale(TILE, TILE);
-                tilesCache.put(chave, tileFinal);
-            }
+            GreenfootImage tileFinal = obterTile(escolhido, gid);
+            if (tileFinal == null) return;
             imagem.drawImage(tileFinal, px, py);
         } catch (Exception erro) {
             System.out.println("Erro no tile " + gid + ": " + erro.getMessage());
@@ -338,10 +334,34 @@ public class CarregadorTiled {
         Tileset escolhido = null;
         for (Tileset t : tilesets) if (t.firstGid <= gid && (escolhido == null || t.firstGid > escolhido.firstGid)) escolhido = t;
         if (escolhido == null) return;
-        String chave = escolhido.imagePath + "#" + gid;
-        GreenfootImage tileFinal = tilesCache.get(chave);
+        GreenfootImage tileFinal = obterTile(escolhido, gid);
         if (tileFinal == null) return;
         destino.drawImage(tileFinal, (tx - MIN_X) * TILE, (ty - MIN_Y) * TILE);
+    }
+
+    /** Obtém o tile recortado e ampliado, carregando-o quando necessário. */
+    private static GreenfootImage obterTile(Tileset tileset, int gid) {
+        String chave = tileset.imagePath + "#" + gid;
+        GreenfootImage tileFinal = tilesCache.get(chave);
+        if (tileFinal != null) return tileFinal;
+        try {
+            GreenfootImage folha = folhasCache.get(tileset.imagePath);
+            if (folha == null) {
+                folha = new GreenfootImage(tileset.imagePath);
+                folhasCache.put(tileset.imagePath, folha);
+            }
+            int local = gid - tileset.firstGid;
+            GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
+            tile.drawImage(folha, -(local % tileset.columns) * SOURCE_TILE,
+                    -(local / tileset.columns) * SOURCE_TILE);
+            tileFinal = new GreenfootImage(tile);
+            tileFinal.scale(TILE, TILE);
+            tilesCache.put(chave, tileFinal);
+            return tileFinal;
+        } catch (Exception erro) {
+            System.out.println("Erro no tile " + gid + ": " + erro.getMessage());
+            return null;
+        }
     }
 }
 

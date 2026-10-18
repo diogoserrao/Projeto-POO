@@ -10,7 +10,7 @@ public class Player extends Personagem {
     private final int velocidade = 4;
     private boolean teclaInteracaoPressionada;
     private boolean teclaLancarPressionada;
-    private int pedras = 1;
+    private int pedras = 0;
     private final Set<String> chaves = new HashSet<String>();
 
     public Player(int skin, Controlos controlos) {
