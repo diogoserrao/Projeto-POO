@@ -49,6 +49,13 @@ public class DungeonMap {
         return Collections.unmodifiableList(interagiveis);
     }
 
+    /** Regista um objeto interagível criado durante a execução do mundo. */
+    public void adicionarInteragivel(Interagivel interagivel) {
+        if (interagivel != null && !interagiveis.contains(interagivel)) {
+            interagiveis.add(interagivel);
+        }
+    }
+
     /** Remove um objeto interagível sem expor a coleção interna. */
     public void removerInteragivel(Interagivel interagivel) {
         interagiveis.remove(interagivel);

@@ -210,6 +210,11 @@ public class Player extends Personagem {
         return pedras;
     }
 
+    /** Adiciona uma pedra ao inventário deste jogador. */
+    public void adicionarPedra() {
+        pedras++;
+    }
+
     /** Indica se este jogador ainda pode lançar uma pedra. */
     public boolean temPedras() {
         return pedras > 0;

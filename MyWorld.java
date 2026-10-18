@@ -98,7 +98,9 @@ public class MyWorld extends World {
 
     private void configurarPedras() {
         for (Point posicao : mapa.getPosicoesPedras()) {
-            addObject(new Pedra(), posicao.x, posicao.y);
+            Pedra pedra = new Pedra();
+            addObject(pedra, posicao.x, posicao.y);
+            mapa.adicionarInteragivel(pedra);
         }
     }
 

@@ -1,9 +1,10 @@
 import greenfoot.Actor;
 import greenfoot.GreenfootImage;
 import greenfoot.World;
+import java.awt.Rectangle;
 
 /** Um objeto não letal que pode ser lançado para distrair inimigos. */
-public class Pedra extends Actor {
+public class Pedra extends Actor implements Interagivel {
     private static final int TAMANHO = 16;
     private static final int VELOCIDADE = 8;
     private static final int ALCANCE_MAXIMO = 240;
@@ -12,7 +13,8 @@ public class Pedra extends Actor {
     private enum Estado {
         POR_RECOLHER,
         A_VOAR,
-        ATERRADA
+        ATERRADA,
+        RECOLHIDA
     }
 
     private Estado estado;
@@ -119,6 +121,44 @@ public class Pedra extends Actor {
 
     public boolean estaPorRecolher() {
         return estado == Estado.POR_RECOLHER;
+    }
+
+    /** Área de interação da pedra disponível no chão. */
+    @Override
+    public Rectangle getArea() {
+        return new Rectangle(getX() - 24, getY() - 24, 48, 48);
+    }
+
+    @Override
+    public String getDescricao() {
+        return estaPorRecolher() ? "Apanhar pedra" : "Pedra indisponível";
+    }
+
+    @Override
+    public String getDescricao(Player jogador) {
+        if (!estaPorRecolher()) {
+            return "Pedra indisponível";
+        }
+        return jogador == null
+                ? getDescricao()
+                : "Premir " + jogador.getTeclaInteracao().toUpperCase()
+                        + " para apanhar a pedra";
+    }
+
+    /** Recolhe a pedra apenas enquanto ela é um ponto inicial disponível. */
+    @Override
+    public void interagir(Player jogador) {
+        if (!estaPorRecolher() || jogador == null || getWorld() == null) {
+            return;
+        }
+
+        estado = Estado.RECOLHIDA;
+        jogador.adicionarPedra();
+
+        if (jogador.getMapa() != null) {
+            jogador.getMapa().removerInteragivel(this);
+        }
+        getWorld().removeObject(this);
     }
 
     public boolean fazDistracao() {

@@ -328,19 +328,8 @@ public class CarregadorTiled {
         dados.imagem.drawImage(dados.imagemBase, 0, 0);
         for (Map.Entry<Chave, ArrayList<int[]>> entrada : dados.tilesDasChaves.entrySet()) {
             if (entrada.getKey().estaRecolhida()) continue;
-            int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
             for (int[] tile : entrada.getValue()) {
                 desenharTileEstatica(dados.imagem, tile[2], tile[0], tile[1], dados.tilesets);
-                minX = Math.min(minX, tile[0]); minY = Math.min(minY, tile[1]);
-                maxX = Math.max(maxX, tile[0]); maxY = Math.max(maxY, tile[1]);
-            }
-            if (minX != Integer.MAX_VALUE) {
-                int x = (minX - MIN_X) * TILE, y = (minY - MIN_Y) * TILE;
-                greenfoot.Color cor = dados.fase == 2 ? new greenfoot.Color(22, 42, 58, 55)
-                        : dados.fase == 3 ? new greenfoot.Color(62, 30, 45, 65)
-                        : new greenfoot.Color(8, 8, 18, 25);
-                dados.imagem.setColor(cor);
-                dados.imagem.fillRect(x, y, (maxX - minX + 1) * TILE, (maxY - minY + 1) * TILE);
             }
         }
     }
