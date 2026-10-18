@@ -132,7 +132,7 @@ public class Player extends Personagem {
         }
 
         pedras--;
-        mundo.addObject(new Pedra(direcao), x, y);
+        mundo.addObject(new Pedra(direcao, mapa), x, y);
     }
 
     /** Recolhe automaticamente as pedras disponíveis que estão próximas. */

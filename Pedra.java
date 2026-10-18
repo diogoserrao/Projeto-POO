@@ -19,11 +19,13 @@ public class Pedra extends Actor implements Interagivel {
 
     private Estado estado;
     private Direcao direcao;
+    private final DungeonMap mapa;
     private int distanciaPercorrida;
     private int contadorNoChao;
 
     /** Cria uma pedra disponível para ser recolhida. */
     public Pedra() {
+        this.mapa = null;
         this.estado = Estado.POR_RECOLHER;
         this.direcao = Direcao.BAIXO;
         this.distanciaPercorrida = 0;
@@ -36,7 +38,13 @@ public class Pedra extends Actor implements Interagivel {
      * Direcao, mantendo a assinatura prevista para o lançamento.
      */
     public Pedra(int direcao) {
+        this(direcao, null);
+    }
+
+    /** Cria uma pedra em voo associada ao mapa que controla as colisões. */
+    public Pedra(int direcao, DungeonMap mapa) {
         this.converterDirecao(direcao);
+        this.mapa = mapa;
         this.estado = Estado.A_VOAR;
         this.distanciaPercorrida = 0;
         this.contadorNoChao = 0;
@@ -45,7 +53,13 @@ public class Pedra extends Actor implements Interagivel {
 
     /** Sobrecarga conveniente para código que já trabalha com Direcao. */
     public Pedra(Direcao direcao) {
+        this(direcao, null);
+    }
+
+    /** Cria uma pedra em voo associada ao mapa que controla as colisões. */
+    public Pedra(Direcao direcao, DungeonMap mapa) {
         this.direcao = direcao == null ? Direcao.BAIXO : direcao;
+        this.mapa = mapa;
         this.estado = Estado.A_VOAR;
         this.distanciaPercorrida = 0;
         this.contadorNoChao = 0;
@@ -92,11 +106,10 @@ public class Pedra extends Actor implements Interagivel {
 
     private void voar() {
         World mundo = getWorld();
-        if (!(mundo instanceof MyWorld)) {
+        if (mundo == null) {
             return;
         }
 
-        DungeonMap mapa = ((MyWorld) mundo).getMapa();
         int deslocamentoX = direcao.getDx() * VELOCIDADE;
         int deslocamentoY = direcao.getDy() * VELOCIDADE;
         int novoX = getX() + deslocamentoX;
