@@ -17,7 +17,7 @@ public class DungeonMap {
     private final GreenfootImage imagem;
     private final GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis;
-    private final Map<Chave, ArrayList<int[]>> tilesDasChaves;
+    private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
     private final ArrayList<Point> posicoesPedras;
     private final ArrayList<Point> spawnsJogadores;
@@ -33,7 +33,7 @@ public class DungeonMap {
         imagem = dados.imagem;
         imagemBase = dados.imagemBase;
         interagiveis = dados.interagiveis;
-        tilesDasChaves = dados.tilesDasChaves;
+        tilesDosObjetos = dados.tilesDosObjetos;
         configuracoesInimigos = dados.configuracoesInimigos;
         posicoesPedras = dados.posicoesPedras;
         spawnsJogadores = dados.spawnsJogadores;
@@ -53,18 +53,30 @@ public class DungeonMap {
     public void adicionarInteragivel(Interagivel interagivel) {
         if (interagivel != null && !interagiveis.contains(interagivel)) {
             interagiveis.add(interagivel);
+            registarInteragivel(interagivel);
+        }
+    }
+
+    /** Regista um objeto e prepara os tiles que lhe pertencem. */
+    public void registarInteragivel(Interagivel objeto) {
+        if (objeto != null && !tilesDosObjetos.containsKey(objeto)) {
+            tilesDosObjetos.put(objeto, new ArrayList<int[]>());
         }
     }
 
     /** Remove um objeto interagível sem expor a coleção interna. */
     public void removerInteragivel(Interagivel interagivel) {
         interagiveis.remove(interagivel);
-        if (interagivel instanceof Chave) {
-            CarregadorTiled.redesenharChaves(new CarregadorTiled.DadosMapa(
-                    imagem, imagemBase, interagiveis, tilesDasChaves,
-                    configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
-                    tilesets, fase));
-        }
+        tilesDosObjetos.remove(interagivel);
+        redesenharObjetos();
+    }
+
+    /** Reconstrói o mapa base e reaplica o estado visual de todos os objetos. */
+    public void redesenharObjetos() {
+        CarregadorTiled.redesenharObjetos(new CarregadorTiled.DadosMapa(
+                imagem, imagemBase, interagiveis, tilesDosObjetos,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
+                tilesets, fase));
     }
 
     public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() { return configuracoesInimigos; }

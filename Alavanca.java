@@ -16,6 +16,12 @@ public class Alavanca implements Interagivel {
     }
 
     @Override
+    public boolean temAnimacao() { return true; }
+
+    @Override
+    public int getFrameVisual() { return ativada ? FRAME_FINAL : 0; }
+
+    @Override
     public Rectangle getArea() {
         return area;
     }
@@ -35,8 +41,9 @@ public class Alavanca implements Interagivel {
 
     @Override
     public void interagir(Player jogador) {
-        if (jogador != null) {
-            ativada = true;
-        }
+        if (jogador == null || ativada) return;
+        ativada = true;
+        DungeonMap mapa = jogador.getMapa();
+        if (mapa != null) mapa.redesenharObjetos();
     }
 }

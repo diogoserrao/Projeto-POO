@@ -26,7 +26,7 @@ public class CarregadorTiled {
     private final GreenfootImage imagem;
     private GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
-    private final Map<Chave, ArrayList<int[]>> tilesDasChaves = new HashMap<Chave, ArrayList<int[]>>();
+    private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos = new HashMap<Interagivel, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
     private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
@@ -50,11 +50,11 @@ public class CarregadorTiled {
         if (MOSTRAR_COLISAO) depurarColisao();
         aplicarAmbiente(imagem, 0, 0, imagem.getWidth(), imagem.getHeight());
         imagemBase = new GreenfootImage(imagem);
-        redesenharChaves(getDados());
+        redesenharObjetos(getDados());
     }
 
     public DadosMapa getDados() {
-        return new DadosMapa(imagem, imagemBase, interagiveis, tilesDasChaves,
+        return new DadosMapa(imagem, imagemBase, interagiveis, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
                 tilesetsAtuais, fase);
     }
@@ -63,7 +63,7 @@ public class CarregadorTiled {
         final GreenfootImage imagem;
         final GreenfootImage imagemBase;
         final ArrayList<Interagivel> interagiveis;
-        final Map<Chave, ArrayList<int[]>> tilesDasChaves;
+        final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
         final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
         final ArrayList<Point> posicoesPedras;
         final ArrayList<Point> spawnsJogadores;
@@ -73,7 +73,7 @@ public class CarregadorTiled {
 
         DadosMapa(GreenfootImage imagem, GreenfootImage imagemBase,
                 ArrayList<Interagivel> interagiveis,
-                Map<Chave, ArrayList<int[]>> tilesDasChaves,
+                Map<Interagivel, ArrayList<int[]>> tilesDosObjetos,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> posicoesPedras,
                 ArrayList<Point> spawnsJogadores, boolean[][] colisaoComum,
@@ -81,7 +81,7 @@ public class CarregadorTiled {
             this.imagem = imagem;
             this.imagemBase = imagemBase;
             this.interagiveis = interagiveis;
-            this.tilesDasChaves = tilesDasChaves;
+            this.tilesDosObjetos = tilesDosObjetos;
             this.configuracoesInimigos = configuracoesInimigos;
             this.posicoesPedras = posicoesPedras;
             this.spawnsJogadores = spawnsJogadores;
@@ -188,14 +188,18 @@ public class CarregadorTiled {
             String nome = objeto.getAttribute("name").trim();
             if (nome.isEmpty()) continue;
             String tipo = nome.toLowerCase();
-            if (tipo.startsWith("bau")) interagiveis.add(new Bau(nome, area));
+            if (tipo.startsWith("bau")) registarInteragivel(new Bau(nome, area));
             else if (tipo.startsWith("chave")) {
-                Chave chave = new Chave(nome, area);
-                interagiveis.add(chave);
-                tilesDasChaves.put(chave, new ArrayList<int[]>());
-            } else if (tipo.startsWith("alavanca")) interagiveis.add(new Alavanca(nome, area));
+                registarInteragivel(new Chave(nome, area));
+            } else if (tipo.startsWith("alavanca")) registarInteragivel(new Alavanca(nome, area));
             else System.out.println("Objeto interativo desconhecido ignorado: " + nome);
         }
+    }
+
+    private void registarInteragivel(Interagivel objeto) {
+        if (objeto == null || interagiveis.contains(objeto)) return;
+        interagiveis.add(objeto);
+        tilesDosObjetos.put(objeto, new ArrayList<int[]>());
     }
 
     private Rectangle converterParaMundo(double x, double y, double largura, double altura, boolean ponto) {
@@ -225,29 +229,36 @@ public class CarregadorTiled {
     }
 
     private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
-        boolean objetos = "objects".equalsIgnoreCase(layer.getAttribute("name"));
+        boolean objetos = "objects".equalsIgnoreCase(layer.getAttribute("name"))
+                || "objects2".equalsIgnoreCase(layer.getAttribute("name"));
         for (int[] t : listarTiles(layer)) {
-            if (objetos && guardarTileDeChave(t)) continue;
+            if (objetos && guardarTileDeObjeto(t)) continue;
             desenharTile(t[2], t[0], t[1], tilesets);
         }
     }
 
-    private boolean guardarTileDeChave(int[] tile) {
-        Chave chaveMaisProxima = null;
+    private boolean guardarTileDeObjeto(int[] tile) {
+        Interagivel objetoMaisProximo = null;
         int menorDistancia = Integer.MAX_VALUE;
-        for (Map.Entry<Chave, ArrayList<int[]>> entrada : tilesDasChaves.entrySet()) {
-            Chave chave = entrada.getKey();
-            int ancoraX = (int) Math.floor(chave.getArea().getCenterX() / TILE + MIN_X);
-            int ancoraY = (int) Math.floor(chave.getArea().getCenterY() / TILE + MIN_Y);
+        Tileset tileset = escolherTileset(tile[2], tilesetsAtuais);
+        for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : tilesDosObjetos.entrySet()) {
+            Interagivel objeto = entrada.getKey();
+            if (objeto.temAnimacao() && (tileset == null
+                    || !new File(tileset.imagePath).getName().equalsIgnoreCase("doors_lever_chest_animation.png"))) continue;
+            int ancoraX = (int) Math.floor(objeto.getArea().getCenterX() / TILE + MIN_X);
+            int ancoraY = (int) Math.floor(objeto.getArea().getCenterY() / TILE + MIN_Y);
             int distancia = Math.abs(tile[0] - ancoraX) + Math.abs(tile[1] - ancoraY);
-            if (Math.abs(tile[0] - ancoraX) <= 2 && Math.abs(tile[1] - ancoraY) <= 2
+            if (Math.abs(tile[0] - ancoraX) <= objeto.getRaioSprite()
+                    && Math.abs(tile[1] - ancoraY) <= objeto.getRaioSprite()
                     && distancia < menorDistancia) {
-                chaveMaisProxima = chave;
+                objetoMaisProximo = objeto;
                 menorDistancia = distancia;
             }
         }
-        if (chaveMaisProxima == null) return false;
-        tilesDasChaves.get(chaveMaisProxima).add(new int[] { tile[0], tile[1], tile[2] });
+        if (objetoMaisProximo == null) return false;
+        ArrayList<int[]> tiles = tilesDosObjetos.get(objetoMaisProximo);
+        for (int[] existente : tiles) if (existente[0] == tile[0] && existente[1] == tile[1]) return true;
+        tiles.add(new int[] { tile[0], tile[1], tile[2] });
         return true;
     }
 
@@ -279,8 +290,7 @@ public class CarregadorTiled {
     }
 
     private void desenharTile(int gid, int tx, int ty, ArrayList<Tileset> tilesets) {
-        Tileset escolhido = null;
-        for (Tileset t : tilesets) if (t.firstGid <= gid && (escolhido == null || t.firstGid > escolhido.firstGid)) escolhido = t;
+        Tileset escolhido = escolherTileset(gid, tilesets);
         if (escolhido == null) return;
         try {
             int px = (tx - MIN_X) * TILE, py = (ty - MIN_Y) * TILE;
@@ -320,23 +330,31 @@ public class CarregadorTiled {
         }
     }
 
-    static void redesenharChaves(DadosMapa dados) {
+    static void redesenharObjetos(DadosMapa dados) {
         dados.imagem.drawImage(dados.imagemBase, 0, 0);
-        for (Map.Entry<Chave, ArrayList<int[]>> entrada : dados.tilesDasChaves.entrySet()) {
-            if (entrada.getKey().estaRecolhida()) continue;
+        for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : dados.tilesDosObjetos.entrySet()) {
+            Interagivel objeto = entrada.getKey();
+            if (!objeto.estaVisivel()) continue;
             for (int[] tile : entrada.getValue()) {
-                desenharTileEstatica(dados.imagem, tile[2], tile[0], tile[1], dados.tilesets);
+                int gid = objeto.temAnimacao() ? tile[2] + objeto.getFrameVisual() * 30 : tile[2];
+                desenharTileEstatica(dados.imagem, gid, tile[0], tile[1], dados.tilesets);
             }
         }
     }
 
     private static void desenharTileEstatica(GreenfootImage destino, int gid, int tx, int ty, ArrayList<Tileset> tilesets) {
-        Tileset escolhido = null;
-        for (Tileset t : tilesets) if (t.firstGid <= gid && (escolhido == null || t.firstGid > escolhido.firstGid)) escolhido = t;
+        Tileset escolhido = escolherTileset(gid, tilesets);
         if (escolhido == null) return;
         GreenfootImage tileFinal = obterTile(escolhido, gid);
         if (tileFinal == null) return;
         destino.drawImage(tileFinal, (tx - MIN_X) * TILE, (ty - MIN_Y) * TILE);
+    }
+
+    private static Tileset escolherTileset(int gid, ArrayList<Tileset> tilesets) {
+        Tileset escolhido = null;
+        for (Tileset t : tilesets) if (t.firstGid <= gid
+                && (escolhido == null || t.firstGid > escolhido.firstGid)) escolhido = t;
+        return escolhido;
     }
 
     /** Obtém o tile recortado e ampliado, carregando-o quando necessário. */

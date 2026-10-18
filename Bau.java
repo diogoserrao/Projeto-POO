@@ -23,6 +23,12 @@ public class Bau implements Interagivel {
     }
 
     @Override
+    public boolean temAnimacao() { return true; }
+
+    @Override
+    public int getFrameVisual() { return aberto ? FRAME_FINAL : 0; }
+
+    @Override
     public Rectangle getArea() {
         return area;
     }
@@ -41,6 +47,9 @@ public class Bau implements Interagivel {
 
     @Override
     public void interagir(Player jogador) {
+        if (jogador == null || aberto) return;
         abrir();
+        DungeonMap mapa = jogador.getMapa();
+        if (mapa != null) mapa.redesenharObjetos();
     }
 }

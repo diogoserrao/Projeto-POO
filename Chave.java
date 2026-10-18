@@ -28,6 +28,12 @@ public class Chave implements Interagivel {
     }
 
     @Override
+    public boolean estaVisivel() { return !recolhida; }
+
+    @Override
+    public int getRaioSprite() { return 2; }
+
+    @Override
     public Rectangle getArea() {
         return area;
     }
