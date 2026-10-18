@@ -9,6 +9,8 @@ public class Player extends Personagem {
     private final Controlos controlos;
     private final int velocidade = 4;
     private boolean teclaInteracaoPressionada;
+    private boolean teclaLancarPressionada;
+    private int pedras = 1;
     private final Set<String> chaves = new HashSet<String>();
 
     public Player(int skin, Controlos controlos) {
@@ -68,6 +70,7 @@ public class Player extends Personagem {
             movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
         processarInteracao();
+        processarLancamento();
 
     }
 
@@ -91,6 +94,37 @@ public class Player extends Personagem {
         }
 
         teclaInteracaoPressionada = teclaPressionada;
+    }
+
+    /** Lança uma pedra apenas no início da pressão da tecla configurada. */
+    private void processarLancamento() {
+        boolean teclaPressionada = Greenfoot.isKeyDown(controlos.getLancar());
+
+        if (teclaPressionada && !teclaLancarPressionada) {
+            lancarPedra();
+        }
+
+        teclaLancarPressionada = teclaPressionada;
+    }
+
+    /**
+     * Cria uma pedra em frente ao jogador e consome uma unidade do inventário.
+     * A posição inicial deixa espaço suficiente para a pedra não ficar sobre
+     * a imagem da personagem.
+     */
+    private void lancarPedra() {
+        World mundo = getWorld();
+        if (mundo == null || pedras <= 0) {
+            return;
+        }
+
+        Direcao direcao = getDirecao();
+        int distanciaInicial = 40;
+        int x = getX() + direcao.getDx() * distanciaInicial;
+        int y = getY() + direcao.getDy() * distanciaInicial;
+
+        pedras--;
+        mundo.addObject(new Pedra(direcao), x, y);
     }
 
     /** Ataca o inimigo mais próximo, mas apenas se estiver atrás dele. */
@@ -169,6 +203,16 @@ public class Player extends Personagem {
     /** Devolve uma visão apenas de leitura das chaves deste jogador. */
     public Set<String> getChaves() {
         return Collections.unmodifiableSet(chaves);
+    }
+
+    /** Devolve o número de pedras ainda disponíveis neste jogador. */
+    public int getPedras() {
+        return pedras;
+    }
+
+    /** Indica se este jogador ainda pode lançar uma pedra. */
+    public boolean temPedras() {
+        return pedras > 0;
     }
 
     private boolean tentarMover(int x, int y) {
