@@ -96,12 +96,11 @@ public class Pedra extends Actor implements Interagivel {
             return;
         }
 
+        DungeonMap mapa = ((MyWorld) mundo).getMapa();
         int deslocamentoX = direcao.getDx() * VELOCIDADE;
         int deslocamentoY = direcao.getDy() * VELOCIDADE;
         int novoX = getX() + deslocamentoX;
         int novoY = getY() + deslocamentoY;
-        DungeonMap mapa = ((MyWorld) mundo).getMapa();
-
         if (mapa == null
                 || distanciaPercorrida + VELOCIDADE >= ALCANCE_MAXIMO
                 || mapa.temColisaoNaZona(novoX - 4, novoY - 4,

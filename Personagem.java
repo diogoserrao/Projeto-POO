@@ -252,27 +252,34 @@ public abstract class Personagem extends Actor {
         }
     }
 
-    /** Devolve o mapa do mundo atual, quando este disponibiliza um mapa. */
-    protected DungeonMap getMapa() {
+    /** Devolve o mundo do jogo, quando este personagem já lhe pertence. */
+    protected MyWorld getMundo() {
         World mundo = getWorld();
-        if (!(mundo instanceof MyWorld)) {
-            return null;
+
+        if (mundo instanceof MyWorld) {
+            return (MyWorld) mundo;
         }
 
-        return ((MyWorld) mundo).getMapa();
+        return null;
+    }
+
+    /** Devolve o mapa do mundo atual, quando este disponibiliza um mapa. */
+    protected DungeonMap getMapa() {
+        MyWorld mundo = getMundo();
+        return mundo == null ? null : mundo.getMapa();
     }
 
     /** Consulta o estado de fim de jogo sem duplicar dependências nas subclasses. */
     protected boolean mundoEstaEmGameOver() {
-        World mundo = getWorld();
-        return mundo instanceof MyWorld && ((MyWorld) mundo).estaEmGameOver();
+        MyWorld mundo = getMundo();
+        return mundo != null && mundo.estaEmGameOver();
     }
 
     /** Termina a partida quando este personagem pertence ao mundo do jogo. */
     protected void terminarJogoNoMundo() {
-        World mundo = getWorld();
-        if (mundo instanceof MyWorld) {
-            ((MyWorld) mundo).terminarJogo();
+        MyWorld mundo = getMundo();
+        if (mundo != null) {
+            mundo.terminarJogo();
         }
     }
 

@@ -38,7 +38,7 @@ public class Enemy extends Personagem {
 
     @Override
     public void act() {
-        World mundo = getWorld();
+        World mundo = getMundo();
         if (mundoEstaEmGameOver()) {
             return;
         }
@@ -73,7 +73,7 @@ public class Enemy extends Personagem {
             contadorDistracao--;
         }
 
-        World mundo = getWorld();
+        World mundo = getMundo();
         if (mundo == null) {
             return;
         }
@@ -236,7 +236,7 @@ public class Enemy extends Personagem {
 
     /** Escolhe o jogador vivo, visivel e mais proximo. */
     private Player encontrarAlvo() {
-        World mundo = getWorld();
+        World mundo = getMundo();
         if (mundo == null) {
             return null;
         }

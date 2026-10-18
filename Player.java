@@ -115,7 +115,7 @@ public class Player extends Personagem {
      * a imagem da personagem.
      */
     private void lancarPedra() {
-        World mundo = getWorld();
+        World mundo = getMundo();
         if (mundo == null || pedras <= 0) {
             return;
         }
@@ -154,7 +154,7 @@ public class Player extends Personagem {
 
     /** Ataca o inimigo mais próximo, mas apenas se estiver atrás dele. */
     private boolean atacarInimigoPelasCostas() {
-        World mundo = getWorld();
+        World mundo = getMundo();
         if (mundo == null) {
             return false;
         }
