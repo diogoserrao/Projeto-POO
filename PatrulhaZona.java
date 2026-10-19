@@ -29,11 +29,11 @@ public class PatrulhaZona implements Movimento {
     }
 
     @Override
-    public boolean mover(Enemy inimigo) {
+    public boolean mover(Inimigo inimigo) {
         return patrulharZona(inimigo);
     }
 
-    private boolean patrulharZona(Enemy inimigo) {
+    private boolean patrulharZona(Inimigo inimigo) {
         int limite = horizontal
                 ? (sentido > 0 ? zona.x + zona.width : zona.x)
                 : (sentido > 0 ? zona.y + zona.height : zona.y);
@@ -41,7 +41,7 @@ public class PatrulhaZona implements Movimento {
     }
 
     /** Move ate ao extremo sem o ultrapassar e gere a pausa da viragem. */
-    private boolean patrulharAte(Enemy inimigo, int limite) {
+    private boolean patrulharAte(Inimigo inimigo, int limite) {
         if (estadoPatrulha == EstadoPatrulha.PAUSANDO) {
             contadorPausa--;
             if (contadorPausa <= 0) {

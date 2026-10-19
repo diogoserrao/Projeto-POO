@@ -13,11 +13,11 @@ public abstract class Personagem extends Actor {
     private static final int PES_OFFSET_Y = 18;
     private static final int PES_LARGURA = 15;
     private static final int PES_ALTURA = 11;
-    private static final int MAX_VIDAS = 3;
     private static final int DURACAO_FLASH_DANO = 8;
     private static final Map<String, GreenfootImage> SPRITESHEETS =
             new HashMap<String, GreenfootImage>();
 
+    private final int vidasMaximas;
     private int vidas;
 
     private final GreenfootImage walkSpritesheet;
@@ -38,28 +38,32 @@ public abstract class Personagem extends Actor {
     private boolean terminouMorte;
     private int contadorFlashDano;
 
-    protected Personagem(int personagem) {
+    protected Personagem(int personagem, int vidasMaximas) {
         this(carregarSpritesheet(personagem, "Walk"),
              carregarSpritesheet(personagem, "Idle"),
              carregarSpritesheet(personagem, "attack"),
-             carregarSpritesheet(personagem, "Death"));
+             carregarSpritesheet(personagem, "Death"), vidasMaximas);
     }
 
     protected Personagem(GreenfootImage walkSpritesheet,
-                         GreenfootImage idleSpritesheet) {
+                         GreenfootImage idleSpritesheet, int vidasMaximas) {
         this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
-             idleSpritesheet);
+             idleSpritesheet, vidasMaximas);
     }
 
     private Personagem(GreenfootImage walkSpritesheet,
                        GreenfootImage idleSpritesheet,
                        GreenfootImage attackSpritesheet,
-                       GreenfootImage deathSpritesheet) {
+                       GreenfootImage deathSpritesheet, int vidasMaximas) {
+        if (vidasMaximas <= 0) {
+            throw new IllegalArgumentException("O numero maximo de vidas deve ser positivo");
+        }
+        this.vidasMaximas = vidasMaximas;
         this.walkSpritesheet = walkSpritesheet;
         this.idleSpritesheet = idleSpritesheet;
         this.attackSpritesheet = attackSpritesheet;
         this.deathSpritesheet = deathSpritesheet;
-        this.vidas = MAX_VIDAS;
+        this.vidas = vidasMaximas;
         this.walkFrames = walkSpritesheet.getWidth() / FRAME_SIZE;
         this.idleFrames = idleSpritesheet.getWidth() / FRAME_SIZE;
         this.attackFrames = attackSpritesheet.getWidth() / FRAME_SIZE;
@@ -263,6 +267,35 @@ public abstract class Personagem extends Actor {
         return null;
     }
 
+    /** Fluxo comum a todos os personagens (Template Method). */
+    @Override
+    public final void act() {
+        if (mundoEstaEmGameOver()) {
+            return;
+        }
+
+        if (!estaVivo()) {
+            if (!estaEmMorte()) {
+                iniciarMorte();
+            }
+            atualizarAnimacao(false);
+            if (terminouMorte()) {
+                aoTerminarMorte();
+            }
+            return;
+        }
+
+        agir();
+    }
+
+    /** Comportamento específico implementado por cada personagem. */
+    protected abstract void agir();
+
+    /** Hook para as regras específicas após a animação de morte. */
+    protected void aoTerminarMorte() {
+        // Por defeito, não há nenhuma ação adicional.
+    }
+
     /** Devolve o mapa do mundo atual, quando este disponibiliza um mapa. */
     protected DungeonMap getMapa() {
         MyWorld mundo = getMundo();
@@ -290,7 +323,7 @@ public abstract class Personagem extends Actor {
 
     /** Devolve o número máximo de vidas/corações deste personagem. */
     public int getMaxVidas() {
-        return MAX_VIDAS;
+        return vidasMaximas;
     }
 
     /** Indica se este personagem ainda tem pelo menos uma vida. */
@@ -306,9 +339,27 @@ public abstract class Personagem extends Actor {
         }
     }
 
+    /** Aplica um dano e inicia a morte quando a última vida é perdida. */
+    public void receberDano() {
+        receberDano(1);
+    }
+
+    /** Variante protegida para efeitos que causam mais do que uma vida de dano. */
+    protected void receberDano(int quantidade) {
+        if (quantidade <= 0 || !estaVivo() || estaEmMorte()) {
+            return;
+        }
+        for (int i = 0; i < quantidade && estaVivo(); i++) {
+            perderVida();
+        }
+        if (!estaVivo()) {
+            iniciarMorte();
+        }
+    }
+
     /** Recupera exatamente uma vida, sem ultrapassar o máximo. */
     public void ganharVida() {
-        if (vidas < MAX_VIDAS) {
+        if (vidas < vidasMaximas) {
             vidas++;
         }
     }

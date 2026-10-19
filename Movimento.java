@@ -5,5 +5,5 @@ public interface Movimento {
      *
      * @return true quando o inimigo se moveu; false caso contrario
      */
-    boolean mover(Enemy inimigo);
+    boolean mover(Inimigo inimigo);
 }

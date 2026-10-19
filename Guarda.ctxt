@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Guarda
+comment0.text=Inimigo\ que\ patrulha\ uma\ zona\ configurada\ no\ mapa.
+comment1.params=personagem\ zonaPatrulha
+comment1.target=Guarda(int,\ java.awt.Rectangle)
+numComments=2

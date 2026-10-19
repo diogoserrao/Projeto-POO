@@ -2,5 +2,5 @@
 comment0.target=Aleatorio
 comment0.text=Implementacao\ de\ teste\:\ escolhe\ uma\ direcao\ nova\ em\ cada\ tentativa.
 comment1.params=inimigo
-comment1.target=boolean\ mover(Enemy)
+comment1.target=boolean\ mover(Inimigo)
 numComments=2

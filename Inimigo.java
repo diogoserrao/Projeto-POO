@@ -2,7 +2,7 @@ import greenfoot.*;
 import java.util.List;
 
 /** Um inimigo delega o movimento para a implementacao recebida. */
-public class Enemy extends Personagem {
+public abstract class Inimigo extends Personagem {
     private static final int RAIO_VISAO = 100;
     private static final int ALCANCE_GOLPE = RAIO_VISAO;
     private static final int ALCANCE_GOLPE_QUADRADO =
@@ -10,7 +10,6 @@ public class Enemy extends Personagem {
     private static final double ANGULO_VISAO = 60.0;
     private static final int COOLDOWN_ATAQUE = 60;
     private static final boolean MOSTRAR_VISAO = true;
-    private static final int VIDAS_INIMIGO = 3;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
     private static final int DURACAO_DISTRACAO = 180;
     private static final int RAIO_DETECAO_PEDRAS = RAIO_VISAO;
@@ -21,15 +20,18 @@ public class Enemy extends Personagem {
     private static final double RAIO_VISAO_QUADRADO = RAIO_VISAO * RAIO_VISAO;
     private static final double RAIO_DETECAO_PEDRAS_QUADRADO =
             RAIO_DETECAO_PEDRAS * RAIO_DETECAO_PEDRAS;
-    private final Movimento movimento;
+    private Movimento movimento;
     private int contadorAtaque;
     private int contadorInvulnerabilidade;
     private int contadorDistracao;
     private Pedra ultimaPedraVista;
-    private int vidasInimigo = VIDAS_INIMIGO;
 
-    public Enemy(int personagem, Movimento movimento) {
-        super(personagem);
+    protected Inimigo(int personagem) {
+        super(personagem, 3);
+    }
+
+    /** Configura o movimento específico da subclasse concreta. */
+    protected final void definirMovimento(Movimento movimento) {
         if (movimento == null) {
             throw new IllegalArgumentException("O movimento nao pode ser null");
         }
@@ -37,20 +39,10 @@ public class Enemy extends Personagem {
     }
 
     @Override
-    public void act() {
-        World mundo = getMundo();
-        if (mundoEstaEmGameOver()) {
+    protected void agir() {
+        if (movimento == null) {
             return;
         }
-
-        if (estaEmMorte()) {
-            atualizarAnimacao(false);
-            if (terminouMorte() && mundo != null) {
-                mundo.removeObject(this);
-            }
-            return;
-        }
-
         if (contadorInvulnerabilidade > 0) {
             contadorInvulnerabilidade--;
         }
@@ -112,7 +104,7 @@ public class Enemy extends Personagem {
     /**
      * Deteta o jogador válido mais próximo e aplica-lhe dano.
      *
-     * Este método pertence à classe Enemy, por isso é executado por todos os
+     * Este método pertence à classe Inimigo, por isso é executado por todos os
      * inimigos, independentemente do movimento que cada um utiliza.
      */
     public void detetarEAtacarJogador(Player alvo) {
@@ -122,7 +114,7 @@ public class Enemy extends Personagem {
 
         if (alvo != null && contadorAtaque == 0) {
             iniciarAtaque();
-            alvo.perderVida();
+            alvo.receberDano();
             contadorAtaque = COOLDOWN_ATAQUE;
 
             if (!alvo.estaVivo()) {
@@ -137,12 +129,8 @@ public class Enemy extends Personagem {
             return;
         }
 
-        vidasInimigo--;
-        iniciarFlashDano();
+        receberDano();
         contadorInvulnerabilidade = INVULNERABILIDADE_APOS_GOLPE;
-        if (vidasInimigo <= 0) {
-            iniciarMorte();
-        }
     }
 
     /** Recebe um golpe do jogador, eliminando imediatamente um golpe pelas costas. */
@@ -152,8 +140,7 @@ public class Enemy extends Personagem {
         }
 
         if (estaDeCostasPara(atacante)) {
-            vidasInimigo = 0;
-            iniciarMorte();
+            receberDano(getMaxVidas());
         } else {
             receberAtaque();
         }
@@ -208,15 +195,12 @@ public class Enemy extends Personagem {
                 getDirecao().getDx()));
     }
 
-    /** Devolve as vidas próprias do inimigo, usadas pelos ataques do jogador. */
     @Override
-    public boolean estaVivo() {
-        return vidasInimigo > 0;
-    }
-
-    @Override
-    public int getVidas() {
-        return vidasInimigo;
+    protected void aoTerminarMorte() {
+        World mundo = getWorld();
+        if (mundo != null) {
+            mundo.removeObject(this);
+        }
     }
 
     /**

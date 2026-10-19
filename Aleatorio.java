@@ -5,7 +5,7 @@ public class Aleatorio implements Movimento {
     private static final int VELOCIDADE = 2;
 
     @Override
-    public boolean mover(Enemy inimigo) {
+    public boolean mover(Inimigo inimigo) {
         Direcao[] direcoes = Direcao.values();
         Direcao direcao = direcoes[Greenfoot.getRandomNumber(direcoes.length)];
         int novoX = inimigo.getX();

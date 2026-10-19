@@ -15,27 +15,12 @@ public class Player extends Personagem {
     private final Set<String> chaves = new HashSet<String>();
 
     public Player(int skin, Controlos controlos) {
-        super(skin);
+        super(skin, 3);
         this.controlos = controlos;
     }
 
     @Override
-    public void act() {
-        if (mundoEstaEmGameOver()) {
-            return;
-        }
-
-        if (!estaVivo()) {
-            if (!estaEmMorte()) {
-                iniciarMorte();
-            }
-            atualizarAnimacao(false);
-            if (terminouMorte()) {
-                terminarJogoNoMundo();
-            }
-            return;
-        }
-
+    protected void agir() {
         if (estaEmAtaque()) {
             atualizarAnimacao(false);
             return;
@@ -74,6 +59,11 @@ public class Player extends Personagem {
         recolherPedras();
         processarLancamento();
 
+    }
+
+    @Override
+    protected void aoTerminarMorte() {
+        terminarJogoNoMundo();
     }
 
     private void processarInteracao() {
@@ -159,11 +149,11 @@ public class Player extends Personagem {
             return false;
         }
 
-        List<Enemy> inimigos = mundo.getObjects(Enemy.class);
-        Enemy alvo = null;
+        List<Inimigo> inimigos = mundo.getObjects(Inimigo.class);
+        Inimigo alvo = null;
         double menorDistanciaQuadrado = Double.MAX_VALUE;
 
-        for (Enemy inimigo : inimigos) {
+        for (Inimigo inimigo : inimigos) {
             if (inimigo.podeSerAtacadoPor(this)) {
                 double dx = inimigo.getX() - getX();
                 double dy = inimigo.getY() - getY();

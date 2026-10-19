@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Sentinela
+comment0.text=Inimigo\ que\ permanece\ parado\ e\ vigia\ a\ sua\ \u00E1rea.
+comment1.params=personagem
+comment1.target=Sentinela(int)
+numComments=2

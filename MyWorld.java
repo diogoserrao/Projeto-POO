@@ -85,10 +85,9 @@ public class MyWorld extends World {
             int spawnY = spawn.y + spawn.height / 2;
             int personagem = (i % 2) + 1;
 
-            Movimento movimento = configuracao.temPatrulha()
-                    ? new PatrulhaZona(configuracao.getPatrulha(), 2)
-                    : new Parado();
-            Enemy inimigo = new Enemy(personagem, movimento);
+            Inimigo inimigo = configuracao.temPatrulha()
+                    ? new Guarda(personagem, configuracao.getPatrulha())
+                    : new Sentinela(personagem);
 
             addObject(inimigo, spawnX, spawnY);
             inimigo.orientarPara(jogadorMaisProximo(inimigo));
@@ -104,7 +103,7 @@ public class MyWorld extends World {
         }
     }
 
-    private Player jogadorMaisProximo(Enemy inimigo) {
+    private Player jogadorMaisProximo(Inimigo inimigo) {
         Player maisProximo = null;
         double menorDistancia = Double.MAX_VALUE;
 
