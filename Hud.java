@@ -8,6 +8,10 @@ public class Hud {
     private final List<Player> jogadores;
     private final IntSupplier faseAtual;
     private final int maxFases;
+    private final String[] ultimasVidas;
+    private String ultimaFase;
+    private String ultimosControlos;
+    private String ultimasInteracoes;
 
     public Hud(World mundo, List<Player> jogadores,
             IntSupplier faseAtual, int maxFases) {
@@ -15,20 +19,25 @@ public class Hud {
         this.jogadores = jogadores;
         this.faseAtual = faseAtual;
         this.maxFases = maxFases;
+        this.ultimasVidas = new String[jogadores.size()];
     }
 
     /** Atualiza todos os textos do HUD sem conhecer a logica do jogo. */
     public void atualizar() {
         for (int i = 0; i < jogadores.size(); i++) {
             Player jogador = jogadores.get(i);
-            mundo.showText(formatarVidas(jogador, i),
-                    posicaoJogador(i), 25);
+            String vidas = formatarVidas(jogador, i);
+            if (!vidas.equals(ultimasVidas[i])) {
+                mundo.showText(vidas, posicaoJogador(i), 25);
+                ultimasVidas[i] = vidas;
+            }
         }
 
-        mundo.showText(
-                "FASE " + faseAtual.getAsInt() + " / " + maxFases,
-                mundo.getWidth() / 2,
-                25);
+        String fase = "FASE " + faseAtual.getAsInt() + " / " + maxFases;
+        if (!fase.equals(ultimaFase)) {
+            mundo.showText(fase, mundo.getWidth() / 2, 25);
+            ultimaFase = fase;
+        }
 
         String controlos = "";
         for (int i = 0; i < jogadores.size(); i++) {
@@ -53,10 +62,14 @@ public class Hud {
             }
         }
 
-        mundo.showText(controlos, mundo.getWidth() / 2,
-                mundo.getHeight() - 20);
-        mundo.showText(interacoes, mundo.getWidth() / 2,
-                mundo.getHeight() - 44);
+        if (!controlos.equals(ultimosControlos)) {
+            mundo.showText(controlos, mundo.getWidth() / 2, mundo.getHeight() - 20);
+            ultimosControlos = controlos;
+        }
+        if (!interacoes.equals(ultimasInteracoes)) {
+            mundo.showText(interacoes, mundo.getWidth() / 2, mundo.getHeight() - 44);
+            ultimasInteracoes = interacoes;
+        }
     }
 
     private String formatarControlos(Player jogador, int indiceJogador) {

@@ -89,15 +89,6 @@ public class DungeonMap {
         return Collections.unmodifiableList(armadilhas);
     }
 
-    public void atualizarArmadilhas(List<Player> jogadores) {
-        for (Armadilha armadilha : armadilhas) {
-            armadilha.atualizar();
-            if (jogadores != null)
-                for (Player jogador : jogadores) armadilha.aplicarDano(jogador);
-        }
-        redesenharObjetos();
-    }
-
     public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() { return configuracoesInimigos; }
     public ArrayList<Point> getPosicoesPedras() { return posicoesPedras; }
     public ArrayList<Point> getSpawnsJogadores() { return spawnsJogadores; }

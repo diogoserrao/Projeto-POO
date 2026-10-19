@@ -55,6 +55,7 @@ public class CarregadorTiled {
         imagem.setColor(new greenfoot.Color(13, 17, 24));
         imagem.fill();
         carregar();
+        prepararRecursosDasArmadilhas();
         if (MOSTRAR_COLISAO) depurarColisao();
         aplicarAmbiente(imagem, 0, 0, imagem.getWidth(), imagem.getHeight());
         imagemBase = new GreenfootImage(imagem);
@@ -430,6 +431,52 @@ public class CarregadorTiled {
         }
     }
 
+    /** Compõe uma vez os quadros dos atores, sem tocar na imagem de fundo. */
+    private void prepararRecursosDasArmadilhas() {
+        for (Armadilha armadilha : armadilhas) {
+            ArrayList<int[]> tiles = tilesDosObjetos.get(armadilha);
+            if (tiles == null || tiles.isEmpty()) continue;
+
+            int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+            int numeroQuadros = 1;
+            int[] duracoes = null;
+            for (int[] tile : tiles) {
+                minX = Math.min(minX, tile[0]);
+                minY = Math.min(minY, tile[1]);
+                maxX = Math.max(maxX, tile[0]);
+                maxY = Math.max(maxY, tile[1]);
+                TileAnimation animacao = animacoesTiles.get(tile[2]);
+                if (animacao != null && animacao.frames.length > 0) {
+                    numeroQuadros = Math.max(numeroQuadros, animacao.frames.length);
+                    if (duracoes == null) duracoes = animacao.duracoes.clone();
+                }
+            }
+            if (duracoes != null) armadilha.configurarAnimacao(duracoes);
+
+            int largura = (maxX - minX + 1) * TILE;
+            int altura = (maxY - minY + 1) * TILE;
+            GreenfootImage[] imagens = new GreenfootImage[numeroQuadros];
+            for (int quadro = 0; quadro < numeroQuadros; quadro++) {
+                imagens[quadro] = new GreenfootImage(largura, altura);
+                for (int[] tile : tiles) {
+                    int gid = tile[2];
+                    TileAnimation animacao = animacoesTiles.get(gid);
+                    if (animacao != null && animacao.frames.length > 0)
+                        gid = animacao.frames[quadro % animacao.frames.length];
+                    Tileset tileset = escolherTileset(gid, tilesetsAtuais);
+                    GreenfootImage imagemTile = tileset == null ? null : obterTile(tileset, gid);
+                    if (imagemTile != null)
+                        imagens[quadro].drawImage(imagemTile,
+                                (tile[0] - minX) * TILE, (tile[1] - minY) * TILE);
+                }
+            }
+            int centroX = (minX - MIN_X) * TILE + largura / 2;
+            int centroY = (minY - MIN_Y) * TILE + altura / 2;
+            armadilha.configurarRecursosVisuais(imagens, centroX, centroY);
+        }
+    }
+
     private void lerSpawnJogadores(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         TreeMap<String, Point> porNome = new TreeMap<String, Point>();
@@ -461,14 +508,11 @@ public class CarregadorTiled {
         dados.imagem.drawImage(dados.imagemBase, 0, 0);
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : dados.tilesDosObjetos.entrySet()) {
             Interagivel objeto = entrada.getKey();
+            if (objeto instanceof Armadilha) continue;
             if (!objeto.estaVisivel()) continue;
             for (int[] tile : entrada.getValue()) {
                 int gid = tile[2];
-                if (objeto instanceof Armadilha) {
-                    TileAnimation animacao = dados.animacoesTiles.get(tile[2]);
-                    if (animacao != null && animacao.frames.length > 0)
-                        gid = animacao.frames[Math.min(objeto.getFrameVisual(), animacao.frames.length - 1)];
-                } else if (objeto.temAnimacao()) {
+                if (objeto.temAnimacao()) {
                     gid += objeto.getFrameVisual() * 30;
                 }
                 desenharTileEstatica(dados.imagem, gid, tile[0], tile[1], dados.tilesets);

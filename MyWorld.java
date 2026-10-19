@@ -40,6 +40,7 @@ public class MyWorld extends World {
 
         removeObjects(getObjects(null));
 
+        configurarArmadilhas();
         configurarSpawnAtor();
         hud = new Hud(this, jogadores, new java.util.function.IntSupplier() {
             @Override
@@ -51,6 +52,15 @@ public class MyWorld extends World {
         configurarPedras();
 
         hud.atualizar();
+    }
+
+    /** Adiciona cada armadilha uma única vez; a animação corre no próprio ator. */
+    private void configurarArmadilhas() {
+        for (Armadilha armadilha : mapa.getArmadilhas()) {
+            if (armadilha.getWorld() == null) {
+                addObject(armadilha, armadilha.getCentroVisualX(), armadilha.getCentroVisualY());
+            }
+        }
     }
 
     private void configurarSpawnAtor() {
@@ -157,7 +167,6 @@ public class MyWorld extends World {
 
         teclaProximaFasePressionada = teclaN;
 
-        mapa.atualizarArmadilhas(jogadores);
         hud.atualizar();
         verificarDerrota();
     }
