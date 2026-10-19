@@ -16,6 +16,8 @@ public class MyWorld extends World {
 
     private final List<Player> jogadores = new ArrayList<Player>();
     private final List<Player> jogadoresVisiveis = Collections.unmodifiableList(jogadores);
+    private final List<Pedra> pedras = new ArrayList<Pedra>();
+    private final List<Pedra> pedrasVisiveis = Collections.unmodifiableList(pedras);
     private Hud hud;
     private boolean teclaProximaFasePressionada = false;
     private boolean jogoTerminou = false;
@@ -72,6 +74,7 @@ public class MyWorld extends World {
         Point p2 = spawns.size() > 1 ? spawns.get(1) : new Point(p1.x + 32, p1.y);
 
         jogadores.clear();
+        pedras.clear();
 
         jogadores.add(new Player(
                 2,
@@ -102,6 +105,7 @@ public class MyWorld extends World {
                     : new Sentinela(personagem);
 
             addObject(inimigo, spawnX, spawnY);
+            inimigo.inicializarConeVisao();
             inimigo.orientarPara(jogadorMaisProximo(inimigo));
         }
 
@@ -111,6 +115,7 @@ public class MyWorld extends World {
         for (Point posicao : mapa.getPosicoesPedras()) {
             Pedra pedra = new Pedra();
             addObject(pedra, posicao.x, posicao.y);
+            adicionarPedra(pedra);
             mapa.adicionarInteragivel(pedra);
         }
     }
@@ -221,5 +226,17 @@ public class MyWorld extends World {
     /** Lista de jogadores disponivel para sistemas do mundo, como a IA. */
     public List<Player> getJogadores() {
         return jogadoresVisiveis;
+    }
+
+    public List<Pedra> getPedras() {
+        return pedrasVisiveis;
+    }
+
+    public void adicionarPedra(Pedra pedra) {
+        if (pedra != null && !pedras.contains(pedra)) pedras.add(pedra);
+    }
+
+    public void removerPedra(Pedra pedra) {
+        pedras.remove(pedra);
     }
 }

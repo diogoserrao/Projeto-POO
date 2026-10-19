@@ -20,6 +20,8 @@ public abstract class Personagem extends Actor {
     /** Frames prontos partilhados por personagens que usam o mesmo spritesheet. */
     private static final Map<GreenfootImage, GreenfootImage[][]> FRAMES_CACHE =
             new IdentityHashMap<GreenfootImage, GreenfootImage[][]>();
+    private static final Map<GreenfootImage, GreenfootImage> FLASH_CACHE =
+            new IdentityHashMap<GreenfootImage, GreenfootImage>();
 
     private final int vidasMaximas;
     private int vidas;
@@ -195,6 +197,8 @@ public abstract class Personagem extends Actor {
 
     /** Cria uma cópia avermelhada sem alterar a imagem original da animação. */
     private GreenfootImage tingirDeVermelho(GreenfootImage original) {
+        GreenfootImage existente = FLASH_CACHE.get(original);
+        if (existente != null) return existente;
         GreenfootImage tingida = new GreenfootImage(original);
 
         for (int x = 0; x < tingida.getWidth(); x++) {
@@ -212,6 +216,7 @@ public abstract class Personagem extends Actor {
             }
         }
 
+        FLASH_CACHE.put(original, tingida);
         return tingida;
     }
 

@@ -8,6 +8,7 @@ public abstract class Inimigo extends Personagem {
     private static final int ALCANCE_GOLPE_QUADRADO =
             ALCANCE_GOLPE * ALCANCE_GOLPE;
     private static final int COOLDOWN_ATAQUE = 60;
+    /** A visão permanece sempre ativa; a otimização está na camada em cache. */
     private static final boolean MOSTRAR_VISAO = true;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
     private static final int DURACAO_DISTRACAO = 180;
@@ -20,6 +21,14 @@ public abstract class Inimigo extends Personagem {
     private Pedra ultimaPedraVista;
     private boolean morteFurtiva;
     private boolean pontuacaoAtribuida;
+    private ConeVisao coneVisao;
+    private Direcao direcaoCone;
+    private int raioCone = -1;
+    private double anguloCone = Double.NaN;
+    private int raioDetecaoCache = -1;
+    private double raioDetecaoQuadradoCache;
+    private double anguloDetecaoCache = Double.NaN;
+    private double cosenoMeioConeCache;
 
     protected Inimigo(int personagem) {
         super(personagem, 3);
@@ -61,6 +70,7 @@ public abstract class Inimigo extends Personagem {
         } else {
             atualizarAnimacao(false);
         }
+        atualizarImagemCone();
         detetarEAtacarJogador(alvo);
     }
 
@@ -70,12 +80,12 @@ public abstract class Inimigo extends Personagem {
             contadorDistracao--;
         }
 
-        World mundo = getMundo();
+        MyWorld mundo = getMundo();
         if (mundo == null) {
             return;
         }
 
-        List<Pedra> pedras = mundo.getObjects(Pedra.class);
+        List<Pedra> pedras = mundo.getPedras();
         for (Pedra pedra : pedras) {
             if (pedra == null || pedra == ultimaPedraVista
                     || !pedra.fazDistracao()) {
@@ -85,8 +95,7 @@ public abstract class Inimigo extends Personagem {
             int dx = pedra.getX() - getX();
             int dy = pedra.getY() - getY();
             double distanciaQuadrado = dx * dx + dy * dy;
-            int raioVisao = getRaioVisao();
-            double raioDetecaoPedrasQuadrado = (double) raioVisao * raioVisao;
+            double raioDetecaoPedrasQuadrado = getRaioDetecaoQuadrado();
             if (distanciaQuadrado <= raioDetecaoPedrasQuadrado
                     && distanciaQuadrado > 0) {
                 ultimaPedraVista = pedra;
@@ -181,49 +190,42 @@ public abstract class Inimigo extends Personagem {
     @Override
     protected void mostrarFrame() {
         super.mostrarFrame();
-        if (!MOSTRAR_VISAO) {
-            return;
-        }
-
-        GreenfootImage personagem = getImage();
-        int raioVisao = getRaioVisao();
-        double anguloVisao = getAnguloVisao();
-        int tamanho = raioVisao * 2 + 4;
-        GreenfootImage imagem = new GreenfootImage(tamanho, tamanho);
-        int centro = tamanho / 2;
-        int[] xs = new int[23];
-        int[] ys = new int[23];
-        xs[0] = centro;
-        ys[0] = centro;
-        double direcao = direcaoEmGraus();
-
-        for (int i = 0; i <= 21; i++) {
-            double graus = Math.toRadians(direcao - anguloVisao / 2.0
-                    + anguloVisao * i / 21.0);
-            xs[i + 1] = centro + (int) Math.round(
-                    Math.cos(graus) * raioVisao);
-            ys[i + 1] = centro + (int) Math.round(
-                    Math.sin(graus) * raioVisao);
-        }
-
-        imagem.setColor(new Color(255, 220, 70, 45));
-        imagem.fillPolygon(xs, ys, xs.length);
-        imagem.setColor(new Color(255, 220, 70, 150));
-        imagem.drawPolygon(xs, ys, xs.length);
-        imagem.drawImage(personagem, centro - personagem.getWidth() / 2,
-                centro - personagem.getHeight() / 2);
-        setImage(imagem);
+        atualizarImagemCone();
     }
 
-    private double direcaoEmGraus() {
-        return Math.toDegrees(Math.atan2(getDirecao().getDy(),
-                getDirecao().getDx()));
+    /** Cria a camada visual depois de o ator estar no mundo. */
+    public void inicializarConeVisao() {
+        MyWorld mundo = getMundo();
+        if (!MOSTRAR_VISAO || coneVisao != null || mundo == null) return;
+        coneVisao = new ConeVisao(getRaioVisao(), getAnguloVisao());
+        mundo.addObject(coneVisao, getX(), getY());
+        atualizarImagemCone();
+    }
+
+    private void atualizarImagemCone() {
+        if (coneVisao == null) return;
+        int raio = getRaioVisao();
+        double angulo = getAnguloVisao();
+        Direcao direcao = getDirecao();
+        if (raio != raioCone || Double.compare(angulo, anguloCone) != 0
+                || direcao != direcaoCone) {
+            coneVisao.atualizar(raio, angulo, direcao);
+            raioCone = raio;
+            anguloCone = angulo;
+            direcaoCone = direcao;
+        }
+        if (coneVisao.getX() != getX() || coneVisao.getY() != getY()) {
+            coneVisao.setLocation(getX(), getY());
+        }
     }
 
     @Override
     protected void aoTerminarMorte() {
         MyWorld mundo = getMundo();
         if (mundo != null) {
+            if (coneVisao != null && coneVisao.getWorld() == mundo) {
+                mundo.removeObject(coneVisao);
+            }
             if (!pontuacaoAtribuida) {
                 mundo.adicionarPontos(morteFurtiva ? 200 : 100);
                 pontuacaoAtribuida = true;
@@ -249,19 +251,18 @@ public abstract class Inimigo extends Personagem {
 
     /** Escolhe o jogador vivo, visivel e mais proximo. */
     private Player encontrarAlvo() {
-        World mundo = getMundo();
+        MyWorld mundo = getMundo();
         if (mundo == null) {
             return null;
         }
 
         /* Consulta os atores que estão realmente no mundo. */
-        List<Player> jogadores = mundo.getObjects(Player.class);
+        List<Player> jogadores = mundo.getJogadores();
         Player maisProximo = null;
         double menorDistanciaQuadrado = Double.MAX_VALUE;
         int raioVisao = getRaioVisao();
-        double raioVisaoQuadrado = (double) raioVisao * raioVisao;
-        double cosenoMeioCone = Math.cos(
-                Math.toRadians(getAnguloVisao() / 2.0));
+        double raioVisaoQuadrado = getRaioDetecaoQuadrado();
+        double cosenoMeioCone = getCosenoMeioConeVisao();
 
         for (Player jogador : jogadores) {
             if (jogador == null || !jogador.estaVivo()) {
@@ -281,6 +282,24 @@ public abstract class Inimigo extends Personagem {
         }
 
         return maisProximo;
+    }
+
+    private double getRaioDetecaoQuadrado() {
+        int raio = getRaioVisao();
+        if (raio != raioDetecaoCache) {
+            raioDetecaoCache = raio;
+            raioDetecaoQuadradoCache = (double) raio * raio;
+        }
+        return raioDetecaoQuadradoCache;
+    }
+
+    private double getCosenoMeioConeVisao() {
+        double angulo = getAnguloVisao();
+        if (Double.compare(angulo, anguloDetecaoCache) != 0) {
+            anguloDetecaoCache = angulo;
+            cosenoMeioConeCache = Math.cos(Math.toRadians(angulo / 2.0));
+        }
+        return cosenoMeioConeCache;
     }
 
     private static boolean estaNoCone(double dx, double dy, int direcao,

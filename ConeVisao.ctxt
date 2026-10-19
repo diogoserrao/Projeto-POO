@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=ConeVisao
+comment0.text=Camada\ visual\ independente\ do\ inimigo,\ com\ imagens\ partilhadas\ por\ geometria.
+comment1.params=raio\ angulo
+comment1.target=ConeVisao(int,\ double)
+comment2.params=raio\ angulo\ direcao
+comment2.target=void\ atualizar(int,\ double,\ Direcao)
+comment3.params=raio\ angulo\ direcao
+comment3.target=greenfoot.GreenfootImage\ obterImagem(int,\ double,\ Direcao)
+comment4.params=raio\ angulo
+comment4.target=greenfoot.GreenfootImage[]\ criarImagens(int,\ double)
+comment5.params=
+comment5.target=void\ act()
+numComments=6

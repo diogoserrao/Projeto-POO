@@ -103,6 +103,7 @@ public class Pedra extends Actor implements Interagivel {
             if (contadorNoChao == 0) {
                 World mundo = getWorld();
                 if (mundo != null) {
+                    if (mundo instanceof MyWorld) ((MyWorld) mundo).removerPedra(this);
                     mundo.removeObject(this);
                 }
             }
@@ -174,6 +175,7 @@ public class Pedra extends Actor implements Interagivel {
         if (jogador.getMapa() != null) {
             jogador.getMapa().removerInteragivel(this);
         }
+        if (getWorld() instanceof MyWorld) ((MyWorld) getWorld()).removerPedra(this);
         getWorld().removeObject(this);
     }
 

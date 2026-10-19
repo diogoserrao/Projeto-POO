@@ -14,6 +14,11 @@ public class Player extends Personagem {
     private boolean teclaLancarPressionada;
     private int pedras = 0;
     private final List<Chave> chaves = new ArrayList<Chave>();
+    private Interagivel interagivelPertoCache;
+    private int interagivelCacheX;
+    private int interagivelCacheY;
+    private DungeonMap interagivelCacheMapa;
+    private long interagivelCacheRevisao = Long.MIN_VALUE;
 
     public Player(int skin, Controlos controlos) {
         super(skin, 3);
@@ -122,7 +127,9 @@ public class Player extends Personagem {
         }
 
         pedras--;
-        mundo.addObject(new Pedra(direcao, mapa), x, y);
+        Pedra pedra = new Pedra(direcao, mapa);
+        mundo.addObject(pedra, x, y);
+        if (mundo instanceof MyWorld) ((MyWorld) mundo).adicionarPedra(pedra);
         // O som só é emitido depois de a pedra ser efetivamente criada.
         Greenfoot.playSound("pedra.mp3");
     }
@@ -217,16 +224,29 @@ public class Player extends Personagem {
             return null;
         }
 
+        long revisao = mapa.getRevisaoInteracoes();
+        if (mapa == interagivelCacheMapa && getX() == interagivelCacheX
+                && getY() == interagivelCacheY
+                && revisao == interagivelCacheRevisao) {
+            return interagivelPertoCache;
+        }
+
         Rectangle areaDosPes = new Rectangle(getX() - 12, getY() + 12, 24, 24);
+        Interagivel resultado = null;
 
         for (Interagivel interagivel : mapa.getInteragiveis()) {
             if (!(interagivel instanceof Pedra)
                     && interagivel.getArea().intersects(areaDosPes)) {
-                return interagivel;
+                resultado = interagivel;
+                break;
             }
         }
-
-        return null;
+        interagivelCacheMapa = mapa;
+        interagivelCacheX = getX();
+        interagivelCacheY = getY();
+        interagivelCacheRevisao = revisao;
+        interagivelPertoCache = resultado;
+        return resultado;
     }
 
     public Interagivel getInteragivelPerto() {

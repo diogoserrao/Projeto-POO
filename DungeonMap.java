@@ -27,6 +27,7 @@ public class DungeonMap {
     private final ArrayList<CarregadorTiled.Tileset> tilesets;
     private final java.util.Map<Integer, CarregadorTiled.TileAnimation> animacoesTiles;
     private final int fase;
+    private long revisaoInteracoes;
 
     public DungeonMap() { this(1); }
 
@@ -60,6 +61,7 @@ public class DungeonMap {
         if (interagivel != null && !interagiveis.contains(interagivel)) {
             interagiveis.add(interagivel);
             registarInteragivel(interagivel);
+            revisaoInteracoes++;
         }
     }
 
@@ -74,8 +76,11 @@ public class DungeonMap {
     public void removerInteragivel(Interagivel interagivel) {
         interagiveis.remove(interagivel);
         tilesDosObjetos.remove(interagivel);
+        revisaoInteracoes++;
         redesenharObjetos();
     }
+
+    public long getRevisaoInteracoes() { return revisaoInteracoes; }
 
     /** Reconstrói o mapa base e reaplica o estado visual de todos os objetos. */
     public void redesenharObjetos() {
