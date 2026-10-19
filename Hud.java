@@ -103,6 +103,7 @@ public class Hud {
         }
 
         return "P" + (indiceJogador + 1) + ": " + coracoes
-                + " Pedras: " + jogador.getPedras();
+                + " Pedras: " + jogador.getPedras()
+                + " Chaves: " + jogador.getNumeroChaves();
     }
 }

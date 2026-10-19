@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 public class Chave implements Interagivel {
     private final String tipo;
     private final Rectangle area;
+    private Porta porta;
     private boolean recolhida;
 
     public Chave(String nome, Rectangle area) {
@@ -22,6 +23,10 @@ public class Chave implements Interagivel {
     public String getTipo() {
         return tipo;
     }
+
+    public void associarPorta(Porta porta) { this.porta = porta; }
+    public Porta getPorta() { return porta; }
+    public boolean abre(Porta porta) { return porta != null && this.porta == porta; }
 
     public boolean estaRecolhida() {
         return recolhida;
@@ -58,7 +63,7 @@ public class Chave implements Interagivel {
             return;
         }
 
-        jogador.adicionarChave(tipo);
+        jogador.adicionarChave(this);
         recolhida = true;
 
         DungeonMap mapa = jogador.getMapa();

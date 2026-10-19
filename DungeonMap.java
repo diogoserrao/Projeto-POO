@@ -17,6 +17,7 @@ public class DungeonMap {
     private final GreenfootImage imagem;
     private final GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis;
+    private final ArrayList<Porta> portas;
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
     private final ArrayList<Point> posicoesPedras;
@@ -33,6 +34,7 @@ public class DungeonMap {
         imagem = dados.imagem;
         imagemBase = dados.imagemBase;
         interagiveis = dados.interagiveis;
+        portas = dados.portas;
         tilesDosObjetos = dados.tilesDosObjetos;
         configuracoesInimigos = dados.configuracoesInimigos;
         posicoesPedras = dados.posicoesPedras;
@@ -74,7 +76,7 @@ public class DungeonMap {
     /** Reconstrói o mapa base e reaplica o estado visual de todos os objetos. */
     public void redesenharObjetos() {
         CarregadorTiled.redesenharObjetos(new CarregadorTiled.DadosMapa(
-                imagem, imagemBase, interagiveis, tilesDosObjetos,
+                imagem, imagemBase, interagiveis, portas, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
                 tilesets, fase));
     }
@@ -95,7 +97,15 @@ public class DungeonMap {
 
     public boolean estaBloqueado(Rectangle pes) {
         if (pes == null) return true;
-        return temColisaoNaZona(pes.x, pes.y, pes.x + pes.width - 1,
-                pes.y + pes.height - 1);
+        if (temColisaoNaZona(pes.x, pes.y, pes.x + pes.width - 1,
+                pes.y + pes.height - 1)) return true;
+        return encontrarPortaFechada(pes) != null;
+    }
+
+    public Porta encontrarPortaFechada(Rectangle area) {
+        if (area == null) return null;
+        for (Porta porta : portas)
+            if (porta.estaFechada() && porta.getArea().intersects(area)) return porta;
+        return null;
     }
 }

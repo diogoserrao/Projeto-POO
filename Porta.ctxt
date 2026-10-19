@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=Porta
+comment0.text=Representa\ uma\ porta\ trancada\ definida\ no\ mapa\ Tiled.
+comment1.params=nome\ area
+comment1.target=Porta(java.lang.String,\ java.awt.Rectangle)
+comment10.params=jogador
+comment10.target=java.lang.String\ getDescricao(Player)
+comment11.params=jogador
+comment11.target=void\ interagir(Player)
+comment2.params=
+comment2.target=java.lang.String\ getIdentificador()
+comment3.params=
+comment3.target=boolean\ estaAberta()
+comment4.params=
+comment4.target=boolean\ estaFechada()
+comment5.params=jogador
+comment5.target=boolean\ abrir(Player)
+comment5.text=Abre\ apenas\ com\ a\ chave\ desta\ porta\ e\ consome-a\ do\ jogador.
+comment6.params=
+comment6.target=java.awt.Rectangle\ getArea()
+comment7.params=
+comment7.target=boolean\ temAnimacao()
+comment8.params=
+comment8.target=int\ getFrameVisual()
+comment9.params=
+comment9.target=java.lang.String\ getDescricao()
+numComments=12

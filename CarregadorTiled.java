@@ -26,6 +26,7 @@ public class CarregadorTiled {
     private final GreenfootImage imagem;
     private GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
+    private final ArrayList<Porta> portas = new ArrayList<Porta>();
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos = new HashMap<Interagivel, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
     private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
@@ -54,7 +55,7 @@ public class CarregadorTiled {
     }
 
     public DadosMapa getDados() {
-        return new DadosMapa(imagem, imagemBase, interagiveis, tilesDosObjetos,
+        return new DadosMapa(imagem, imagemBase, interagiveis, portas, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
                 tilesetsAtuais, fase);
     }
@@ -63,6 +64,7 @@ public class CarregadorTiled {
         final GreenfootImage imagem;
         final GreenfootImage imagemBase;
         final ArrayList<Interagivel> interagiveis;
+        final ArrayList<Porta> portas;
         final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
         final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
         final ArrayList<Point> posicoesPedras;
@@ -72,7 +74,7 @@ public class CarregadorTiled {
         final int fase;
 
         DadosMapa(GreenfootImage imagem, GreenfootImage imagemBase,
-                ArrayList<Interagivel> interagiveis,
+                ArrayList<Interagivel> interagiveis, ArrayList<Porta> portas,
                 Map<Interagivel, ArrayList<int[]>> tilesDosObjetos,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> posicoesPedras,
@@ -81,6 +83,7 @@ public class CarregadorTiled {
             this.imagem = imagem;
             this.imagemBase = imagemBase;
             this.interagiveis = interagiveis;
+            this.portas = portas;
             this.tilesDosObjetos = tilesDosObjetos;
             this.configuracoesInimigos = configuracoesInimigos;
             this.posicoesPedras = posicoesPedras;
@@ -107,6 +110,7 @@ public class CarregadorTiled {
                     lerInteracoes((Element) node);
                 }
             }
+            associarChavesEPortas();
             for (int i = 0; i < filhos.getLength(); i++) {
                 Node node = filhos.item(i);
                 if (!(node instanceof Element)) continue;
@@ -191,8 +195,33 @@ public class CarregadorTiled {
             if (tipo.startsWith("bau")) registarInteragivel(new Bau(nome, area));
             else if (tipo.startsWith("chave")) {
                 registarInteragivel(new Chave(nome, area));
+            } else if (tipo.startsWith("porta")) {
+                Porta porta = new Porta(nome, area);
+                portas.add(porta);
+                registarInteragivel(porta);
             } else if (tipo.startsWith("alavanca")) registarInteragivel(new Alavanca(nome, area));
             else System.out.println("Objeto interativo desconhecido ignorado: " + nome);
+        }
+    }
+
+    private void associarChavesEPortas() {
+        Map<String, Porta> porId = new HashMap<String, Porta>();
+        for (Porta porta : portas) porId.put(porta.getIdentificador(), porta);
+        for (Interagivel objeto : interagiveis) {
+            if (!(objeto instanceof Chave)) continue;
+            Chave chave = (Chave) objeto;
+            Porta porta = porId.get(chave.getTipo());
+            if (porta == null) {
+                System.out.println("Aviso: chave sem porta correspondente: chave_" + chave.getTipo());
+            } else {
+                chave.associarPorta(porta);
+            }
+        }
+        for (Porta porta : portas) {
+            boolean encontrada = false;
+            for (Interagivel objeto : interagiveis)
+                if (objeto instanceof Chave && ((Chave) objeto).getTipo().equals(porta.getIdentificador())) encontrada = true;
+            if (!encontrada) System.out.println("Aviso: porta sem chave correspondente: porta_" + porta.getIdentificador());
         }
     }
 

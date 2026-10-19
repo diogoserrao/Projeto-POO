@@ -116,8 +116,7 @@ public class Pedra extends Actor implements Interagivel {
         int novoY = getY() + deslocamentoY;
         if (mapa == null
                 || distanciaPercorrida + VELOCIDADE >= ALCANCE_MAXIMO
-                || mapa.temColisaoNaZona(novoX - 4, novoY - 4,
-                        novoX + 4, novoY + 4)) {
+                || mapa.estaBloqueado(new Rectangle(novoX - 4, novoY - 4, 9, 9))) {
             aterrar();
             return;
         }

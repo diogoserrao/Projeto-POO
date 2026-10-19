@@ -1,9 +1,8 @@
 import greenfoot.*;
 import java.awt.Rectangle;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class Player extends Personagem {
     private static final int MAX_PEDRAS = 3;
@@ -12,7 +11,7 @@ public class Player extends Personagem {
     private boolean teclaInteracaoPressionada;
     private boolean teclaLancarPressionada;
     private int pedras = 0;
-    private final Set<String> chaves = new HashSet<String>();
+    private final List<Chave> chaves = new ArrayList<Chave>();
 
     public Player(int skin, Controlos controlos) {
         super(skin, 3);
@@ -116,8 +115,7 @@ public class Player extends Personagem {
         int y = getY() + direcao.getDy() * distanciaInicial;
 
         DungeonMap mapa = getMapa();
-        if (mapa != null && mapa.temColisaoNaZona(x - 4, y - 4,
-                x + 4, y + 4)) {
+        if (mapa != null && mapa.estaBloqueado(new Rectangle(x - 4, y - 4, 9, 9))) {
             return;
         }
 
@@ -205,21 +203,31 @@ public class Player extends Personagem {
     }
 
     /** Adiciona uma chave apenas ao inventário deste jogador. */
-    public void adicionarChave(String tipo) {
-        if (tipo != null && !tipo.trim().isEmpty()) {
-            chaves.add(tipo.trim().toLowerCase());
-        }
+    public void adicionarChave(Chave chave) {
+        if (chave != null && !chaves.contains(chave)) chaves.add(chave);
     }
 
     /** Indica se este jogador possui uma chave do tipo indicado. */
     public boolean temChave(String tipo) {
-        return tipo != null && chaves.contains(tipo.trim().toLowerCase());
+        if (tipo == null) return false;
+        for (Chave chave : chaves)
+            if (tipo.trim().equalsIgnoreCase(chave.getTipo())) return true;
+        return false;
     }
 
     /** Devolve uma visão apenas de leitura das chaves deste jogador. */
-    public Set<String> getChaves() {
-        return Collections.unmodifiableSet(chaves);
+    public List<Chave> getChaves() {
+        return Collections.unmodifiableList(chaves);
     }
+
+    public int getNumeroChaves() { return chaves.size(); }
+
+    public Chave encontrarChave(Porta porta) {
+        for (Chave chave : chaves) if (chave.abre(porta)) return chave;
+        return null;
+    }
+
+    boolean consumirChave(Chave chave) { return chaves.remove(chave); }
 
     /** Devolve o número de pedras ainda disponíveis neste jogador. */
     public int getPedras() {
@@ -240,6 +248,11 @@ public class Player extends Personagem {
 
     private boolean tentarMover(int x, int y) {
         DungeonMap mapa = getMapa();
+        if (mapa != null) {
+            Rectangle pes = getPes(x, y);
+            Porta porta = mapa.encontrarPortaFechada(pes);
+            if (porta != null && !porta.abrir(this)) return false;
+        }
         if (mapa != null && !mapa.estaBloqueado(getPes(x, y))) {
             setLocation(x, y);
             return true;
