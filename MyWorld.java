@@ -100,9 +100,13 @@ public class MyWorld extends World {
             int spawnY = spawn.y + spawn.height / 2;
             int personagem = (i % 2) + 1;
 
-            Inimigo inimigo = configuracao.temPatrulha()
-                    ? new Guarda(personagem, configuracao.getPatrulha())
-                    : new Sentinela(personagem);
+            // Cada terceiro spawn usa o Vigia; os restantes conservam a regra
+            // original baseada na existência de uma zona de patrulha.
+            Inimigo inimigo = i % 3 == 2
+                    ? new Vigia(personagem)
+                    : configuracao.temPatrulha()
+                        ? new Guarda(personagem, configuracao.getPatrulha())
+                        : new Sentinela(personagem);
 
             addObject(inimigo, spawnX, spawnY);
             inimigo.inicializarConeVisao();
