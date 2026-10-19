@@ -260,19 +260,23 @@ public class CarregadorTiled {
     private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
         boolean objetos = "objects".equalsIgnoreCase(layer.getAttribute("name"))
                 || "objects2".equalsIgnoreCase(layer.getAttribute("name"));
+        boolean paredes = "walls".equalsIgnoreCase(layer.getAttribute("name"));
         for (int[] t : listarTiles(layer)) {
-            if (objetos && guardarTileDeObjeto(t)) continue;
+            if ((objetos && guardarTileDeObjeto(t, false))
+                    || (paredes && guardarTileDeObjeto(t, true))) continue;
             desenharTile(t[2], t[0], t[1], tilesets);
         }
     }
 
-    private boolean guardarTileDeObjeto(int[] tile) {
+    /** Guarda tiles de objetos normais ou, especificamente, de portas nas paredes. */
+    private boolean guardarTileDeObjeto(int[] tile, boolean apenasPortas) {
         Tileset tileset = escolherTileset(tile[2], tilesetsAtuais);
         Interagivel objetoMaisProximo = null;
         int menorDistancia = Integer.MAX_VALUE;
 
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : tilesDosObjetos.entrySet()) {
             Interagivel objeto = entrada.getKey();
+            if (apenasPortas != (objeto instanceof Porta)) continue;
             if (objeto.temAnimacao() && (tileset == null
                     || !new File(tileset.imagePath).getName().equalsIgnoreCase("doors_lever_chest_animation.png"))) continue;
 
