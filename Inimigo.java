@@ -18,6 +18,8 @@ public abstract class Inimigo extends Personagem {
     private int contadorInvulnerabilidade;
     private int contadorDistracao;
     private Pedra ultimaPedraVista;
+    private boolean morteFurtiva;
+    private boolean pontuacaoAtribuida;
 
     protected Inimigo(int personagem) {
         super(personagem, 3);
@@ -153,6 +155,9 @@ public abstract class Inimigo extends Personagem {
             receberDano(getMaxVidas());
             if (getVidas() < vidasAntes) {
                 reproduzirSomDano();
+                if (!estaVivo()) {
+                    morteFurtiva = true;
+                }
             }
         } else {
             receberAtaque();
@@ -217,8 +222,12 @@ public abstract class Inimigo extends Personagem {
 
     @Override
     protected void aoTerminarMorte() {
-        World mundo = getWorld();
+        MyWorld mundo = getMundo();
         if (mundo != null) {
+            if (!pontuacaoAtribuida) {
+                mundo.adicionarPontos(morteFurtiva ? 200 : 100);
+                pontuacaoAtribuida = true;
+            }
             mundo.removeObject(this);
         }
     }

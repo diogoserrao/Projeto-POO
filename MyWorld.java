@@ -12,6 +12,7 @@ public class MyWorld extends World {
     /* "Fase" representa os mapas Dungeon1, Dungeon2 e Dungeon3. */
     private int faseAtual = 1;
     private static final int MAX_FASES = 3;
+    private int pontuacao = 0;
 
     private final List<Player> jogadores = new ArrayList<Player>();
     private final List<Player> jogadoresVisiveis = Collections.unmodifiableList(jogadores);
@@ -203,6 +204,18 @@ public class MyWorld extends World {
 
     public DungeonMap getMapa() {
         return mapa;
+    }
+
+    /** Devolve a pontuacao acumulada na partida atual. */
+    public int getPontuacao() {
+        return pontuacao;
+    }
+
+    /** Adiciona pontos validos sem expor o estado interno da pontuacao. */
+    public void adicionarPontos(int pontos) {
+        if (pontos > 0) {
+            pontuacao += pontos;
+        }
     }
 
     /** Lista de jogadores disponivel para sistemas do mundo, como a IA. */

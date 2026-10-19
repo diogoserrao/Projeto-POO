@@ -10,6 +10,7 @@ public class Hud {
     private final int maxFases;
     private final String[] ultimasVidas;
     private String ultimaFase;
+    private String ultimaPontuacao;
     private String ultimosControlos;
     private String ultimasInteracoes;
 
@@ -37,6 +38,15 @@ public class Hud {
         if (!fase.equals(ultimaFase)) {
             mundo.showText(fase, mundo.getWidth() / 2, 25);
             ultimaFase = fase;
+        }
+
+        if (mundo instanceof MyWorld) {
+            String pontuacao = "Pontuação: "
+                    + ((MyWorld) mundo).getPontuacao();
+            if (!pontuacao.equals(ultimaPontuacao)) {
+                mundo.showText(pontuacao, mundo.getWidth() / 2, 50);
+                ultimaPontuacao = pontuacao;
+            }
         }
 
         String controlos = "";
