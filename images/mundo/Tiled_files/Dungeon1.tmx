@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="46" nextobjectid="42">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="46" nextobjectid="44">
  <tileset firstgid="1" name="cracked_tiles" tilewidth="16" tileheight="16" tilecount="256" columns="8">
   <image source="decorative_cracks_walls.png" width="128" height="512"/>
  </tileset>
@@ -5500,10 +5500,10 @@
 0,0,0,0,0,0,0,0,0,0,3,0,0,56,55,0,
 96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
 103,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-111,0,0,0,634,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,144,808,809,115,686,96,0,0,0,0,0,0,
-0,0,0,0,148,825,826,703,703,104,0,0,0,0,0,0,
-0,0,0,0,669,842,843,720,130,112,0,0,395,50,51,396,
+111,0,0,0,83,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,144,5435,5436,115,686,96,0,0,0,0,0,0,
+0,0,0,0,148,5445,5446,703,703,104,0,0,0,0,0,0,
+0,0,0,0,669,5455,5456,720,130,112,0,0,395,50,51,396,
 0,0,0,0,83,0,0,0,0,10,52,396,452,413,413,413,
 116,5433,5434,113,674,0,0,0,0,429,54,430,401,413,413,413,
 703,5443,5444,703,650,0,0,0,0,446,447,447,422,53,677,56,
@@ -6125,7 +6125,7 @@
 </chunk>
   </data>
  </layer>
- <layer id="37" name="Colisao" width="16" height="24">
+ <layer id="37" name="Colisao" width="16" height="24" visible="0">
   <data encoding="csv">
    <chunk x="-16" y="-16" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -6201,12 +6201,12 @@
 </chunk>
    <chunk x="-16" y="0" width="16" height="16">
 30,30,30,30,0,0,0,0,0,30,30,30,30,30,30,30,
-0,0,0,0,30,30,36,36,36,30,0,0,0,0,0,0,
+0,0,930,930,30,30,36,36,36,30,0,0,0,0,0,0,
 0,0,0,0,0,30,36,0,36,0,0,0,0,0,0,0,
 21,0,0,0,0,30,36,36,36,0,0,0,0,29,30,0,
 21,0,0,0,0,0,0,0,0,0,0,0,0,29,0,0,
 21,0,0,0,0,0,0,0,0,0,0,0,0,29,0,0,
-14,0,14,14,0,0,14,0,0,0,0,0,0,0,21,21,
+14,0,14,14,0,0,14,0,0,0,0,0,0,0,21,0,
 14,0,14,14,0,30,30,30,30,0,0,0,29,0,0,29,
 14,0,0,14,0,30,0,0,30,0,0,0,29,0,0,29,
 0,0,30,30,30,30,0,0,30,30,0,0,29,0,0,0,
@@ -6329,7 +6329,7 @@
  <objectgroup id="40" name="InteracoesObjetos">
   <object id="7" name="Bau_1" x="128.667" y="-16.6667"/>
   <object id="8" name="Bau_2" x="242" y="-0.666667"/>
-  <object id="9" name="Bau_3" x="-208" y="28"/>
+  <object id="9" name="Bau_3" x="-208" y="29.3333"/>
   <object id="10" name="Bau_4" x="-47.3333" y="206.667"/>
   <object id="19" name="chave_1" x="-280" y="165.333"/>
   <object id="20" name="chave_2" x="168.667" y="346"/>
@@ -6344,9 +6344,10 @@
   <object id="35" name="armadilha_3" x="47.3333" y="-14.6667" width="32" height="14"/>
   <object id="36" name="armadilha" x="-96" y="61.3333" width="17.3333" height="50.6667"/>
   <object id="37" name="armadilha" x="-216" y="71.3333"/>
-  <object id="38" name="armadilha" x="24" y="86"/>
+  <object id="38" name="armadilha" x="16" y="82" width="15.3333" height="12.6667"/>
   <object id="39" name="armadilha " x="16.6667" y="272.667" width="30.6667" height="14"/>
   <object id="41" name="alavanca_3" x="-213.333" y="136"/>
+  <object id="42" x="76" y="150" width="36" height="40.6667"/>
  </objectgroup>
  <objectgroup id="41" name="Inimigos">
   <object id="11" name="Patrulha_1" x="-71.3333" y="22.6667" width="6.66667" height="108"/>
