@@ -238,26 +238,33 @@ public class CarregadorTiled {
     }
 
     private boolean guardarTileDeObjeto(int[] tile) {
+        Tileset tileset = escolherTileset(tile[2], tilesetsAtuais);
         Interagivel objetoMaisProximo = null;
         int menorDistancia = Integer.MAX_VALUE;
-        Tileset tileset = escolherTileset(tile[2], tilesetsAtuais);
+
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : tilesDosObjetos.entrySet()) {
             Interagivel objeto = entrada.getKey();
             if (objeto.temAnimacao() && (tileset == null
                     || !new File(tileset.imagePath).getName().equalsIgnoreCase("doors_lever_chest_animation.png"))) continue;
+
             int ancoraX = (int) Math.floor(objeto.getArea().getCenterX() / TILE + MIN_X);
             int ancoraY = (int) Math.floor(objeto.getArea().getCenterY() / TILE + MIN_Y);
             int distancia = Math.abs(tile[0] - ancoraX) + Math.abs(tile[1] - ancoraY);
             if (Math.abs(tile[0] - ancoraX) <= objeto.getRaioSprite()
                     && Math.abs(tile[1] - ancoraY) <= objeto.getRaioSprite()
+                    && distancia <= objeto.getRaioSprite() * 2
                     && distancia < menorDistancia) {
                 objetoMaisProximo = objeto;
                 menorDistancia = distancia;
             }
         }
+
         if (objetoMaisProximo == null) return false;
+
         ArrayList<int[]> tiles = tilesDosObjetos.get(objetoMaisProximo);
-        for (int[] existente : tiles) if (existente[0] == tile[0] && existente[1] == tile[1]) return true;
+        for (int[] existente : tiles) {
+            if (existente[0] == tile[0] && existente[1] == tile[1]) return true;
+        }
         tiles.add(new int[] { tile[0], tile[1], tile[2] });
         return true;
     }
@@ -382,4 +389,3 @@ public class CarregadorTiled {
         }
     }
 }
-

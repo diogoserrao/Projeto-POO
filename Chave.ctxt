@@ -15,6 +15,7 @@ comment5.params=
 comment5.target=boolean\ estaVisivel()
 comment6.params=
 comment6.target=int\ getRaioSprite()
+comment6.text=A\ chave\ ocupa\ apenas\ o\ tile\ onde\ est\u00E1\ desenhada.
 comment7.params=
 comment7.target=java.awt.Rectangle\ getArea()
 comment8.params=

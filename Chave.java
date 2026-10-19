@@ -30,8 +30,9 @@ public class Chave implements Interagivel {
     @Override
     public boolean estaVisivel() { return !recolhida; }
 
+    /** A chave ocupa apenas o tile onde está desenhada. */
     @Override
-    public int getRaioSprite() { return 2; }
+    public int getRaioSprite() { return 0; }
 
     @Override
     public Rectangle getArea() {
