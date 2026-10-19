@@ -1,15 +1,11 @@
 import greenfoot.Greenfoot;
-import java.awt.Rectangle;
 
 /** Representa um baú interagível do mapa. */
-public class Bau implements Interagivel {
-    private String nome;
-    private Rectangle area;
+public class Bau extends ObjetoInteragivel {
     private boolean aberto;
 
-    public Bau(String nome, Rectangle area) {
-        this.nome = nome;
-        this.area = area;
+    public Bau(String nome, java.awt.Rectangle area) {
+        super(area);
         this.aberto = false;
     }
 
@@ -32,13 +28,8 @@ public class Bau implements Interagivel {
     public int getFrameVisual() { return aberto ? FRAME_FINAL : 0; }
 
     @Override
-    public Rectangle getArea() {
-        return area;
-    }
-
-    @Override
     public String getDescricao() {
-        return aberto ? "Baú vazio" : "Premir E para abrir";
+        return aberto ? "Baú vazio" : textoTecla(null, "abrir");
     }
 
     @Override

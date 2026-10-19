@@ -1,16 +1,14 @@
 import greenfoot.Greenfoot;
-import java.awt.Rectangle;
 
 /** Representa uma chave interagível do mapa. */
-public class Chave implements Interagivel {
+public class Chave extends ObjetoInteragivel {
     private final String tipo;
-    private final Rectangle area;
     private Porta porta;
     private boolean recolhida;
 
-    public Chave(String nome, Rectangle area) {
+    public Chave(String nome, java.awt.Rectangle area) {
+        super(area);
         this.tipo = obterTipo(nome);
-        this.area = area;
     }
 
     private String obterTipo(String nome) {
@@ -41,13 +39,8 @@ public class Chave implements Interagivel {
     public int getRaioSprite() { return 0; }
 
     @Override
-    public Rectangle getArea() {
-        return area;
-    }
-
-    @Override
     public String getDescricao() {
-        return recolhida ? "Chave já recolhida" : "Apanhar chave";
+        return recolhida ? "Chave já recolhida" : textoTecla(null, "apanhar a chave");
     }
 
     @Override

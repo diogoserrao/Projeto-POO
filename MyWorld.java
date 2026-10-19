@@ -116,15 +116,15 @@ public class MyWorld extends World {
 
     private Player jogadorMaisProximo(Inimigo inimigo) {
         Player maisProximo = null;
-        double menorDistancia = Double.MAX_VALUE;
+        double menorDistanciaQuadrado = Double.MAX_VALUE;
 
         for (Player jogador : jogadores) {
             double dx = jogador.getX() - inimigo.getX();
             double dy = jogador.getY() - inimigo.getY();
-            double distancia = Math.sqrt(dx * dx + dy * dy);
+            double distanciaQuadrado = dx * dx + dy * dy;
 
-            if (distancia < menorDistancia) {
-                menorDistancia = distancia;
+            if (distanciaQuadrado < menorDistanciaQuadrado) {
+                menorDistanciaQuadrado = distanciaQuadrado;
                 maisProximo = jogador;
             }
         }

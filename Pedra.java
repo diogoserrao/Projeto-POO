@@ -9,6 +9,7 @@ public class Pedra extends Actor implements Interagivel {
     private static final int VELOCIDADE = 8;
     private static final int ALCANCE_MAXIMO = 240;
     private static final int TEMPO_NO_CHAO = 150;
+    private static final GreenfootImage IMAGEM = carregarImagemPartilhada();
 
     private enum Estado {
         POR_RECOLHER,
@@ -76,6 +77,10 @@ public class Pedra extends Actor implements Interagivel {
     }
 
     private void carregarImagem() {
+        setImage(IMAGEM);
+    }
+
+    private static GreenfootImage carregarImagemPartilhada() {
         GreenfootImage imagem = new GreenfootImage("pedra.png");
         // A imagem existente já tem aproximadamente TAMANHO x TAMANHO.
         if (imagem.getWidth() != TAMANHO || imagem.getHeight() != TAMANHO) {
@@ -84,7 +89,7 @@ public class Pedra extends Actor implements Interagivel {
             int altura = Math.max(1, imagem.getHeight() * TAMANHO / maiorDimensao);
             imagem.scale(largura, altura);
         }
-        setImage(imagem);
+        return imagem;
     }
 
     @Override

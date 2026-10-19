@@ -4,4 +4,14 @@ public class Guarda extends Inimigo {
         super(personagem);
         definirMovimento(new PatrulhaZona(zonaPatrulha, 2));
     }
+
+    @Override
+    protected int getRaioVisao() {
+        return 75;
+    }
+
+    @Override
+    protected double getAnguloVisao() {
+        return 100.0;
+    }
 }

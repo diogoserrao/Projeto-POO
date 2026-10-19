@@ -4,4 +4,14 @@ public class Sentinela extends Inimigo {
         super(personagem);
         definirMovimento(new Parado());
     }
+
+    @Override
+    protected int getRaioVisao() {
+        return 160;
+    }
+
+    @Override
+    protected double getAnguloVisao() {
+        return 40.0;
+    }
 }

@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=ObjetoInteragivel
+comment0.text=Base\ comum\ dos\ objetos\ do\ mapa\ com\ os\ quais\ o\ jogador\ pode\ interagir.
+comment1.params=area
+comment1.target=ObjetoInteragivel(java.awt.Rectangle)
+comment2.params=
+comment2.target=java.awt.Rectangle\ getArea()
+comment3.params=jogador\ acao
+comment3.target=java.lang.String\ textoTecla(Player,\ java.lang.String)
+comment3.text=Constr\u00F3i\ a\ indica\u00E7\u00E3o\ de\ intera\u00E7\u00E3o\ usada\ pelos\ objetos\ do\ mapa.
+numComments=4

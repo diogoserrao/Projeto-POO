@@ -18,7 +18,5 @@ public interface Interagivel {
 
     default int getRaioSprite() { return 1; }
 
-    int FRAME_FINAL = 4;
-
     void interagir(Player jogador);
 }

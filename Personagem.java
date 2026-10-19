@@ -1,6 +1,7 @@
 import greenfoot.*;
 import java.awt.Rectangle;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /** Classe base para jogadores e inimigos. */
@@ -16,6 +17,9 @@ public abstract class Personagem extends Actor {
     private static final int DURACAO_FLASH_DANO = 8;
     private static final Map<String, GreenfootImage> SPRITESHEETS =
             new HashMap<String, GreenfootImage>();
+    /** Frames prontos partilhados por personagens que usam o mesmo spritesheet. */
+    private static final Map<GreenfootImage, GreenfootImage[][]> FRAMES_CACHE =
+            new IdentityHashMap<GreenfootImage, GreenfootImage[][]>();
 
     private final int vidasMaximas;
     private int vidas;
@@ -158,10 +162,21 @@ public abstract class Personagem extends Actor {
             } else {
                 spritesheet = estavaEmMovimento ? walkSpritesheet : idleSpritesheet;
             }
-            imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
-            imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
-                    -linhaSpritesheet * FRAME_SIZE);
-            imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
+            GreenfootImage[][] framesDoSpritesheet = FRAMES_CACHE.get(spritesheet);
+            if (framesDoSpritesheet == null) {
+                framesDoSpritesheet = new GreenfootImage[Direcao.values().length]
+                        [Math.max(IDLE_FRAMES_CIMA,
+                                spritesheet.getWidth() / FRAME_SIZE)];
+                FRAMES_CACHE.put(spritesheet, framesDoSpritesheet);
+            }
+            imagem = framesDoSpritesheet[linhaSpritesheet][frame];
+            if (imagem == null) {
+                imagem = new GreenfootImage(FRAME_SIZE, FRAME_SIZE);
+                imagem.drawImage(spritesheet, -frame * FRAME_SIZE,
+                        -linhaSpritesheet * FRAME_SIZE);
+                imagem.scale(DISPLAY_SIZE, DISPLAY_SIZE);
+                framesDoSpritesheet[linhaSpritesheet][frame] = imagem;
+            }
             imagensAnimacao[tipoAnimacao][linhaSpritesheet][frame] = imagem;
         }
 

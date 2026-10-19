@@ -35,7 +35,9 @@ public class Porta implements Interagivel {
 
     @Override public Rectangle getArea() { return area; }
     @Override public boolean temAnimacao() { return true; }
-    @Override public int getFrameVisual() { return aberta ? FRAME_FINAL : 0; }
+    @Override public int getFrameVisual() {
+        return aberta ? ObjetoInteragivel.FRAME_FINAL : 0;
+    }
     @Override public String getDescricao() {
         return aberta ? "Porta aberta" : "Porta trancada (chave " + identificador + ")";
     }

@@ -6,7 +6,8 @@ import java.util.List;
 
 public class Player extends Personagem {
     private static final int MAX_PEDRAS = 3;
-    private static final GreenfootSound SOM_DANO = criarSomDano();
+    /* O som só é preparado quando ocorre dano, não durante a criação do mundo. */
+    private static GreenfootSound somDano;
     private final Controlos controlos;
     private final int velocidade = 4;
     private boolean teclaInteracaoPressionada;
@@ -132,6 +133,13 @@ public class Player extends Personagem {
         return som;
     }
 
+    private static GreenfootSound obterSomDano() {
+        if (somDano == null) {
+            somDano = criarSomDano();
+        }
+        return somDano;
+    }
+
     /** Reproduz dano apenas quando o jogador continua vivo após o golpe. */
     @Override
     public void receberDano() {
@@ -140,7 +148,7 @@ public class Player extends Personagem {
         }
         super.receberDano();
         if (estaVivo()) {
-            SOM_DANO.play();
+            obterSomDano().play();
         }
     }
 

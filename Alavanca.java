@@ -1,17 +1,15 @@
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 /** Representa uma alavanca interagível do mapa. */
-public class Alavanca implements Interagivel {
+public class Alavanca extends ObjetoInteragivel {
     private final String nome;
-    private final Rectangle area;
     private boolean ativada;
     private final List<Armadilha> armadilhas = new ArrayList<Armadilha>();
 
-    public Alavanca(String nome, Rectangle area) {
+    public Alavanca(String nome, java.awt.Rectangle area) {
+        super(area);
         this.nome = nome;
-        this.area = area;
     }
 
     public boolean estaAtivada() {
@@ -32,13 +30,8 @@ public class Alavanca implements Interagivel {
     public int getFrameVisual() { return ativada ? FRAME_FINAL : 0; }
 
     @Override
-    public Rectangle getArea() {
-        return area;
-    }
-
-    @Override
     public String getDescricao() {
-        return ativada ? "Alavanca ativada" : "Ativar alavanca";
+        return ativada ? "Alavanca ativada" : textoTecla(null, "ativar a alavanca");
     }
 
     @Override
