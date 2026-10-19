@@ -157,6 +157,7 @@ public class MyWorld extends World {
 
         teclaProximaFasePressionada = teclaN;
 
+        mapa.atualizarArmadilhas(jogadores);
         hud.atualizar();
         verificarDerrota();
     }

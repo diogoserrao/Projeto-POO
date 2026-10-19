@@ -26,6 +26,8 @@ public class CarregadorTiled {
     private final GreenfootImage imagem;
     private GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
+    private final ArrayList<Armadilha> armadilhas = new ArrayList<Armadilha>();
+    private final Map<Integer, TileAnimation> animacoesTiles = new HashMap<Integer, TileAnimation>();
     private final ArrayList<Porta> portas = new ArrayList<Porta>();
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos = new HashMap<Interagivel, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
@@ -42,6 +44,11 @@ public class CarregadorTiled {
         String imagePath;
     }
 
+    static class TileAnimation {
+        int[] frames;
+        int[] duracoes;
+    }
+
     public CarregadorTiled(int fase) {
         this.fase = Math.max(1, Math.min(3, fase));
         imagem = new GreenfootImage(WORLD_WIDTH, WORLD_HEIGHT);
@@ -55,15 +62,16 @@ public class CarregadorTiled {
     }
 
     public DadosMapa getDados() {
-        return new DadosMapa(imagem, imagemBase, interagiveis, portas, tilesDosObjetos,
+        return new DadosMapa(imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
-                tilesetsAtuais, fase);
+                tilesetsAtuais, animacoesTiles, fase);
     }
 
     public static final class DadosMapa {
         final GreenfootImage imagem;
         final GreenfootImage imagemBase;
         final ArrayList<Interagivel> interagiveis;
+        final ArrayList<Armadilha> armadilhas;
         final ArrayList<Porta> portas;
         final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
         final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
@@ -71,18 +79,20 @@ public class CarregadorTiled {
         final ArrayList<Point> spawnsJogadores;
         final boolean[][] colisaoComum;
         final ArrayList<Tileset> tilesets;
+        final Map<Integer, TileAnimation> animacoesTiles;
         final int fase;
 
         DadosMapa(GreenfootImage imagem, GreenfootImage imagemBase,
-                ArrayList<Interagivel> interagiveis, ArrayList<Porta> portas,
+                ArrayList<Interagivel> interagiveis, ArrayList<Armadilha> armadilhas, ArrayList<Porta> portas,
                 Map<Interagivel, ArrayList<int[]>> tilesDosObjetos,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> posicoesPedras,
                 ArrayList<Point> spawnsJogadores, boolean[][] colisaoComum,
-                ArrayList<Tileset> tilesets, int fase) {
+                ArrayList<Tileset> tilesets, Map<Integer, TileAnimation> animacoesTiles, int fase) {
             this.imagem = imagem;
             this.imagemBase = imagemBase;
             this.interagiveis = interagiveis;
+            this.armadilhas = armadilhas;
             this.portas = portas;
             this.tilesDosObjetos = tilesDosObjetos;
             this.configuracoesInimigos = configuracoesInimigos;
@@ -90,6 +100,7 @@ public class CarregadorTiled {
             this.spawnsJogadores = spawnsJogadores;
             this.colisaoComum = colisaoComum;
             this.tilesets = tilesets;
+            this.animacoesTiles = animacoesTiles;
             this.fase = fase;
         }
     }
@@ -102,13 +113,18 @@ public class CarregadorTiled {
             Element mapa = doc.getDocumentElement();
             ArrayList<Tileset> tilesets = lerTilesets(mapa);
             tilesetsAtuais.addAll(tilesets);
+            lerAnimacoesTiles(mapa, tilesets);
             NodeList filhos = mapa.getChildNodes();
+            // Regista primeiro todos os objetos, independentemente da ordem no TMX.
             for (int i = 0; i < filhos.getLength(); i++) {
                 Node node = filhos.item(i);
-                if (node instanceof Element && "objectgroup".equals(node.getNodeName())
-                        && "interacoesobjetos".equalsIgnoreCase(((Element) node).getAttribute("name").trim())) {
-                    lerInteracoes((Element) node);
-                }
+                if (!(node instanceof Element) || !"objectgroup".equals(node.getNodeName())) continue;
+                Element grupo = (Element) node;
+                String nome = grupo.getAttribute("name").trim().toLowerCase();
+                if (nome.equals("interacoesobjetos")) lerInteracoes(grupo);
+                else if (nome.equals("inimigos")) lerInimigos(grupo);
+                else if (nome.equals("pedras") || nome.equals("pedra")) lerPedras(grupo);
+                else if (nome.equals("jogadores")) lerSpawnJogadores(grupo);
             }
             associarChavesEPortas();
             for (int i = 0; i < filhos.getLength(); i++) {
@@ -117,9 +133,6 @@ public class CarregadorTiled {
                 Element elemento = (Element) node;
                 String nome = elemento.getAttribute("name").toLowerCase();
                 if ("objectgroup".equals(node.getNodeName())) {
-                    if (nome.equals("inimigos")) lerInimigos(elemento);
-                    if (nome.equals("pedras") || nome.equals("pedra")) lerPedras(elemento);
-                    if (nome.equals("jogadores")) lerSpawnJogadores(elemento);
                     continue;
                 }
                 if (!"layer".equals(node.getNodeName())) continue;
@@ -154,6 +167,11 @@ public class CarregadorTiled {
             double y = Double.parseDouble(objeto.getAttribute("y"));
             double largura = objeto.hasAttribute("width") ? Double.parseDouble(objeto.getAttribute("width")) : SOURCE_TILE;
             double altura = objeto.hasAttribute("height") ? Double.parseDouble(objeto.getAttribute("height")) : SOURCE_TILE;
+            boolean ponto = !objeto.hasAttribute("width") || !objeto.hasAttribute("height");
+            if (nome.toLowerCase().startsWith("armadilha")) {
+                registarArmadilha(new Armadilha(nome, converterParaMundo(x, y, largura, altura, ponto)));
+                continue;
+            }
             if (nome.startsWith("Patrulha_")) {
                 patrulhas.put(nome.substring("Patrulha_".length()), converterParaMundo(x, y, largura, altura, false));
             } else if (nome.startsWith("Spawn_")) {
@@ -192,7 +210,8 @@ public class CarregadorTiled {
             String nome = objeto.getAttribute("name").trim();
             if (nome.isEmpty()) continue;
             String tipo = nome.toLowerCase();
-            if (tipo.startsWith("bau")) registarInteragivel(new Bau(nome, area));
+            if (tipo.startsWith("armadilha")) registarArmadilha(new Armadilha(nome, area));
+            else if (tipo.startsWith("bau")) registarInteragivel(new Bau(nome, area));
             else if (tipo.startsWith("chave")) {
                 registarInteragivel(new Chave(nome, area));
             } else if (tipo.startsWith("porta")) {
@@ -223,12 +242,31 @@ public class CarregadorTiled {
                 if (objeto instanceof Chave && ((Chave) objeto).getTipo().equals(porta.getIdentificador())) encontrada = true;
             if (!encontrada) System.out.println("Aviso: porta sem chave correspondente: porta_" + porta.getIdentificador());
         }
+        Map<String, Alavanca> alavancas = new HashMap<String, Alavanca>();
+        for (Interagivel objeto : interagiveis)
+            if (objeto instanceof Alavanca) alavancas.put(((Alavanca) objeto).getIdentificador(), (Alavanca) objeto);
+        for (Armadilha armadilha : armadilhas) {
+            if (!armadilha.podeSerDesativada()) continue;
+            String numero = armadilha.getIdentificador().substring("armadilha_".length());
+            Alavanca alavanca = alavancas.get("alavanca_" + numero);
+            if (alavanca == null) {
+                System.out.println("Aviso: armadilha sem alavanca correspondente: " + armadilha.getIdentificador());
+            } else {
+                alavanca.associarArmadilha(armadilha);
+            }
+        }
     }
 
     private void registarInteragivel(Interagivel objeto) {
         if (objeto == null || interagiveis.contains(objeto)) return;
         interagiveis.add(objeto);
         tilesDosObjetos.put(objeto, new ArrayList<int[]>());
+    }
+
+    private void registarArmadilha(Armadilha armadilha) {
+        if (armadilha == null || armadilhas.contains(armadilha)) return;
+        armadilhas.add(armadilha);
+        registarInteragivel(armadilha);
     }
 
     private Rectangle converterParaMundo(double x, double y, double largura, double altura, boolean ponto) {
@@ -257,15 +295,64 @@ public class CarregadorTiled {
         return resultado;
     }
 
+    private void lerAnimacoesTiles(Element mapa, ArrayList<Tileset> tilesets) {
+        NodeList nodes = mapa.getElementsByTagName("tileset");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element ts = (Element) nodes.item(i);
+            int firstGid = Integer.parseInt(ts.getAttribute("firstgid"));
+            NodeList tiles = ts.getElementsByTagName("tile");
+            for (int j = 0; j < tiles.getLength(); j++) {
+                Element tile = (Element) tiles.item(j);
+                Element anim = (Element) tile.getElementsByTagName("animation").item(0);
+                if (anim == null) continue;
+                NodeList frames = anim.getElementsByTagName("frame");
+                TileAnimation resultado = new TileAnimation();
+                resultado.frames = new int[frames.getLength()];
+                resultado.duracoes = new int[frames.getLength()];
+                for (int k = 0; k < frames.getLength(); k++) {
+                    Element frame = (Element) frames.item(k);
+                    resultado.frames[k] = firstGid + Integer.parseInt(frame.getAttribute("tileid"));
+                    int milissegundos = Integer.parseInt(frame.getAttribute("duration"));
+                    resultado.duracoes[k] = Math.max(1, (milissegundos + 8) / 16);
+                }
+                animacoesTiles.put(firstGid + Integer.parseInt(tile.getAttribute("id")), resultado);
+            }
+        }
+    }
+
     private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
+        boolean armadilhasLayer = "traps".equalsIgnoreCase(layer.getAttribute("name").trim());
         boolean objetos = "objects".equalsIgnoreCase(layer.getAttribute("name"))
                 || "objects2".equalsIgnoreCase(layer.getAttribute("name"));
         boolean paredes = "walls".equalsIgnoreCase(layer.getAttribute("name"));
         for (int[] t : listarTiles(layer)) {
+            if (armadilhasLayer && guardarTileDeArmadilha(t)) continue;
             if ((objetos && guardarTileDeObjeto(t, false))
                     || (paredes && guardarTileDeObjeto(t, true))) continue;
             desenharTile(t[2], t[0], t[1], tilesets);
         }
+    }
+
+    private boolean guardarTileDeArmadilha(int[] tile) {
+        int px = (tile[0] - MIN_X) * TILE;
+        int py = (tile[1] - MIN_Y) * TILE;
+        Rectangle tileArea = new Rectangle(px, py, TILE, TILE);
+        Armadilha escolhida = null;
+        int maiorIntersecao = 0;
+        for (Armadilha armadilha : armadilhas) {
+            Rectangle intersecao = armadilha.getArea().intersection(tileArea);
+            int areaIntersecao = Math.max(0, intersecao.width) * Math.max(0, intersecao.height);
+            if (areaIntersecao > maiorIntersecao) {
+                maiorIntersecao = areaIntersecao;
+                escolhida = armadilha;
+            }
+        }
+        if (escolhida == null) return false;
+        TileAnimation animacao = animacoesTiles.get(tile[2]);
+        if (animacao != null) escolhida.configurarAnimacao(animacao.duracoes);
+        ArrayList<int[]> tiles = tilesDosObjetos.get(escolhida);
+        tiles.add(new int[] { tile[0], tile[1], tile[2] });
+        return true;
     }
 
     /** Guarda tiles de objetos normais ou, especificamente, de portas nas paredes. */
@@ -376,7 +463,14 @@ public class CarregadorTiled {
             Interagivel objeto = entrada.getKey();
             if (!objeto.estaVisivel()) continue;
             for (int[] tile : entrada.getValue()) {
-                int gid = objeto.temAnimacao() ? tile[2] + objeto.getFrameVisual() * 30 : tile[2];
+                int gid = tile[2];
+                if (objeto instanceof Armadilha) {
+                    TileAnimation animacao = dados.animacoesTiles.get(tile[2]);
+                    if (animacao != null && animacao.frames.length > 0)
+                        gid = animacao.frames[Math.min(objeto.getFrameVisual(), animacao.frames.length - 1)];
+                } else if (objeto.temAnimacao()) {
+                    gid += objeto.getFrameVisual() * 30;
+                }
                 desenharTileEstatica(dados.imagem, gid, tile[0], tile[1], dados.tilesets);
             }
         }

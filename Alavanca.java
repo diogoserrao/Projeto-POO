@@ -1,10 +1,13 @@
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Representa uma alavanca interagível do mapa. */
 public class Alavanca implements Interagivel {
     private final String nome;
     private final Rectangle area;
     private boolean ativada;
+    private final List<Armadilha> armadilhas = new ArrayList<Armadilha>();
 
     public Alavanca(String nome, Rectangle area) {
         this.nome = nome;
@@ -13,6 +16,13 @@ public class Alavanca implements Interagivel {
 
     public boolean estaAtivada() {
         return ativada;
+    }
+
+    public String getIdentificador() { return nome.trim().toLowerCase(); }
+
+    public void associarArmadilha(Armadilha armadilha) {
+        if (armadilha != null && !armadilhas.contains(armadilha)) armadilhas.add(armadilha);
+        if (ativada && armadilha != null) armadilha.desativarPermanentemente();
     }
 
     @Override
@@ -43,6 +53,7 @@ public class Alavanca implements Interagivel {
     public void interagir(Player jogador) {
         if (jogador == null || ativada) return;
         ativada = true;
+        for (Armadilha armadilha : armadilhas) armadilha.desativarPermanentemente();
         DungeonMap mapa = jogador.getMapa();
         if (mapa != null) mapa.redesenharObjetos();
     }

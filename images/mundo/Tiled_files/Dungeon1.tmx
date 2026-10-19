@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="46" nextobjectid="33">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="46" nextobjectid="42">
  <tileset firstgid="1" name="cracked_tiles" tilewidth="16" tileheight="16" tilecount="256" columns="8">
   <image source="decorative_cracks_walls.png" width="128" height="512"/>
  </tileset>
@@ -6208,7 +6208,7 @@
 21,0,0,0,0,0,0,0,0,0,0,0,0,29,0,0,
 14,0,14,14,0,0,14,0,0,0,0,0,0,0,21,21,
 14,0,14,14,0,30,30,30,30,0,0,0,29,0,0,29,
-14,0,14,14,0,30,0,0,30,0,0,0,29,0,0,29,
+14,0,0,14,0,30,0,0,30,0,0,0,29,0,0,29,
 0,0,30,30,30,30,0,0,30,30,0,0,29,0,0,0,
 0,0,30,30,30,30,30,0,0,30,29,29,29,29,29,0,
 30,30,30,30,0,0,30,0,0,30,29,29,29,29,29,0,
@@ -6339,6 +6339,14 @@
   <object id="30" name="porta_1" x="16" y="210" width="31.3333" height="39.3333"/>
   <object id="31" name="porta_2" x="-65.3333" y="272.667" width="31.3333" height="27.3333"/>
   <object id="32" name="porta_3" x="-192.667" y="177.333" width="32.6667" height="30.6667"/>
+  <object id="33" name="armadilha_1" x="159.333" y="303.333" width="32" height="30.6667"/>
+  <object id="34" name="armadilha_2" x="-176.667" y="295.333" width="34" height="24"/>
+  <object id="35" name="armadilha_3" x="47.3333" y="-14.6667" width="32" height="14"/>
+  <object id="36" name="armadilha" x="-96" y="61.3333" width="17.3333" height="50.6667"/>
+  <object id="37" name="armadilha" x="-216" y="71.3333"/>
+  <object id="38" name="armadilha" x="24" y="86"/>
+  <object id="39" name="armadilha " x="16.6667" y="272.667" width="30.6667" height="14"/>
+  <object id="41" name="alavanca_3" x="-213.333" y="136"/>
  </objectgroup>
  <objectgroup id="41" name="Inimigos">
   <object id="11" name="Patrulha_1" x="-71.3333" y="22.6667" width="6.66667" height="108"/>
@@ -6346,7 +6354,8 @@
   <object id="13" name="Spawn_2" x="101.333" y="51.3333"/>
   <object id="14" name="Spawn_4" x="91.3333" y="275.333"/>
   <object id="15" name="Spawn_3" x="254.667" y="294"/>
-  <object id="16" name="Patrulha_4" x="88.6667" y="192.667" width="7.33333" height="82.6667"/>
+  <object id="16" name="Patrulha_4" x="88.6667" y="210.667" width="7.33333" height="84.6667"/>
+  <object id="40" name="armadilha" x="76" y="188.667" width="35.3333" height="16"/>
  </objectgroup>
  <objectgroup id="42" name="Jogadores">
   <object id="17" name="Player_2" x="-271.333" y="26.6667"/>

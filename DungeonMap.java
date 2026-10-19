@@ -17,6 +17,7 @@ public class DungeonMap {
     private final GreenfootImage imagem;
     private final GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis;
+    private final ArrayList<Armadilha> armadilhas;
     private final ArrayList<Porta> portas;
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
@@ -24,6 +25,7 @@ public class DungeonMap {
     private final ArrayList<Point> spawnsJogadores;
     private final boolean[][] colisaoComum;
     private final ArrayList<CarregadorTiled.Tileset> tilesets;
+    private final java.util.Map<Integer, CarregadorTiled.TileAnimation> animacoesTiles;
     private final int fase;
 
     public DungeonMap() { this(1); }
@@ -34,6 +36,7 @@ public class DungeonMap {
         imagem = dados.imagem;
         imagemBase = dados.imagemBase;
         interagiveis = dados.interagiveis;
+        armadilhas = dados.armadilhas;
         portas = dados.portas;
         tilesDosObjetos = dados.tilesDosObjetos;
         configuracoesInimigos = dados.configuracoesInimigos;
@@ -41,6 +44,7 @@ public class DungeonMap {
         spawnsJogadores = dados.spawnsJogadores;
         colisaoComum = dados.colisaoComum;
         tilesets = dados.tilesets;
+        animacoesTiles = dados.animacoesTiles;
         fase = dados.fase;
     }
 
@@ -76,9 +80,22 @@ public class DungeonMap {
     /** Reconstrói o mapa base e reaplica o estado visual de todos os objetos. */
     public void redesenharObjetos() {
         CarregadorTiled.redesenharObjetos(new CarregadorTiled.DadosMapa(
-                imagem, imagemBase, interagiveis, portas, tilesDosObjetos,
+                imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
-                tilesets, fase));
+                tilesets, animacoesTiles, fase));
+    }
+
+    public List<Armadilha> getArmadilhas() {
+        return Collections.unmodifiableList(armadilhas);
+    }
+
+    public void atualizarArmadilhas(List<Player> jogadores) {
+        for (Armadilha armadilha : armadilhas) {
+            armadilha.atualizar();
+            if (jogadores != null)
+                for (Player jogador : jogadores) armadilha.aplicarDano(jogador);
+        }
+        redesenharObjetos();
     }
 
     public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() { return configuracoesInimigos; }
