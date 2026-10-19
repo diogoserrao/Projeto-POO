@@ -1,3 +1,4 @@
+import greenfoot.Greenfoot;
 import java.awt.Rectangle;
 
 /** Representa uma porta trancada definida no mapa Tiled. */
@@ -25,6 +26,8 @@ public class Porta implements Interagivel {
         Chave chave = jogador.encontrarChave(this);
         if (chave == null || !chave.abre(this) || !jogador.consumirChave(chave)) return false;
         aberta = true;
+        // Só é emitido depois de a chave ser consumida e a porta abrir.
+        Greenfoot.playSound("win.wav");
         DungeonMap mapa = jogador.getMapa();
         if (mapa != null) mapa.redesenharObjetos();
         return true;

@@ -1,3 +1,4 @@
+import greenfoot.Greenfoot;
 import java.awt.Rectangle;
 
 /** Representa uma chave interagível do mapa. */
@@ -65,6 +66,8 @@ public class Chave implements Interagivel {
 
         jogador.adicionarChave(this);
         recolhida = true;
+        // A chave só produz som depois de entrar realmente no inventário.
+        Greenfoot.playSound("chave.wav");
 
         DungeonMap mapa = jogador.getMapa();
         if (mapa != null) {

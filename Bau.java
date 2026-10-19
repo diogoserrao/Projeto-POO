@@ -1,3 +1,4 @@
+import greenfoot.Greenfoot;
 import java.awt.Rectangle;
 
 /** Representa um baú interagível do mapa. */
@@ -15,6 +16,8 @@ public class Bau implements Interagivel {
     public void abrir() {
         if (!aberto) {
             aberto = true;
+            // O som acompanha a transição fechada -> aberto, uma única vez.
+            Greenfoot.playSound("bau.mp3");
         }
     }
 

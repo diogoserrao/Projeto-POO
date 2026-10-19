@@ -18,6 +18,7 @@ public class MyWorld extends World {
     private Hud hud;
     private boolean teclaProximaFasePressionada = false;
     private boolean jogoTerminou = false;
+    private boolean jogoVenceu = false;
 
     public MyWorld() {
         super(1280, 960, 1, false);
@@ -133,12 +134,17 @@ public class MyWorld extends World {
 
     public void proximaFase() {
 
+        if (jogoVenceu) {
+            return;
+        }
+
         if (faseAtual < MAX_FASES) {
 
             carregarFase(faseAtual + 1);
 
         } else {
-
+            jogoVenceu = true;
+            Greenfoot.playSound("win.wav");
             showText(
                     "PARABÉNS! VOCÊ VENCEU O JOGO!",
                     getWidth() / 2,
@@ -149,7 +155,7 @@ public class MyWorld extends World {
     @Override
     public void act() {
 
-        if (jogoTerminou) {
+        if (jogoTerminou || jogoVenceu) {
             return;
         }
 
