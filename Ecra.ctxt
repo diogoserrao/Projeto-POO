@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=Ecra
+comment0.text=Base\ visual\ comum\ aos\ ecr\u00E3s\ fora\ da\ partida.
+comment1.params=
+comment1.target=Ecra()
+comment2.params=imagem\ corBarra
+comment2.target=void\ prepararFundo(greenfoot.GreenfootImage,\ greenfoot.Color)
+comment3.params=imagem\ texto\ centroX\ linhaBase\ fonte\ cor
+comment3.target=void\ desenharTexto(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int,\ greenfoot.Font,\ greenfoot.Color)
+comment4.params=tecla\ estavaPressionada
+comment4.target=boolean\ teclaNova(java.lang.String,\ boolean)
+numComments=5

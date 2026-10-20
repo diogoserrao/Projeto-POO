@@ -7,6 +7,4 @@ comment2.params=
 comment2.target=void\ act()
 comment3.params=
 comment3.target=void\ desenharMenu()
-comment4.params=imagem\ texto\ centroX\ centroY\ fonte\ cor
-comment4.target=void\ desenharTexto(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int,\ greenfoot.Font,\ greenfoot.Color)
-numComments=5
+numComments=4

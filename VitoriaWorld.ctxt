@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=VitoriaWorld
+comment0.text=Ecr\u00E3\ final\ apresentado\ depois\ de\ os\ jogadores\ escaparem\ da\ masmorra.
+comment1.params=pontuacao
+comment1.target=VitoriaWorld(int)
+comment2.params=
+comment2.target=void\ act()
+comment3.params=
+comment3.target=void\ desenharEcr\u00E3()
+numComments=4

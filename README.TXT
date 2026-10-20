@@ -7,7 +7,7 @@ ele/ela precisa saber. Os comentários devem incluir, pelo menos:
 TÍTULO DO PROJETO: Dungeon Escape
 OBJETIVO DO PROJETO: Jogo cooperativo para dois jogadores explorarem três fases.
 VERSÃO ou DATA: 23/09/2026
-COMO INICIAR O PROJETO: Abrir a pasta no Greenfoot, compilar e executar MyWorld.
+COMO INICIAR O PROJETO: Abrir a pasta no Greenfoot, compilar e executar StartScreen.
 AUTORES: Projeto POO
 INSTRUÇÕES PARA O USUÁRIO:
 Zag usa WASD e Zig usa as setas. E/Enter servem para interagir e atacar.

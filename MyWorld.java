@@ -154,10 +154,7 @@ public class MyWorld extends World {
         } else {
             jogoVenceu = true;
             Greenfoot.playSound("win.wav");
-            showText(
-                    "PARABÉNS! VOCÊ VENCEU O JOGO!",
-                    getWidth() / 2,
-                    getHeight() / 2);
+            Greenfoot.setWorld(new VitoriaWorld(pontuacao));
         }
         transicaoEmCurso = false;
     }
