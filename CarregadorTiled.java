@@ -23,6 +23,7 @@ public class CarregadorTiled {
     private static final boolean MOSTRAR_COLISAO = false;
 
     private final int fase;
+    private File ficheiroMapa;
     private final GreenfootImage imagem;
     private GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
@@ -50,7 +51,7 @@ public class CarregadorTiled {
     }
 
     public CarregadorTiled(int fase) {
-        this.fase = Math.max(1, Math.min(3, fase));
+        this.fase = Math.max(1, Math.min(2, fase));
         imagem = new GreenfootImage(WORLD_WIDTH, WORLD_HEIGHT);
         imagem.setColor(new greenfoot.Color(13, 17, 24));
         imagem.fill();
@@ -107,12 +108,16 @@ public class CarregadorTiled {
     }
 
     private void carregar() {
-        File ficheiro = new File("images/mundo/Tiled_files/Dungeon" + fase + ".tmx");
-        if (!ficheiro.exists()) ficheiro = new File("images/mundo/Tiled_files/Dungeon1.tmx");
+        File ficheiro = new File("images/mundo/Mundo" + fase + "/Tiled_files/Dungeon" + fase + ".tmx");
+        ficheiroMapa = ficheiro;
+        if (!ficheiro.isFile()) {
+            throw new IllegalStateException("Mapa Tiled em falta: " + ficheiro.getPath()
+                    + " (fase " + fase + ")");
+        }
         try {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(ficheiro);
             Element mapa = doc.getDocumentElement();
-            ArrayList<Tileset> tilesets = lerTilesets(mapa);
+            ArrayList<Tileset> tilesets = lerTilesets(mapa, ficheiro.getParentFile());
             tilesetsAtuais.addAll(tilesets);
             lerAnimacoesTiles(mapa, tilesets);
             NodeList filhos = mapa.getChildNodes();
@@ -278,29 +283,75 @@ public class CarregadorTiled {
         return new Rectangle(ponto ? mundoX - mundoLargura / 2 : mundoX, ponto ? mundoY - mundoAltura / 2 : mundoY, mundoLargura, mundoAltura);
     }
 
-    private ArrayList<Tileset> lerTilesets(Element mapa) {
+    private ArrayList<Tileset> lerTilesets(Element mapa, File pastaReferencia) {
         ArrayList<Tileset> resultado = new ArrayList<Tileset>();
         NodeList nodes = mapa.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if (!(node instanceof Element) || !"tileset".equals(node.getNodeName())) continue;
-            Element ts = (Element) node;
+            Element referencia = (Element) node;
+            Element ts = referencia;
+            File pastaTileset = pastaReferencia;
+            Document documentoTileset = null;
+            if (referencia.hasAttribute("source")) {
+                File ficheiroTileset = resolverFicheiro(pastaReferencia, referencia.getAttribute("source"));
+                exigirFicheiro(ficheiroTileset, "tileset referenciado pelo mapa");
+                try {
+                    documentoTileset = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(ficheiroTileset);
+                } catch (Exception erro) {
+                    throw new IllegalStateException("Não foi possível ler o tileset: " + ficheiroTileset.getPath(), erro);
+                }
+                ts = documentoTileset.getDocumentElement();
+                pastaTileset = ficheiroTileset.getParentFile();
+            }
             Element img = (Element) ts.getElementsByTagName("image").item(0);
-            if (img == null) continue;
+            if (img == null || !img.hasAttribute("source")) {
+                throw new IllegalStateException("Tileset sem imagem: "
+                        + (referencia.hasAttribute("source") ? referencia.getAttribute("source") : "incorporado")
+                        + " no mapa " + ficheiroMapa.getPath());
+            }
             Tileset t = new Tileset();
-            t.firstGid = Integer.parseInt(ts.getAttribute("firstgid"));
-            t.columns = Integer.parseInt(ts.getAttribute("columns"));
-            t.imagePath = "images/mundo/Tiled_files/" + new File(img.getAttribute("source")).getName();
+            t.firstGid = Integer.parseInt(referencia.getAttribute("firstgid"));
+            t.columns = ts.hasAttribute("columns") ? Integer.parseInt(ts.getAttribute("columns")) : 0;
+            File caminhoImagem = resolverFicheiro(pastaTileset, img.getAttribute("source"));
+            exigirFicheiro(caminhoImagem, "imagem do tileset");
+            t.imagePath = caminhoImagem.getPath().replace('\\', '/');
+            if (t.columns <= 0) {
+                throw new IllegalStateException("Tileset sem número de colunas: " + caminhoImagem.getPath());
+            }
             resultado.add(t);
         }
         return resultado;
     }
 
+    private static File resolverFicheiro(File pastaReferencia, String caminho) {
+        File indicado = new File(caminho.replace('/', File.separatorChar));
+        return indicado.isAbsolute() ? indicado : new File(pastaReferencia, caminho);
+    }
+
+    private static void exigirFicheiro(File ficheiro, String tipo) {
+        if (!ficheiro.isFile()) {
+            throw new IllegalStateException("Falta " + tipo + ": " + ficheiro.getPath());
+        }
+    }
+
     private void lerAnimacoesTiles(Element mapa, ArrayList<Tileset> tilesets) {
-        NodeList nodes = mapa.getElementsByTagName("tileset");
+        NodeList nodes = mapa.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
-            Element ts = (Element) nodes.item(i);
-            int firstGid = Integer.parseInt(ts.getAttribute("firstgid"));
+            if (!(nodes.item(i) instanceof Element) || !"tileset".equals(nodes.item(i).getNodeName())) continue;
+            Element referencia = (Element) nodes.item(i);
+            Element ts = referencia;
+            if (referencia.hasAttribute("source")) {
+                File ficheiroTileset = resolverFicheiro(ficheiroMapa.getParentFile(), referencia.getAttribute("source"));
+                exigirFicheiro(ficheiroTileset, "tileset referenciado pelo mapa");
+                try {
+                    ts = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(ficheiroTileset).getDocumentElement();
+                } catch (Exception erro) {
+                    throw new IllegalStateException("Não foi possível ler as animações do tileset: "
+                            + ficheiroTileset.getPath(), erro);
+                }
+            }
+            int firstGid = Integer.parseInt(referencia.getAttribute("firstgid"));
             NodeList tiles = ts.getElementsByTagName("tile");
             for (int j = 0; j < tiles.getLength(); j++) {
                 Element tile = (Element) tiles.item(j);
@@ -427,7 +478,8 @@ public class CarregadorTiled {
             if (tileFinal == null) return;
             imagem.drawImage(tileFinal, px, py);
         } catch (Exception erro) {
-            System.out.println("Erro no tile " + gid + ": " + erro.getMessage());
+            throw new IllegalStateException("Erro ao desenhar o tile " + gid
+                    + " usando a imagem " + escolhido.imagePath, erro);
         }
     }
 
@@ -555,8 +607,8 @@ public class CarregadorTiled {
             tilesCache.put(chave, tileFinal);
             return tileFinal;
         } catch (Exception erro) {
-            System.out.println("Erro no tile " + gid + ": " + erro.getMessage());
-            return null;
+            throw new IllegalStateException("Erro ao carregar o tile " + gid
+                    + " a partir de " + tileset.imagePath, erro);
         }
     }
 }

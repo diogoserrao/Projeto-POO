@@ -9,9 +9,9 @@ public class MyWorld extends World {
 
     private DungeonMap mapa;
 
-    /* "Fase" representa os mapas Dungeon1, Dungeon2 e Dungeon3. */
+    /* As fases disponíveis são os mapas Dungeon1 e Dungeon2. */
     private int faseAtual = 1;
-    private static final int MAX_FASES = 3;
+    private static final int MAX_FASES = 2;
     private int pontuacao = 0;
 
     private final List<Player> jogadores = new ArrayList<Player>();
@@ -19,7 +19,7 @@ public class MyWorld extends World {
     private final List<Pedra> pedras = new ArrayList<Pedra>();
     private final List<Pedra> pedrasVisiveis = Collections.unmodifiableList(pedras);
     private Hud hud;
-    private boolean teclaProximaFasePressionada = false;
+    private boolean transicaoEmCurso = false;
     private boolean jogoTerminou = false;
     private boolean jogoVenceu = false;
 
@@ -144,14 +144,13 @@ public class MyWorld extends World {
 
     public void proximaFase() {
 
-        if (jogoVenceu) {
+        if (jogoVenceu || transicaoEmCurso) {
             return;
         }
 
+        transicaoEmCurso = true;
         if (faseAtual < MAX_FASES) {
-
             carregarFase(faseAtual + 1);
-
         } else {
             jogoVenceu = true;
             Greenfoot.playSound("win.wav");
@@ -160,6 +159,7 @@ public class MyWorld extends World {
                     getWidth() / 2,
                     getHeight() / 2);
         }
+        transicaoEmCurso = false;
     }
 
     @Override
@@ -168,20 +168,6 @@ public class MyWorld extends World {
         if (jogoTerminou || jogoVenceu) {
             return;
         }
-
-        /*
-         * A tecla N fica disponível como teste para mudar de
-         * Dungeon1 -> Dungeon2 -> Dungeon3.
-         */
-        boolean teclaN = Greenfoot.isKeyDown("n");
-
-        if (teclaN &&
-                !teclaProximaFasePressionada) {
-
-            proximaFase();
-        }
-
-        teclaProximaFasePressionada = teclaN;
 
         hud.atualizar();
         verificarDerrota();

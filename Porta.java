@@ -19,17 +19,41 @@ public class Porta implements Interagivel {
     public boolean estaAberta() { return aberta; }
     public boolean estaFechada() { return !aberta; }
 
+    /** A Porta 3 é a saída cooperativa da fase. */
+    private boolean eSaidaCooperativa() {
+        return "3".equals(identificador);
+    }
+
     /** Abre apenas com a chave desta porta e consome-a do jogador. */
     public boolean abrir(Player jogador) {
         if (aberta) return true;
         if (jogador == null) return false;
         Chave chave = jogador.encontrarChave(this);
-        if (chave == null || !chave.abre(this) || !jogador.consumirChave(chave)) return false;
+        if (chave == null || !chave.abre(this)) return false;
+
+        if (eSaidaCooperativa()) {
+            if (!jogadoresEstaoJuntos(jogador)) return false;
+            ((MyWorld) jogador.getMundo()).proximaFase();
+            return true;
+        }
+
+        if (!jogador.consumirChave(chave)) return false;
         aberta = true;
         // Só é emitido depois de a chave ser consumida e a porta abrir.
         Greenfoot.playSound("win.wav");
         DungeonMap mapa = jogador.getMapa();
         if (mapa != null) mapa.redesenharObjetos();
+        return true;
+    }
+
+    private boolean jogadoresEstaoJuntos(Player jogador) {
+        if (!(jogador.getMundo() instanceof MyWorld)) return false;
+        MyWorld mundo = (MyWorld) jogador.getMundo();
+        if (mundo.getJogadores().size() < 2) return false;
+        for (Player outro : mundo.getJogadores()) {
+            Rectangle proximidade = new Rectangle(outro.getX() - 24, outro.getY() - 24, 48, 48);
+            if (!area.intersects(proximidade)) return false;
+        }
         return true;
     }
 
@@ -42,7 +66,14 @@ public class Porta implements Interagivel {
         return aberta ? "Porta aberta" : "Porta trancada (chave " + identificador + ")";
     }
     @Override public String getDescricao(Player jogador) {
-        return aberta ? "Porta aberta" : "Porta trancada: precisa da chave " + identificador;
+        if (aberta) return "Porta aberta";
+        if (eSaidaCooperativa() && (jogador == null || !jogador.temChave(identificador))) {
+            return "Precisas da chave";
+        }
+        return eSaidaCooperativa()
+                ? "Premir " + jogador.getTeclaInteracao().toUpperCase()
+                    + " para sair (os dois jogadores devem estar juntos)"
+                : "Porta trancada: precisa da chave " + identificador;
     }
     @Override public void interagir(Player jogador) { abrir(jogador); }
 }

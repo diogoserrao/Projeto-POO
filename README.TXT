@@ -13,9 +13,9 @@ INSTRUÇÕES PARA O USUÁRIO:
 Zag usa WASD e Zig usa as setas. E/Enter servem para interagir e atacar.
 Os ataques só acertam inimigos pelas costas. A colisão é calculada pela grelha do mapa,
 considerando apenas a zona dos pés dos personagens. Pressione N para avançar
-para a fase seguinte. Dungeon2.tmx e Dungeon3.tmx podem ser adicionados em
-images/mundo/Tiled_files; na sua ausência o mapa base é reutilizado com um
-ambiente visual diferente, mantendo o projeto executável.
+para a fase seguinte. Os mapas usados são:
+images/mundo/Mundo1/Tiled_files/Dungeon1.tmx e
+images/mundo/Mundo2/Tiled_files/Dungeon2.tmx.
 
 INIMIGOS:
 Cada fase contém inimigos parados e inimigos patrulheiros. Os patrulheiros
