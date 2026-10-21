@@ -230,6 +230,7 @@ public abstract class Inimigo extends Personagem {
                 mundo.adicionarPontos(morteFurtiva ? 200 : 100);
                 pontuacaoAtribuida = true;
             }
+            mundo.removerInimigo(this);
             mundo.removeObject(this);
         }
     }

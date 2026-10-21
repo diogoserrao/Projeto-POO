@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Saida
+comment0.text=Porta\ especial\ que\ conclui\ a\ fase\ apenas\ com\ os\ dois\ jogadores\ juntos.
+comment1.params=nome\ area
+comment1.target=Saida(java.lang.String,\ java.awt.Rectangle)
+comment2.params=jogador
+comment2.target=boolean\ abrir(Player)
+comment3.params=jogador
+comment3.target=boolean\ jogadoresEstaoJuntos(Player)
+comment3.text=Usa\ a\ mesma\ zona\ de\ proximidade\ definida\ pela\ \u00E1rea\ da\ sa\u00EDda.
+comment4.params=jogador
+comment4.target=java.lang.String\ getDescricao(Player)
+numComments=5

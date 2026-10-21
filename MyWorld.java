@@ -18,6 +18,8 @@ public class MyWorld extends World {
     private final List<Player> jogadoresVisiveis = Collections.unmodifiableList(jogadores);
     private final List<Pedra> pedras = new ArrayList<Pedra>();
     private final List<Pedra> pedrasVisiveis = Collections.unmodifiableList(pedras);
+    private final List<Inimigo> inimigos = new ArrayList<Inimigo>();
+    private final List<Inimigo> inimigosVisiveis = Collections.unmodifiableList(inimigos);
     private Hud hud;
     private boolean transicaoEmCurso = false;
     /** Pedido pendente, processado no act do mundo e fora do act dos atores. */
@@ -77,6 +79,7 @@ public class MyWorld extends World {
 
         jogadores.clear();
         pedras.clear();
+        inimigos.clear();
 
         jogadores.add(new Player(
                 2,
@@ -111,6 +114,7 @@ public class MyWorld extends World {
                         : new Sentinela(personagem);
 
             addObject(inimigo, spawnX, spawnY);
+            this.inimigos.add(inimigo);
             inimigo.inicializarConeVisao();
             inimigo.orientarPara(jogadorMaisProximo(inimigo));
         }
@@ -167,9 +171,14 @@ public class MyWorld extends World {
      * A mudança efetiva fica fora do act do jogador que abriu a porta.
      */
     public void pedirProximaFase() {
-        if (!jogoVenceu && !jogoTerminou && !transicaoEmCurso) {
+        if (!jogoVenceu && !jogoTerminou && !transicaoEmCurso && !faseConcluida) {
             faseConcluida = true;
         }
+    }
+
+    /** Indica se uma saída ainda pode registar a conclusão desta fase. */
+    public boolean podePedirProximaFase() {
+        return !jogoVenceu && !jogoTerminou && !transicaoEmCurso && !faseConcluida;
     }
 
     @Override
@@ -236,6 +245,15 @@ public class MyWorld extends World {
 
     public List<Pedra> getPedras() {
         return pedrasVisiveis;
+    }
+
+    /** Lista estável dos inimigos que pertencem à fase atual. */
+    public List<Inimigo> getInimigos() {
+        return inimigosVisiveis;
+    }
+
+    public void removerInimigo(Inimigo inimigo) {
+        inimigos.remove(inimigo);
     }
 
     public void adicionarPedra(Pedra pedra) {

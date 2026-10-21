@@ -8,15 +8,7 @@ public class Chave extends ObjetoInteragivel {
 
     public Chave(String nome, java.awt.Rectangle area) {
         super(area);
-        this.tipo = obterTipo(nome);
-    }
-
-    private String obterTipo(String nome) {
-        String nomeNormalizado = nome == null ? "" : nome.trim().toLowerCase();
-        int separador = nomeNormalizado.indexOf('_');
-        return separador >= 0 && separador + 1 < nomeNormalizado.length()
-                ? nomeNormalizado.substring(separador + 1)
-                : nomeNormalizado;
+        this.tipo = obterIdentificador(nome);
     }
 
     public String getTipo() {

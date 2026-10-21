@@ -62,6 +62,11 @@ public class Player extends Personagem {
             movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
         processarInteracao();
+        // A interação pode iniciar uma transição; não use APIs do Actor se
+        // este já tiver sido retirado do mundo durante essa operação.
+        if (getWorld() == null) {
+            return;
+        }
         recolherPedras();
         processarLancamento();
 
@@ -111,7 +116,7 @@ public class Player extends Personagem {
      * a imagem da personagem.
      */
     private void lancarPedra() {
-        World mundo = getMundo();
+        MyWorld mundo = getMundo();
         if (mundo == null || pedras <= 0) {
             return;
         }
@@ -175,25 +180,33 @@ public class Player extends Personagem {
             return;
         }
 
-        List<Pedra> pedrasPerto = getObjectsInRange(24, Pedra.class);
-        for (Pedra pedra : pedrasPerto) {
+        MyWorld mundo = getMundo();
+        if (mundo == null) return;
+        List<Pedra> pedrasPerto = mundo.getPedras();
+        for (int i = 0; i < pedrasPerto.size();) {
+            Pedra pedra = pedrasPerto.get(i);
+            boolean removida = false;
             if (pedras >= MAX_PEDRAS) {
                 break;
             }
-            if (pedra.estaPorRecolher()) {
+            int dx = pedra.getX() - getX();
+            int dy = pedra.getY() - getY();
+            if (dx * dx + dy * dy <= 24 * 24 && pedra.estaPorRecolher()) {
                 pedra.interagir(this);
+                removida = !pedrasPerto.contains(pedra);
             }
+            if (!removida) i++;
         }
     }
 
     /** Ataca o inimigo mais próximo, mas apenas se estiver atrás dele. */
     private boolean atacarInimigoPelasCostas() {
-        World mundo = getMundo();
+        MyWorld mundo = getMundo();
         if (mundo == null) {
             return false;
         }
 
-        List<Inimigo> inimigos = mundo.getObjects(Inimigo.class);
+        List<Inimigo> inimigos = mundo.getInimigos();
         Inimigo alvo = null;
         double menorDistanciaQuadrado = Double.MAX_VALUE;
 

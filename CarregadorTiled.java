@@ -317,7 +317,9 @@ public class CarregadorTiled {
             else if (tipo.startsWith("chave")) {
                 registarInteragivel(new Chave(nome, area));
             } else if (tipo.startsWith("porta")) {
-                Porta porta = new Porta(nome, area);
+                Porta porta = tipo.equals("porta_3")
+                        ? new Saida(nome, area)
+                        : new Porta(nome, area);
                 portas.add(porta);
                 registarInteragivel(porta);
             } else if (tipo.startsWith("alavanca")) registarInteragivel(new Alavanca(nome, area));

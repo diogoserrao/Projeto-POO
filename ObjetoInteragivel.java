@@ -10,6 +10,14 @@ public abstract class ObjetoInteragivel implements Interagivel {
         this.area = area;
     }
 
+    /** Extrai o identificador usado pelos nomes dos objetos no mapa Tiled. */
+    protected String obterIdentificador(String nome) {
+        String normalizado = nome == null ? "" : nome.trim().toLowerCase();
+        int separador = normalizado.indexOf('_');
+        return separador >= 0 && separador + 1 < normalizado.length()
+                ? normalizado.substring(separador + 1) : normalizado;
+    }
+
     @Override
     public Rectangle getArea() {
         return area;
