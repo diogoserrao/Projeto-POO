@@ -33,11 +33,14 @@ public class CarregadorTiled {
     private final ArrayList<Chave> chaves = new ArrayList<Chave>();
     private final ArrayList<Alavanca> alavancas = new ArrayList<Alavanca>();
     private final Map<Integer, TileAnimation> animacoesTiles = new HashMap<Integer, TileAnimation>();
+    private final Map<String, Rectangle> percursos = new HashMap<String, Rectangle>();
     private final ArrayList<Porta> portas = new ArrayList<Porta>();
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos = new HashMap<Interagivel, ArrayList<int[]>>();
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>();
     private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
+    private final ArrayList<Rectangle> zonasVazio = new ArrayList<Rectangle>();
+    private final ArrayList<Plataforma> plataformas = new ArrayList<Plataforma>();
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
     private static final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
     private static final Map<String, GreenfootImage> tilesCache = new HashMap<String, GreenfootImage>();
@@ -84,7 +87,7 @@ public class CarregadorTiled {
 
     public DadosMapa getDados() {
         return new DadosMapa(imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
-                configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, plataformas, colisaoComum,
                 tilesetsAtuais, animacoesTiles, fase);
     }
 
@@ -98,6 +101,8 @@ public class CarregadorTiled {
         private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
         private final ArrayList<Point> posicoesPedras;
         private final ArrayList<Point> spawnsJogadores;
+        private final ArrayList<Rectangle> zonasVazio;
+        private final ArrayList<Plataforma> plataformas;
         private final boolean[][] colisaoComum;
         private final ArrayList<Tileset> tilesets;
         private final Map<Integer, TileAnimation> animacoesTiles;
@@ -108,7 +113,8 @@ public class CarregadorTiled {
                 Map<Interagivel, ArrayList<int[]>> tilesDosObjetos,
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> posicoesPedras,
-                ArrayList<Point> spawnsJogadores, boolean[][] colisaoComum,
+                ArrayList<Point> spawnsJogadores, ArrayList<Rectangle> zonasVazio,
+                ArrayList<Plataforma> plataformas, boolean[][] colisaoComum,
                 ArrayList<Tileset> tilesets, Map<Integer, TileAnimation> animacoesTiles, int fase) {
             this.imagem = imagem;
             this.imagemBase = imagemBase;
@@ -119,6 +125,8 @@ public class CarregadorTiled {
             this.configuracoesInimigos = configuracoesInimigos;
             this.posicoesPedras = posicoesPedras;
             this.spawnsJogadores = spawnsJogadores;
+            this.zonasVazio = zonasVazio;
+            this.plataformas = plataformas;
             this.colisaoComum = colisaoComum;
             this.tilesets = tilesets;
             this.animacoesTiles = animacoesTiles;
@@ -167,6 +175,16 @@ public class CarregadorTiled {
 
         public List<Point> getSpawnsJogadores() {
             return copiarPontos(spawnsJogadores);
+        }
+
+        public List<Rectangle> getZonasVazio() {
+            ArrayList<Rectangle> copia = new ArrayList<Rectangle>();
+            for (Rectangle zona : zonasVazio) copia.add(new Rectangle(zona));
+            return Collections.unmodifiableList(copia);
+        }
+
+        public List<Plataforma> getPlataformas() {
+            return Collections.unmodifiableList(plataformas);
         }
 
         public boolean[][] getColisaoComum() {
@@ -229,7 +247,10 @@ public class CarregadorTiled {
                 else if (nome.equals("inimigos")) lerInimigos(grupo);
                 else if (nome.equals("pedras") || nome.equals("pedra")) lerPedras(grupo);
                 else if (nome.equals("jogadores")) lerSpawnJogadores(grupo);
+                else if (nome.equals("vazio")) lerVazios(grupo);
+                else if (nome.equals("percurso")) lerPercursos(grupo);
             }
+            lerPlataformas(filhos);
             associarChavesEPortas();
             for (int i = 0; i < filhos.getLength(); i++) {
                 Node node = filhos.item(i);
@@ -330,8 +351,76 @@ public class CarregadorTiled {
                 Alavanca alavanca = new Alavanca(nome, area);
                 alavancas.add(alavanca);
                 registarInteragivel(alavanca);
+            } else if (tipo.startsWith("plataforma")) {
+                // Criadas em lerPlataformas, depois de todos os percursos serem lidos.
+            } else System.out.println("Objeto interativo desconhecido ignorado: " + nome);
+        }
+    }
+
+    private void lerVazios(Element grupo) {
+        NodeList objetos = grupo.getElementsByTagName("object");
+        for (int i = 0; i < objetos.getLength(); i++) {
+            Element objeto = (Element) objetos.item(i);
+            if (!objeto.hasAttribute("width") || !objeto.hasAttribute("height")) continue;
+            zonasVazio.add(converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
+                    Double.parseDouble(objeto.getAttribute("y")),
+                    Double.parseDouble(objeto.getAttribute("width")),
+                    Double.parseDouble(objeto.getAttribute("height")), false));
+        }
+    }
+
+    private void lerPercursos(Element grupo) {
+        NodeList objetos = grupo.getElementsByTagName("object");
+        for (int i = 0; i < objetos.getLength(); i++) {
+            Element objeto = (Element) objetos.item(i);
+            if (!objeto.hasAttribute("width") || !objeto.hasAttribute("height")) continue;
+            String nome = objeto.getAttribute("name").trim();
+            String id = nome.toLowerCase().startsWith("percurso_")
+                    ? nome.substring("percurso_".length()) : "1";
+            percursos.put(id, converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
+                    Double.parseDouble(objeto.getAttribute("y")),
+                    Double.parseDouble(objeto.getAttribute("width")),
+                    Double.parseDouble(objeto.getAttribute("height")), false));
+        }
+    }
+
+    private void lerPlataformas(NodeList filhos) {
+        for (int i = 0; i < filhos.getLength(); i++) {
+            Node node = filhos.item(i);
+            if (!(node instanceof Element) || !"objectgroup".equals(node.getNodeName())) continue;
+            NodeList objetos = ((Element) node).getElementsByTagName("object");
+            for (int j = 0; j < objetos.getLength(); j++) {
+                Element objeto = (Element) objetos.item(j);
+                String nome = objeto.getAttribute("name").trim();
+                String tipo = nome.toLowerCase();
+                if (!tipo.startsWith("plataforma") || !objeto.hasAttribute("x") || !objeto.hasAttribute("y")) continue;
+                boolean ponto = !objeto.hasAttribute("width") || !objeto.hasAttribute("height");
+                Rectangle area = converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
+                        Double.parseDouble(objeto.getAttribute("y")), SOURCE_TILE, SOURCE_TILE, ponto);
+                if (tipo.startsWith("plataformamovel")) {
+                    String id = nome.contains("_") ? nome.substring(nome.indexOf('_') + 1) : "1";
+                    Rectangle percurso = percursos.get(id);
+                    if (percurso == null && percursos.size() == 1) percurso = percursos.values().iterator().next();
+                    if (percurso != null) plataformas.add(new PlataformaMovel(area, percurso));
+                    else System.out.println("Aviso: plataforma móvel sem percurso: " + nome);
+                } else if (tipo.startsWith("plataformatemporaria")) {
+                    plataformas.add(new PlataformaTemporaria(area));
+                }
             }
-            else System.out.println("Objeto interativo desconhecido ignorado: " + nome);
+        }
+    }
+
+    /** Extrai o tile de caixa de madeira já existente no tileset Objects. */
+    static GreenfootImage criarImagemPlataforma(int largura, int altura) {
+        try {
+            GreenfootImage folha = new GreenfootImage("images/mundo/Mundo1/Tiled_files/Objects.png");
+            GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
+            int local = 128; // GID 5707 no mapa: tile de caixa do tileset Objects.
+            tile.drawImage(folha, -(local % 24) * SOURCE_TILE, -(local / 24) * SOURCE_TILE);
+            tile.scale(Math.max(1, largura), Math.max(1, altura));
+            return tile;
+        } catch (Exception erro) {
+            throw new IllegalStateException("Não foi possível reutilizar a caixa do tileset Objects", erro);
         }
     }
 

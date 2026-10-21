@@ -24,6 +24,8 @@ public class DungeonMap {
     private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
     private final ArrayList<Point> posicoesPedras;
     private final ArrayList<Point> spawnsJogadores;
+    private final ArrayList<Rectangle> zonasVazio;
+    private final ArrayList<Plataforma> plataformas;
     private final boolean[][] colisaoComum;
     private final ArrayList<CarregadorTiled.Tileset> tilesets;
     private final java.util.Map<Integer, CarregadorTiled.TileAnimation> animacoesTiles;
@@ -45,6 +47,8 @@ public class DungeonMap {
                 dados.getConfiguracoesInimigos());
         posicoesPedras = new ArrayList<Point>(dados.getPosicoesPedras());
         spawnsJogadores = new ArrayList<Point>(dados.getSpawnsJogadores());
+        zonasVazio = copiarRetangulos(dados.getZonasVazio());
+        plataformas = new ArrayList<Plataforma>(dados.getPlataformas());
         colisaoComum = dados.getColisaoComum();
         tilesets = new ArrayList<CarregadorTiled.Tileset>(dados.getTilesets());
         animacoesTiles = new HashMap<Integer, CarregadorTiled.TileAnimation>(
@@ -114,7 +118,7 @@ public class DungeonMap {
     public void redesenharObjetos() {
         CarregadorTiled.redesenharObjetos(new CarregadorTiled.DadosMapa(
                 imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
-                configuracoesInimigos, posicoesPedras, spawnsJogadores, colisaoComum,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, plataformas, colisaoComum,
                 tilesets, animacoesTiles, fase));
     }
 
@@ -143,6 +147,32 @@ public class DungeonMap {
             copia.add(new Point(ponto));
         }
         return Collections.unmodifiableList(copia);
+    }
+
+    private static ArrayList<Rectangle> copiarRetangulos(List<Rectangle> origem) {
+        ArrayList<Rectangle> copia = new ArrayList<Rectangle>();
+        for (Rectangle area : origem) copia.add(new Rectangle(area));
+        return copia;
+    }
+
+    public List<Rectangle> getZonasVazio() {
+        return Collections.unmodifiableList(copiarRetangulos(zonasVazio));
+    }
+
+    public List<Plataforma> getPlataformas() {
+        return Collections.unmodifiableList(plataformas);
+    }
+
+    public boolean estaNoVazio(Rectangle pes) {
+        if (pes == null) return false;
+        for (Rectangle vazio : zonasVazio) if (vazio.intersects(pes)) return true;
+        return false;
+    }
+
+    public boolean estaSuportado(Rectangle pes) {
+        if (pes == null) return false;
+        for (Plataforma plataforma : plataformas) if (plataforma.suporta(pes)) return true;
+        return false;
     }
 
     public boolean temColisaoNaZona(int x1, int y1, int x2, int y2) {

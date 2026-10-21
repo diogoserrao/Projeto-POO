@@ -19,6 +19,8 @@ public class Player extends Personagem {
     private int interagivelCacheY;
     private DungeonMap interagivelCacheMapa;
     private long interagivelCacheRevisao = Long.MIN_VALUE;
+    private Rectangle ultimaPosicaoSegura;
+    private boolean quedaEmCurso;
 
     public Player(int skin, Controlos controlos) {
         super(skin, 3);
@@ -61,6 +63,7 @@ public class Player extends Personagem {
         if (dy != 0)
             movimento |= tentarMover(getX(), getY() + dy);
         atualizarAnimacao(movimento);
+        atualizarEstadoNoVazio();
         processarInteracao();
         // A interação pode iniciar uma transição; não use APIs do Actor se
         // este já tiver sido retirado do mundo durante essa operação.
@@ -70,6 +73,34 @@ public class Player extends Personagem {
         recolherPedras();
         processarLancamento();
 
+    }
+
+    /** Move o jogador com uma plataforma, preservando a colisão visual relativa. */
+    public void serTransportado(int dx, int dy) {
+        if (getWorld() != null && (dx != 0 || dy != 0)) setLocation(getX() + dx, getY() + dy);
+    }
+
+    private void atualizarEstadoNoVazio() {
+        DungeonMap mapa = getMapa();
+        if (mapa == null) return;
+        Rectangle pes = getPes();
+        boolean noVazio = mapa.estaNoVazio(pes);
+        boolean suportado = mapa.estaSuportado(pes);
+        if (!noVazio) {
+            ultimaPosicaoSegura = new Rectangle(getX(), getY(), 0, 0);
+            quedaEmCurso = false;
+            return;
+        }
+        if (suportado) {
+            return;
+        }
+        if (!quedaEmCurso) {
+            quedaEmCurso = true;
+            receberDano();
+            if (ultimaPosicaoSegura != null) {
+                setLocation(ultimaPosicaoSegura.x, ultimaPosicaoSegura.y);
+            }
+        }
     }
 
     @Override

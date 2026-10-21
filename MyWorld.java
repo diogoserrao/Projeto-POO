@@ -49,6 +49,7 @@ public class MyWorld extends World {
         removeObjects(getObjects(null));
 
         configurarArmadilhas();
+        configurarPlataformas();
         configurarSpawnAtor();
         hud = new Hud(this, jogadores, new java.util.function.IntSupplier() {
             @Override
@@ -67,6 +68,15 @@ public class MyWorld extends World {
         for (Armadilha armadilha : mapa.getArmadilhas()) {
             if (armadilha.getWorld() == null) {
                 addObject(armadilha, armadilha.getCentroVisualX(), armadilha.getCentroVisualY());
+            }
+        }
+    }
+
+    private void configurarPlataformas() {
+        for (Plataforma plataforma : mapa.getPlataformas()) {
+            if (plataforma.getWorld() == null) {
+                Rectangle area = plataforma.getArea();
+                addObject(plataforma, area.x + area.width / 2, area.y + area.height / 2);
             }
         }
     }

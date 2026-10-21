@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="46" nextobjectid="44">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="48" nextobjectid="48">
  <tileset firstgid="1" name="cracked_tiles" tilewidth="16" tileheight="16" tilecount="256" columns="8">
   <image source="decorative_cracks_walls.png" width="128" height="512"/>
  </tileset>
@@ -4449,6 +4449,12 @@
 </chunk>
   </data>
  </layer>
+ <objectgroup id="46" name="vazio">
+  <object id="44" name="vazio_1" x="15.3333" y="306" width="115.333" height="16"/>
+ </objectgroup>
+ <objectgroup id="47" name="percurso">
+  <object id="47" name="percurso" x="14.5833" y="312" width="114.083" height="1.33333"/>
+ </objectgroup>
  <layer id="19" name="walls_under_water" width="16" height="24">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
@@ -6274,9 +6280,9 @@
    <chunk x="0" y="16" width="16" height="16">
 0,0,0,0,30,0,0,0,0,0,0,30,30,30,30,30,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,0,
-0,0,0,0,0,0,0,30,0,0,29,0,29,0,30,0,
-0,30,30,30,30,30,30,30,0,29,0,0,29,0,30,0,
-0,30,0,0,0,0,0,0,0,29,0,0,29,0,30,0,
+0,0,0,0,0,0,0,0,0,0,29,0,29,0,30,0,
+0,0,0,0,0,0,0,0,0,29,0,0,29,0,30,0,
+0,0,0,0,0,0,0,0,0,29,0,0,29,0,30,0,
 30,30,30,30,30,30,30,0,0,29,0,0,29,0,0,0,
 0,0,0,0,0,0,30,29,29,29,29,29,29,0,0,0,
 0,0,0,0,0,0,29,0,0,0,0,0,29,29,29,29,
@@ -6348,6 +6354,7 @@
   <object id="39" name="armadilha " x="16.6667" y="272.667" width="30.6667" height="14"/>
   <object id="41" name="alavanca_3" x="-213.333" y="136"/>
   <object id="42" x="76" y="150" width="36" height="40.6667"/>
+  <object id="45" name="plataformamovel_1" x="24.6667" y="312.667"/>
  </objectgroup>
  <objectgroup id="41" name="Inimigos">
   <object id="11" name="Patrulha_1" x="-71.3333" y="22.6667" width="6.66667" height="108"/>
