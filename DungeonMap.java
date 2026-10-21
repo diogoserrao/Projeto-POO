@@ -3,6 +3,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,22 +35,49 @@ public class DungeonMap {
     public DungeonMap(int fase) { this(new CarregadorTiled(fase).getDados()); }
 
     public DungeonMap(CarregadorTiled.DadosMapa dados) {
-        imagem = dados.imagem;
-        imagemBase = dados.imagemBase;
-        interagiveis = dados.interagiveis;
-        armadilhas = dados.armadilhas;
-        portas = dados.portas;
-        tilesDosObjetos = dados.tilesDosObjetos;
-        configuracoesInimigos = dados.configuracoesInimigos;
-        posicoesPedras = dados.posicoesPedras;
-        spawnsJogadores = dados.spawnsJogadores;
-        colisaoComum = dados.colisaoComum;
-        tilesets = dados.tilesets;
-        animacoesTiles = dados.animacoesTiles;
-        fase = dados.fase;
+        imagem = dados.getImagem();
+        imagemBase = dados.getImagemBase();
+        interagiveis = new ArrayList<Interagivel>(dados.getInteragiveis());
+        armadilhas = new ArrayList<Armadilha>(dados.getArmadilhas());
+        portas = new ArrayList<Porta>(dados.getPortas());
+        tilesDosObjetos = copiarTilesDosObjetos(dados.getTilesDosObjetos());
+        configuracoesInimigos = new ArrayList<ConfiguracaoInimigo>(
+                dados.getConfiguracoesInimigos());
+        posicoesPedras = new ArrayList<Point>(dados.getPosicoesPedras());
+        spawnsJogadores = new ArrayList<Point>(dados.getSpawnsJogadores());
+        colisaoComum = dados.getColisaoComum();
+        tilesets = new ArrayList<CarregadorTiled.Tileset>(dados.getTilesets());
+        animacoesTiles = new HashMap<Integer, CarregadorTiled.TileAnimation>(
+                dados.getAnimacoesTiles());
+        fase = dados.getFase();
     }
 
-    public GreenfootImage getImagem() { return imagem; }
+    private static Map<Interagivel, ArrayList<int[]>> copiarTilesDosObjetos(
+            Map<Interagivel, List<int[]>> origem) {
+        Map<Interagivel, ArrayList<int[]>> copia =
+                new HashMap<Interagivel, ArrayList<int[]>>();
+        for (Map.Entry<Interagivel, List<int[]>> entrada : origem.entrySet()) {
+            ArrayList<int[]> tiles = new ArrayList<int[]>();
+            for (int[] tile : entrada.getValue()) {
+                tiles.add(tile.clone());
+            }
+            copia.put(entrada.getKey(), tiles);
+        }
+        return copia;
+    }
+
+    /**
+     * Devolve uma cópia da imagem para que um consumidor não possa alterar o
+     * fundo interno do mapa através do getter.
+     */
+    public GreenfootImage getImagem() { return new GreenfootImage(imagem); }
+
+    /**
+     * A imagem usada pelo World tem de ser a mesma que é redesenhada quando
+     * o estado dos objetos muda. Este acesso é deliberadamente package-private
+     * e não faz parte da API de consulta do mapa.
+     */
+    GreenfootImage getImagemParaRenderizacao() { return imagem; }
 
     /** Devolve uma vista não modificável dos objetos do mapa. */
     public List<Interagivel> getInteragiveis() {
@@ -94,9 +122,28 @@ public class DungeonMap {
         return Collections.unmodifiableList(armadilhas);
     }
 
-    public ArrayList<ConfiguracaoInimigo> getConfiguracoesInimigos() { return configuracoesInimigos; }
-    public ArrayList<Point> getPosicoesPedras() { return posicoesPedras; }
-    public ArrayList<Point> getSpawnsJogadores() { return spawnsJogadores; }
+    /** Devolve uma vista não modificável das configurações de inimigos. */
+    public List<ConfiguracaoInimigo> getConfiguracoesInimigos() {
+        return Collections.unmodifiableList(configuracoesInimigos);
+    }
+
+    /** Devolve uma vista não modificável das posições das pedras. */
+    public List<Point> getPosicoesPedras() {
+        return copiarPontos(posicoesPedras);
+    }
+
+    /** Devolve uma vista não modificável dos pontos de spawn dos jogadores. */
+    public List<Point> getSpawnsJogadores() {
+        return copiarPontos(spawnsJogadores);
+    }
+
+    private static List<Point> copiarPontos(List<Point> pontos) {
+        ArrayList<Point> copia = new ArrayList<Point>();
+        for (Point ponto : pontos) {
+            copia.add(new Point(ponto));
+        }
+        return Collections.unmodifiableList(copia);
+    }
 
     public boolean temColisaoNaZona(int x1, int y1, int x2, int y2) {
         if (x1 < 0 || y1 < 0 || x2 >= WORLD_WIDTH || y2 >= WORLD_HEIGHT) return true;

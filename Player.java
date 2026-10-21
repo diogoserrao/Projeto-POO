@@ -9,7 +9,7 @@ public class Player extends Personagem {
     /* O som só é preparado quando ocorre dano, não durante a criação do mundo. */
     private static GreenfootSound somDano;
     private final Controlos controlos;
-    private final int velocidade = 4;
+    private static final int VELOCIDADE = 4;
     private boolean teclaInteracaoPressionada;
     private boolean teclaLancarPressionada;
     private int pedras = 0;
@@ -36,13 +36,13 @@ public class Player extends Personagem {
         int dy = 0;
 
         if (Greenfoot.isKeyDown(controlos.getEsquerda()))
-            dx -= velocidade;
+            dx -= VELOCIDADE;
         if (Greenfoot.isKeyDown(controlos.getDireita()))
-            dx += velocidade;
+            dx += VELOCIDADE;
         if (Greenfoot.isKeyDown(controlos.getCima()))
-            dy -= velocidade;
+            dy -= VELOCIDADE;
         if (Greenfoot.isKeyDown(controlos.getBaixo()))
-            dy += velocidade;
+            dy += VELOCIDADE;
 
         if (dx != 0 || dy != 0) {
             if (dy < 0)

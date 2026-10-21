@@ -349,10 +349,6 @@ public abstract class Inimigo extends Personagem {
         definirDirecao(direcao);
     }
 
-    public void definirDirecaoInicial(Direcao direcao) {
-        definirDirecao(direcao);
-    }
-
     /** Orienta o cone inicial para um jogador sem alterar o movimento. */
     public void orientarPara(Player jogador) {
         if (jogador == null) {
@@ -363,10 +359,10 @@ public abstract class Inimigo extends Personagem {
         int diferencaY = jogador.getY() - getY();
 
         if (Math.abs(diferencaX) >= Math.abs(diferencaY)) {
-            definirDirecaoInicial(diferencaX >= 0
+            definirDirecaoMovimento(diferencaX >= 0
                     ? Direcao.DIREITA : Direcao.ESQUERDA);
         } else {
-            definirDirecaoInicial(diferencaY >= 0
+            definirDirecaoMovimento(diferencaY >= 0
                     ? Direcao.BAIXO : Direcao.CIMA);
         }
     }

@@ -352,7 +352,7 @@ public abstract class Personagem extends Actor {
     }
 
     /** Retira exatamente uma vida, sem permitir valores negativos. */
-    public void perderVida() {
+    private void perderVida() {
         if (vidas > 0) {
             vidas--;
             iniciarFlashDano();

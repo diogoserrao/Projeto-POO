@@ -40,7 +40,7 @@ public class MyWorld extends World {
          * Mantemos exatamente a forma original de carregar
          * a imagem do mapa.
          */
-        setBackground(mapa.getImagem());
+        setBackground(mapa.getImagemParaRenderizacao());
 
         removeObjects(getObjects(null));
 
@@ -91,7 +91,7 @@ public class MyWorld extends World {
     /** Cria os inimigos da fase. */
     private void configurarInimigos() {
 
-        ArrayList<ConfiguracaoInimigo> inimigos = mapa.getConfiguracoesInimigos();
+        List<ConfiguracaoInimigo> inimigos = mapa.getConfiguracoesInimigos();
 
         for (int i = 0; i < inimigos.size(); i++) {
             ConfiguracaoInimigo configuracao = inimigos.get(i);

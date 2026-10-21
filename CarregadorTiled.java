@@ -3,7 +3,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,15 +41,30 @@ public class CarregadorTiled {
     private static final Map<String, GreenfootImage> tilesCache = new HashMap<String, GreenfootImage>();
     private final ArrayList<Tileset> tilesetsAtuais = new ArrayList<Tileset>();
 
-    static class Tileset {
-        int firstGid;
-        int columns;
-        String imagePath;
+    static final class Tileset {
+        private int firstGid;
+        private int columns;
+        private String imagePath;
+
+        Tileset() { }
+
+        Tileset(Tileset original) {
+            firstGid = original.firstGid;
+            columns = original.columns;
+            imagePath = original.imagePath;
+        }
     }
 
-    static class TileAnimation {
-        int[] frames;
-        int[] duracoes;
+    static final class TileAnimation {
+        private int[] frames;
+        private int[] duracoes;
+
+        TileAnimation() { }
+
+        TileAnimation(TileAnimation original) {
+            frames = original.frames == null ? null : original.frames.clone();
+            duracoes = original.duracoes == null ? null : original.duracoes.clone();
+        }
     }
 
     public CarregadorTiled(int fase) {
@@ -70,19 +87,19 @@ public class CarregadorTiled {
     }
 
     public static final class DadosMapa {
-        final GreenfootImage imagem;
-        final GreenfootImage imagemBase;
-        final ArrayList<Interagivel> interagiveis;
-        final ArrayList<Armadilha> armadilhas;
-        final ArrayList<Porta> portas;
-        final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
-        final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
-        final ArrayList<Point> posicoesPedras;
-        final ArrayList<Point> spawnsJogadores;
-        final boolean[][] colisaoComum;
-        final ArrayList<Tileset> tilesets;
-        final Map<Integer, TileAnimation> animacoesTiles;
-        final int fase;
+        private final GreenfootImage imagem;
+        private final GreenfootImage imagemBase;
+        private final ArrayList<Interagivel> interagiveis;
+        private final ArrayList<Armadilha> armadilhas;
+        private final ArrayList<Porta> portas;
+        private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos;
+        private final ArrayList<ConfiguracaoInimigo> configuracoesInimigos;
+        private final ArrayList<Point> posicoesPedras;
+        private final ArrayList<Point> spawnsJogadores;
+        private final boolean[][] colisaoComum;
+        private final ArrayList<Tileset> tilesets;
+        private final Map<Integer, TileAnimation> animacoesTiles;
+        private final int fase;
 
         DadosMapa(GreenfootImage imagem, GreenfootImage imagemBase,
                 ArrayList<Interagivel> interagiveis, ArrayList<Armadilha> armadilhas, ArrayList<Porta> portas,
@@ -105,6 +122,85 @@ public class CarregadorTiled {
             this.animacoesTiles = animacoesTiles;
             this.fase = fase;
         }
+
+        /** Devolve uma cópia para impedir alterações à imagem interna. */
+        public GreenfootImage getImagem() { return new GreenfootImage(imagem); }
+
+        /** Devolve uma cópia para impedir alterações à imagem interna. */
+        public GreenfootImage getImagemBase() { return new GreenfootImage(imagemBase); }
+
+        public List<Interagivel> getInteragiveis() {
+            return Collections.unmodifiableList(interagiveis);
+        }
+
+        public List<Armadilha> getArmadilhas() {
+            return Collections.unmodifiableList(armadilhas);
+        }
+
+        public List<Porta> getPortas() {
+            return Collections.unmodifiableList(portas);
+        }
+
+        public Map<Interagivel, List<int[]>> getTilesDosObjetos() {
+            Map<Interagivel, List<int[]>> copia =
+                    new HashMap<Interagivel, List<int[]>>();
+            for (Map.Entry<Interagivel, ArrayList<int[]>> entrada
+                    : tilesDosObjetos.entrySet()) {
+                ArrayList<int[]> tiles = new ArrayList<int[]>();
+                for (int[] tile : entrada.getValue()) {
+                    tiles.add(tile.clone());
+                }
+                copia.put(entrada.getKey(), Collections.unmodifiableList(tiles));
+            }
+            return Collections.unmodifiableMap(copia);
+        }
+
+        public List<ConfiguracaoInimigo> getConfiguracoesInimigos() {
+            return Collections.unmodifiableList(configuracoesInimigos);
+        }
+
+        public List<Point> getPosicoesPedras() {
+            return copiarPontos(posicoesPedras);
+        }
+
+        public List<Point> getSpawnsJogadores() {
+            return copiarPontos(spawnsJogadores);
+        }
+
+        public boolean[][] getColisaoComum() {
+            boolean[][] copia = new boolean[colisaoComum.length][];
+            for (int i = 0; i < colisaoComum.length; i++) {
+                copia[i] = colisaoComum[i].clone();
+            }
+            return copia;
+        }
+
+        public List<Tileset> getTilesets() {
+            ArrayList<Tileset> copia = new ArrayList<Tileset>();
+            for (Tileset tileset : tilesets) {
+                copia.add(new Tileset(tileset));
+            }
+            return Collections.unmodifiableList(copia);
+        }
+
+        public Map<Integer, TileAnimation> getAnimacoesTiles() {
+            Map<Integer, TileAnimation> copia = new HashMap<Integer, TileAnimation>();
+            for (Map.Entry<Integer, TileAnimation> entrada
+                    : animacoesTiles.entrySet()) {
+                copia.put(entrada.getKey(), new TileAnimation(entrada.getValue()));
+            }
+            return Collections.unmodifiableMap(copia);
+        }
+
+        private static List<Point> copiarPontos(List<Point> pontos) {
+            ArrayList<Point> copia = new ArrayList<Point>();
+            for (Point ponto : pontos) {
+                copia.add(new Point(ponto));
+            }
+            return Collections.unmodifiableList(copia);
+        }
+
+        public int getFase() { return fase; }
     }
 
     private void carregar() {
