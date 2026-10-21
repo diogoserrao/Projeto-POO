@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=PlataformaMovel
+comment0.text=Plataforma\ que\ percorre\ horizontalmente\ a\ \u00E1rea\ indicada\ pelo\ Tiled.
+comment1.params=area\ percurso
+comment1.target=PlataformaMovel(java.awt.Rectangle,\ java.awt.Rectangle)
+comment2.params=area\ percurso\ velocidade
+comment2.target=PlataformaMovel(java.awt.Rectangle,\ java.awt.Rectangle,\ int)
+comment3.params=
+comment3.target=void\ act()
+numComments=4

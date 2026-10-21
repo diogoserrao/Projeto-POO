@@ -4450,10 +4450,10 @@
   </data>
  </layer>
  <objectgroup id="46" name="vazio">
-  <object id="44" name="vazio_1" x="15.3333" y="306" width="115.333" height="16"/>
+  <object id="44" name="vazio_1" x="13.3333" y="306" width="116.583" height="16"/>
  </objectgroup>
  <objectgroup id="47" name="percurso">
-  <object id="47" name="percurso" x="14.5833" y="312" width="114.083" height="1.33333"/>
+  <object id="47" name="percurso" x="7.83333" y="312" width="126.833" height="1.33333"/>
  </objectgroup>
  <layer id="19" name="walls_under_water" width="16" height="24">
   <data encoding="csv">

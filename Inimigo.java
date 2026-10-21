@@ -8,6 +8,7 @@ public abstract class Inimigo extends Personagem {
     private static final int ALCANCE_GOLPE_QUADRADO =
             ALCANCE_GOLPE * ALCANCE_GOLPE;
     private static final int COOLDOWN_ATAQUE = 60;
+    private static final boolean ATAQUES_ATIVOS = false;
     /** A visão permanece sempre ativa; a otimização está na camada em cache. */
     private static final boolean MOSTRAR_VISAO = true;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
@@ -64,7 +65,9 @@ public abstract class Inimigo extends Personagem {
         verificarPedras();
         Player alvo = encontrarAlvo();
 
-        if (!estaEmAtaque() && alvo == null && contadorDistracao == 0) {
+        if (!estaEmAtaque()
+                && (alvo == null || !ATAQUES_ATIVOS)
+                && contadorDistracao == 0) {
             boolean estaAMover = movimento.mover(this);
             atualizarAnimacao(estaAMover);
         } else {
@@ -118,12 +121,17 @@ public abstract class Inimigo extends Personagem {
     }
 
     /**
-     * Deteta o jogador válido mais próximo e aplica-lhe dano.
+     * Deteta o jogador válido mais próximo e aplica-lhe dano quando os ataques
+     * dos inimigos estão ativos.
      *
      * Este método pertence à classe Inimigo, por isso é executado por todos os
      * inimigos, independentemente do movimento que cada um utiliza.
      */
     public void detetarEAtacarJogador(Player alvo) {
+        if (!ATAQUES_ATIVOS) {
+            return;
+        }
+
         if (contadorAtaque > 0) {
             contadorAtaque--;
         }

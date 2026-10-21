@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=PlataformaTemporaria
+comment0.text=Plataforma\ parada,\ com\ ciclos\ de\ visibilidade\ e\ piscar\ antes\ de\ desaparecer.
+comment1.params=area
+comment1.target=PlataformaTemporaria(java.awt.Rectangle)
+comment2.params=area\ tempoVisivel\ tempoEscondida
+comment2.target=PlataformaTemporaria(java.awt.Rectangle,\ int,\ int)
+comment3.params=
+comment3.target=void\ act()
+comment4.params=pes
+comment4.target=boolean\ suporta(java.awt.Rectangle)
+numComments=5

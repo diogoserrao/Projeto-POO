@@ -9,7 +9,7 @@ public class PlataformaMovel extends Plataforma {
     private int sentido = 1;
 
     public PlataformaMovel(Rectangle area, Rectangle percurso) {
-        this(area, percurso, 2);
+        this(area, percurso, 1);
     }
 
     public PlataformaMovel(Rectangle area, Rectangle percurso, int velocidade) {
@@ -33,7 +33,7 @@ public class PlataformaMovel extends Plataforma {
 
         Rectangle antiga = getArea();
         int minimo = percurso.x;
-        int maximo = percurso.x + percurso.width - antiga.width;
+        int maximo = Math.max(minimo, percurso.x + percurso.width - antiga.width);
         int novoX = antiga.x + sentido * velocidade;
         if (novoX <= minimo) { novoX = minimo; sentido = 1; }
         if (novoX >= maximo) { novoX = maximo; sentido = -1; }

@@ -22,6 +22,8 @@ public class CarregadorTiled {
     private static final int WORLD_WIDTH = MAP_WIDTH * TILE;
     private static final int WORLD_HEIGHT = MAP_HEIGHT * TILE;
     private static final int TAMANHO_OBJETO_PONTO = 48;
+    /* A caixa escolhida no tileset ocupa dois tiles por dois tiles. */
+    private static final int TAMANHO_PLATAFORMA = SOURCE_TILE * 2;
     private static final boolean MOSTRAR_COLISAO = false;
 
     private final int fase;
@@ -395,8 +397,13 @@ public class CarregadorTiled {
                 String tipo = nome.toLowerCase();
                 if (!tipo.startsWith("plataforma") || !objeto.hasAttribute("x") || !objeto.hasAttribute("y")) continue;
                 boolean ponto = !objeto.hasAttribute("width") || !objeto.hasAttribute("height");
-                Rectangle area = converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
-                        Double.parseDouble(objeto.getAttribute("y")), SOURCE_TILE, SOURCE_TILE, ponto);
+                double x = Double.parseDouble(objeto.getAttribute("x"));
+                double y = Double.parseDouble(objeto.getAttribute("y"));
+                double largura = objeto.hasAttribute("width")
+                        ? Double.parseDouble(objeto.getAttribute("width")) : TAMANHO_PLATAFORMA;
+                double altura = objeto.hasAttribute("height")
+                        ? Double.parseDouble(objeto.getAttribute("height")) : TAMANHO_PLATAFORMA;
+                Rectangle area = converterParaMundo(x, y, largura, altura, ponto);
                 if (tipo.startsWith("plataformamovel")) {
                     String id = nome.contains("_") ? nome.substring(nome.indexOf('_') + 1) : "1";
                     Rectangle percurso = percursos.get(id);
@@ -410,15 +417,32 @@ public class CarregadorTiled {
         }
     }
 
-    /** Extrai o tile de caixa de madeira já existente no tileset Objects. */
+    /**
+     * Extrai a caixa de madeira usada pelo mapa: os GIDs 5707, 5708, 5731
+     * e 5732 são os quatro tiles consecutivos que formam a caixa 2x2.
+     * A composição mantém a proporção do tileset e aplica apenas a escala
+     * global do mapa (2x), ficando com 64x64 no mundo.
+     */
     static GreenfootImage criarImagemPlataforma(int largura, int altura) {
         try {
             GreenfootImage folha = new GreenfootImage("images/mundo/Mundo1/Tiled_files/Objects.png");
-            GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
-            int local = 128; // GID 5707 no mapa: tile de caixa do tileset Objects.
-            tile.drawImage(folha, -(local % 24) * SOURCE_TILE, -(local / 24) * SOURCE_TILE);
-            tile.scale(Math.max(1, largura), Math.max(1, altura));
-            return tile;
+            GreenfootImage caixa = new GreenfootImage(SOURCE_TILE * 2, SOURCE_TILE * 2);
+            int[] tiles = { 128, 129, 152, 153 };
+            for (int i = 0; i < tiles.length; i++) {
+                int local = tiles[i];
+                GreenfootImage tile = new GreenfootImage(SOURCE_TILE, SOURCE_TILE);
+                tile.drawImage(folha, -(local % 24) * SOURCE_TILE,
+                        -(local / 24) * SOURCE_TILE);
+                caixa.drawImage(tile, (i % 2) * SOURCE_TILE,
+                        (i / 2) * SOURCE_TILE);
+            }
+            caixa.scale(caixa.getWidth() * TILE / SOURCE_TILE,
+                    caixa.getHeight() * TILE / SOURCE_TILE);
+            if (largura == caixa.getWidth() && altura == caixa.getHeight()) return caixa;
+            GreenfootImage imagem = new GreenfootImage(Math.max(1, largura), Math.max(1, altura));
+            imagem.drawImage(caixa, (imagem.getWidth() - caixa.getWidth()) / 2,
+                    (imagem.getHeight() - caixa.getHeight()) / 2);
+            return imagem;
         } catch (Exception erro) {
             throw new IllegalStateException("Não foi possível reutilizar a caixa do tileset Objects", erro);
         }

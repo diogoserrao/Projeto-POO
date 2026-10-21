@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Plataforma
+comment0.text=Base\ comum\ \u00E0s\ plataformas\ que\ podem\ suportar\ jogadores.
+comment1.params=area
+comment1.target=Plataforma(java.awt.Rectangle)
+comment2.params=
+comment2.target=java.awt.Rectangle\ getArea()
+comment3.params=novaArea
+comment3.target=void\ atualizarArea(java.awt.Rectangle)
+comment4.params=pes
+comment4.target=boolean\ suporta(java.awt.Rectangle)
+comment4.text=Considera\ suportado\ um\ jogador\ cujo\ ret\u00E2ngulo\ dos\ p\u00E9s\ toca\ o\ topo.
+numComments=5

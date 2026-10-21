@@ -22,9 +22,13 @@ public abstract class Plataforma extends Actor {
 
     /** Considera suportado um jogador cujo retângulo dos pés toca o topo. */
     public boolean suporta(Rectangle pes) {
-        if (pes == null) return false;
-        int basePes = pes.y + pes.height;
-        return pes.x < area.x + area.width && pes.x + pes.width > area.x
-                && basePes >= area.y && basePes <= area.y + 8;
+    if (pes == null) {
+        return false;
     }
+
+    int centroPesX = pes.x + pes.width / 2;
+    int centroPesY = pes.y + pes.height / 2;
+
+    return area.contains(centroPesX, centroPesY);
+}
 }
