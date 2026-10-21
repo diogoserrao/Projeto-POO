@@ -120,7 +120,7 @@ public class Player extends Personagem {
             if (!atacarInimigoPelasCostas()) {
                 Interagivel interagivel = procurarInteragivelPerto();
                 if (interagivel != null) {
-                    interagivel.interagir(this);
+                    interagivel.interagir(this, getMapa(), getMundo());
                 } else {
                     iniciarAtaque();
                 }
@@ -223,7 +223,7 @@ public class Player extends Personagem {
             int dx = pedra.getX() - getX();
             int dy = pedra.getY() - getY();
             if (dx * dx + dy * dy <= 24 * 24 && pedra.estaPorRecolher()) {
-                pedra.interagir(this);
+                pedra.interagir(this, getMapa(), mundo);
                 removida = !pedrasPerto.contains(pedra);
             }
             if (!removida) i++;
@@ -354,7 +354,7 @@ public class Player extends Personagem {
         if (mapa != null) {
             Rectangle pes = getPes(x, y);
             Porta porta = mapa.encontrarPortaFechada(pes);
-            if (porta != null && !porta.abrir(this)) return false;
+            if (porta != null && !porta.abrir(this, mapa, getMundo())) return false;
         }
         if (mapa != null && !mapa.estaBloqueado(getPes(x, y))) {
             setLocation(x, y);

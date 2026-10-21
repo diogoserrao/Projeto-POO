@@ -122,5 +122,5 @@ public class Armadilha extends Actor implements Interagivel {
     @Override public int getFrameVisual() { return desativadaPermanentemente ? 0 : frame; }
     @Override public int getRaioSprite() { return 0; }
     @Override public String getDescricao() { return "Armadilha"; }
-    @Override public void interagir(Player jogador) { /* Não é acionada pelo jogador. */ }
+    @Override public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) { /* Não é acionada pelo jogador. */ }
 }

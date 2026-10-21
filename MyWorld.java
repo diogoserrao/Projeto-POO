@@ -51,7 +51,7 @@ public class MyWorld extends World {
         configurarArmadilhas();
         configurarPlataformas();
         configurarSpawnAtor();
-        hud = new Hud(this, jogadores, new java.util.function.IntSupplier() {
+        hud = new Hud(this, new java.util.function.IntSupplier() {
             @Override
             public int getAsInt() {
                 return faseAtual;

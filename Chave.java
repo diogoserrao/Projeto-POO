@@ -40,7 +40,7 @@ public class Chave extends ObjetoInteragivel {
     protected boolean estaUtilizado() { return recolhida; }
 
     @Override
-    public void interagir(Player jogador) {
+    public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (recolhida || jogador == null) {
             return;
         }
@@ -50,7 +50,6 @@ public class Chave extends ObjetoInteragivel {
         // A chave só produz som depois de entrar realmente no inventário.
         Greenfoot.playSound("chave.wav");
 
-        DungeonMap mapa = jogador.getMapa();
         if (mapa != null) {
             mapa.removerInteragivel(this);
         }

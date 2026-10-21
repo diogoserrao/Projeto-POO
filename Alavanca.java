@@ -39,11 +39,10 @@ public class Alavanca extends ObjetoInteragivel {
     protected boolean estaUtilizado() { return ativada; }
 
     @Override
-    public void interagir(Player jogador) {
+    public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (jogador == null || ativada) return;
         ativada = true;
         for (Armadilha armadilha : armadilhas) armadilha.desativarPermanentemente();
-        DungeonMap mapa = jogador.getMapa();
         if (mapa != null) mapa.redesenharObjetos();
     }
 }

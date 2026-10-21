@@ -24,14 +24,14 @@ public class Porta extends ObjetoInteragivel {
     }
 
     /** Abre apenas com a chave desta porta e consome-a do jogador. */
-    public boolean abrir(Player jogador) {
+    public boolean abrir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (aberta)
             return true;
         if (jogador == null)
             return false;
         if (!consumirChaveCorreta(jogador))
             return false;
-        concluirAbertura(jogador);
+        concluirAbertura(mapa);
         return true;
     }
 
@@ -48,10 +48,9 @@ public class Porta extends ObjetoInteragivel {
     }
 
     /** Atualiza o estado visual depois de uma abertura validada. */
-    protected final void concluirAbertura(Player jogador) {
+    protected final void concluirAbertura(DungeonMap mapa) {
         aberta = true;
         Greenfoot.playSound("win.wav");
-        DungeonMap mapa = jogador == null ? null : jogador.getMapa();
         if (mapa != null)
             mapa.redesenharObjetos();
     }
@@ -82,7 +81,8 @@ public class Porta extends ObjetoInteragivel {
     }
 
     @Override
-    public void interagir(Player jogador) {
-        abrir(jogador);
+    public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
+        abrir(jogador, mapa, mundo);
     }
 }
+

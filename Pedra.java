@@ -176,7 +176,7 @@ public class Pedra extends Actor implements Interagivel {
 
     /** Recolhe a pedra apenas enquanto ela é um ponto inicial disponível. */
     @Override
-    public void interagir(Player jogador) {
+    public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (!estaPorRecolher() || jogador == null || getWorld() == null) {
             return;
         }
@@ -184,10 +184,9 @@ public class Pedra extends Actor implements Interagivel {
         estado = Estado.RECOLHIDA;
         jogador.adicionarPedra();
 
-        if (jogador.getMapa() != null) {
-            jogador.getMapa().removerInteragivel(this);
+        if (mapa != null) {
+            mapa.removerInteragivel(this);
         }
-        MyWorld mundo = getMundo();
         if (mundo != null) {
             mundo.removerPedra(this);
             mundo.removeObject(this);

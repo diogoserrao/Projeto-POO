@@ -9,16 +9,16 @@ public class ConfiguracaoInimigo {
     private final Rectangle patrulha;
 
     public ConfiguracaoInimigo(Rectangle spawn, Rectangle patrulha) {
-        this.spawn = spawn;
-        this.patrulha = patrulha;
+        this.spawn = spawn == null ? null : new Rectangle(spawn);
+        this.patrulha = patrulha == null ? null : new Rectangle(patrulha);
     }
 
     public Rectangle getSpawn() {
-        return spawn;
+        return spawn == null ? null : new Rectangle(spawn);
     }
 
     public Rectangle getPatrulha() {
-        return patrulha;
+        return patrulha == null ? null : new Rectangle(patrulha);
     }
 
     public boolean temPatrulha() {

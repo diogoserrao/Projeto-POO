@@ -24,5 +24,6 @@ public interface Interagivel {
 
     default int getRaioSprite() { return 1; }
 
-    void interagir(Player jogador);
+    /** Executa a interação com o contexto explícito do mundo atual. */
+    void interagir(Player jogador, DungeonMap mapa, MyWorld mundo);
 }

@@ -37,10 +37,9 @@ public class Bau extends ObjetoInteragivel {
     protected boolean estaUtilizado() { return aberto; }
 
     @Override
-    public void interagir(Player jogador) {
+    public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (jogador == null || aberto) return;
         abrir();
-        DungeonMap mapa = jogador.getMapa();
         if (mapa != null) mapa.redesenharObjetos();
     }
 }

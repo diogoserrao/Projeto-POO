@@ -5,7 +5,6 @@ import java.util.function.IntSupplier;
 /** Responsavel pelos textos e informacao visual do mundo. */
 public class Hud {
     private final MyWorld mundo;
-    private final List<Player> jogadores;
     private final IntSupplier faseAtual;
     private final int maxFases;
     private final String[] ultimasVidas;
@@ -14,19 +13,21 @@ public class Hud {
     private String ultimosControlos;
     private String ultimasInteracoes;
 
-    public Hud(MyWorld mundo, List<Player> jogadores,
-            IntSupplier faseAtual, int maxFases) {
+    public Hud(MyWorld mundo, IntSupplier faseAtual, int maxFases) {
         this.mundo = mundo;
-        this.jogadores = jogadores;
         this.faseAtual = faseAtual;
         this.maxFases = maxFases;
-        this.ultimasVidas = new String[jogadores.size()];
+        this.ultimasVidas = new String[mundo.getJogadores().size()];
+    }
+
+    private List<Player> jogadores() {
+        return mundo.getJogadores();
     }
 
     /** Atualiza todos os textos do HUD sem conhecer a logica do jogo. */
     public void atualizar() {
-        for (int i = 0; i < jogadores.size(); i++) {
-            Player jogador = jogadores.get(i);
+        for (int i = 0; i < jogadores().size(); i++) {
+            Player jogador = jogadores().get(i);
             String vidas = formatarVidas(jogador, i);
             if (!vidas.equals(ultimasVidas[i])) {
                 mundo.showText(vidas, posicaoJogador(i), 25);
@@ -47,25 +48,25 @@ public class Hud {
         }
 
         String controlos = "";
-        for (int i = 0; i < jogadores.size(); i++) {
+        for (int i = 0; i < jogadores().size(); i++) {
             if (!controlos.isEmpty()) {
                 controlos += " | ";
             }
-            controlos += formatarControlos(jogadores.get(i), i);
+            controlos += formatarControlos(jogadores().get(i), i);
         }
         if (!controlos.isEmpty()) {
             controlos += " | ";
         }
         controlos += "N: Próxima Fase";
         String interacoes = "";
-        for (int i = 0; i < jogadores.size(); i++) {
-            Interagivel interagivel = jogadores.get(i).getInteragivelPerto();
+        for (int i = 0; i < jogadores().size(); i++) {
+            Interagivel interagivel = jogadores().get(i).getInteragivelPerto();
             if (interagivel != null) {
                 if (!interacoes.isEmpty()) {
                     interacoes += " | ";
                 }
                 interacoes += "P" + (i + 1) + ": "
-                        + interagivel.getDescricao(jogadores.get(i));
+                        + interagivel.getDescricao(jogadores().get(i));
             }
         }
 
@@ -106,10 +107,10 @@ public class Hud {
         if (indice == 0) {
             return 150;
         }
-        if (indice == jogadores.size() - 1) {
+        if (indice == jogadores().size() - 1) {
             return mundo.getWidth() - 150;
         }
-        return mundo.getWidth() * (indice + 1) / (jogadores.size() + 1);
+        return mundo.getWidth() * (indice + 1) / (jogadores().size() + 1);
     }
 
     /** Usa a mesma representacao visual de vidas existente no jogo. */
