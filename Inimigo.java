@@ -8,7 +8,7 @@ public abstract class Inimigo extends Personagem {
     private static final int ALCANCE_GOLPE_QUADRADO =
             ALCANCE_GOLPE * ALCANCE_GOLPE;
     private static final int COOLDOWN_ATAQUE = 60;
-    private static final boolean ATAQUES_ATIVOS = false;
+    private static final boolean ATAQUES_ATIVOS = true;
     /** A visão permanece sempre ativa; a otimização está na camada em cache. */
     private static final boolean MOSTRAR_VISAO = true;
     private static final int INVULNERABILIDADE_APOS_GOLPE = 20;
