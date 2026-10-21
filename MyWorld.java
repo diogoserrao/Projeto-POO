@@ -20,6 +20,8 @@ public class MyWorld extends World {
     private final List<Pedra> pedrasVisiveis = Collections.unmodifiableList(pedras);
     private Hud hud;
     private boolean transicaoEmCurso = false;
+    /** Pedido pendente, processado no act do mundo e fora do act dos atores. */
+    private boolean faseConcluida = false;
     private boolean jogoTerminou = false;
     private boolean jogoVenceu = false;
 
@@ -148,6 +150,7 @@ public class MyWorld extends World {
             return;
         }
 
+        faseConcluida = false;
         transicaoEmCurso = true;
         if (faseAtual < MAX_FASES) {
             carregarFase(faseAtual + 1);
@@ -159,10 +162,26 @@ public class MyWorld extends World {
         transicaoEmCurso = false;
     }
 
+    /**
+     * Regista a conclusão da fase para ser processada no próximo act do mundo.
+     * A mudança efetiva fica fora do act do jogador que abriu a porta.
+     */
+    public void pedirProximaFase() {
+        if (!jogoVenceu && !jogoTerminou && !transicaoEmCurso) {
+            faseConcluida = true;
+        }
+    }
+
     @Override
     public void act() {
 
         if (jogoTerminou || jogoVenceu) {
+            return;
+        }
+
+        if (faseConcluida) {
+            faseConcluida = false;
+            proximaFase();
             return;
         }
 

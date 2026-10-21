@@ -33,7 +33,7 @@ public class Porta implements Interagivel {
 
         if (eSaidaCooperativa()) {
             if (!jogadoresEstaoJuntos(jogador)) return false;
-            ((MyWorld) jogador.getMundo()).proximaFase();
+            ((MyWorld) jogador.getMundo()).pedirProximaFase();
             return true;
         }
 
