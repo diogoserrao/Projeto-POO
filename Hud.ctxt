@@ -2,7 +2,7 @@
 comment0.target=Hud
 comment0.text=Responsavel\ pelos\ textos\ e\ informacao\ visual\ do\ mundo.
 comment1.params=mundo\ jogadores\ faseAtual\ maxFases
-comment1.target=Hud(greenfoot.World,\ java.util.List,\ java.util.function.IntSupplier,\ int)
+comment1.target=Hud(MyWorld,\ java.util.List,\ java.util.function.IntSupplier,\ int)
 comment2.params=
 comment2.target=void\ atualizar()
 comment2.text=Atualiza\ todos\ os\ textos\ do\ HUD\ sem\ conhecer\ a\ logica\ do\ jogo.

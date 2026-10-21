@@ -519,7 +519,7 @@ public class CarregadorTiled {
 
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : tilesDosObjetos.entrySet()) {
             Interagivel objeto = entrada.getKey();
-            if (apenasPortas != (objeto instanceof Porta)) continue;
+            if (apenasPortas != portas.contains(objeto)) continue;
             if (objeto.temAnimacao() && (tileset == null
                     || !new File(tileset.imagePath).getName().equalsIgnoreCase("doors_lever_chest_animation.png"))) continue;
 
@@ -664,7 +664,7 @@ public class CarregadorTiled {
         dados.imagem.drawImage(dados.imagemBase, 0, 0);
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : dados.tilesDosObjetos.entrySet()) {
             Interagivel objeto = entrada.getKey();
-            if (objeto instanceof Armadilha) continue;
+            if (!objeto.deveDesenharTiles()) continue;
             if (!objeto.estaVisivel()) continue;
             for (int[] tile : entrada.getValue()) {
                 int gid = tile[2];

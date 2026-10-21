@@ -50,6 +50,10 @@ public class Armadilha extends Actor implements Interagivel {
     public boolean estaDesativadaPermanentemente() { return desativadaPermanentemente; }
     public Rectangle getArea() { return new Rectangle(area); }
 
+    /** A armadilha desenha os seus recursos visuais através do próprio ator. */
+    @Override
+    public boolean deveDesenharTiles() { return false; }
+
     /** Devolve o mundo do jogo quando a armadilha já foi adicionada a ele. */
     public MyWorld getMundo() {
         World mundo = getWorld();

@@ -12,6 +12,9 @@ public interface Interagivel {
 
     default boolean estaVisivel() { return true; }
 
+    /** Indica se os tiles deste objeto devem ser desenhados pelo mapa. */
+    default boolean deveDesenharTiles() { return true; }
+
     default boolean temAnimacao() { return false; }
 
     /** Indica se o objeto deve ser selecionado pela tecla de interação. */
