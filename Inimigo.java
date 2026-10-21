@@ -347,7 +347,9 @@ public abstract class Inimigo extends Personagem {
 
     public boolean podeMoverPara(int x, int y) {
         DungeonMap mapa = getMapa();
-        return mapa != null && !mapa.estaBloqueado(getPes(x, y));
+        if (mapa == null) return false;
+        java.awt.Rectangle proximaArea = getPes(x, y);
+        return !mapa.estaBloqueado(proximaArea) && !mapa.estaNoVazio(proximaArea);
     }
 
     public void moverPara(int x, int y) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="48" nextobjectid="48">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="16" height="24" tilewidth="16" tileheight="16" infinite="1" nextlayerid="48" nextobjectid="50">
  <tileset firstgid="1" name="cracked_tiles" tilewidth="16" tileheight="16" tilecount="256" columns="8">
   <image source="decorative_cracks_walls.png" width="128" height="512"/>
  </tileset>
@@ -4451,6 +4451,8 @@
  </layer>
  <objectgroup id="46" name="vazio">
   <object id="44" name="vazio_1" x="13.3333" y="306" width="116.583" height="16"/>
+  <object id="48" name="vazio_1" x="111.75" y="291.5" width="15.75" height="14"/>
+  <object id="49" name="vazio_1" x="14" y="323.75" width="20" height="13.25"/>
  </objectgroup>
  <objectgroup id="47" name="percurso">
   <object id="47" name="percurso" x="7.83333" y="312" width="126.833" height="1.33333"/>
@@ -6131,7 +6133,7 @@
 </chunk>
   </data>
  </layer>
- <layer id="37" name="Colisao" width="16" height="24" visible="0">
+ <layer id="37" name="Colisao" width="16" height="24">
   <data encoding="csv">
    <chunk x="-16" y="-16" width="16" height="16">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -6361,7 +6363,7 @@
   <object id="12" name="Spawn_1" x="-68.6667" y="120"/>
   <object id="13" name="Spawn_2" x="101.333" y="51.3333"/>
   <object id="14" name="Spawn_4" x="91.3333" y="275.333"/>
-  <object id="15" name="Spawn_3" x="254.667" y="294"/>
+  <object id="15" name="Spawn_3" x="154" y="271.667"/>
   <object id="16" name="Patrulha_4" x="88.6667" y="210.667" width="7.33333" height="84.6667"/>
   <object id="40" name="armadilha" x="76" y="188.667" width="35.3333" height="16"/>
  </objectgroup>
