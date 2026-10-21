@@ -30,17 +30,13 @@ public class Alavanca extends ObjetoInteragivel {
     public int getFrameVisual() { return ativada ? FRAME_FINAL : 0; }
 
     @Override
-    public String getDescricao() {
-        return ativada ? "Alavanca ativada" : textoTecla(null, "ativar a alavanca");
-    }
+    protected String getAcao() { return "ativar a alavanca"; }
 
     @Override
-    public String getDescricao(Player jogador) {
-        return ativada
-                ? "Alavanca ativada"
-                : "Premir " + jogador.getTeclaInteracao().toUpperCase()
-                        + " para ativar a alavanca";
-    }
+    protected String getTextoConcluido() { return "Alavanca ativada"; }
+
+    @Override
+    protected boolean estaUtilizado() { return ativada; }
 
     @Override
     public void interagir(Player jogador) {

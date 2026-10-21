@@ -25,6 +25,35 @@ public abstract class ObjetoInteragivel implements Interagivel {
 
     /** Constrói a indicação de interação usada pelos objetos do mapa. */
     protected String textoTecla(Player jogador, String acao) {
-        return "Premir E para " + acao;
+        if (jogador == null) {
+            return acao;
+        }
+        return "Premir " + jogador.getTeclaInteracao().toUpperCase()
+                + " para " + acao;
     }
+
+    /**
+     * Template Method para construir a descrição de qualquer objeto
+     * interagível.
+     */
+    @Override
+    public String getDescricao(Player jogador) {
+        return estaUtilizado() ? getTextoConcluido()
+                : textoTecla(jogador, getAcao());
+    }
+
+    /** Mantém a sobrecarga prevista pela interface. */
+    @Override
+    public String getDescricao() {
+        return getDescricao(null);
+    }
+
+    /** Indica a ação apresentada enquanto o objeto ainda está disponível. */
+    protected abstract String getAcao();
+
+    /** Indica o texto apresentado depois de o objeto ser utilizado. */
+    protected abstract String getTextoConcluido();
+
+    /** Devolve se o objeto já foi utilizado. */
+    protected abstract boolean estaUtilizado();
 }

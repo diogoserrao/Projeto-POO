@@ -31,17 +31,13 @@ public class Chave extends ObjetoInteragivel {
     public int getRaioSprite() { return 0; }
 
     @Override
-    public String getDescricao() {
-        return recolhida ? "Chave já recolhida" : textoTecla(null, "apanhar a chave");
-    }
+    protected String getAcao() { return "apanhar a chave"; }
 
     @Override
-    public String getDescricao(Player jogador) {
-        return recolhida
-                ? "Chave já recolhida"
-                : "Premir " + jogador.getTeclaInteracao().toUpperCase()
-                        + " para apanhar a chave";
-    }
+    protected String getTextoConcluido() { return "Chave já recolhida"; }
+
+    @Override
+    protected boolean estaUtilizado() { return recolhida; }
 
     @Override
     public void interagir(Player jogador) {

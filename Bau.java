@@ -28,16 +28,13 @@ public class Bau extends ObjetoInteragivel {
     public int getFrameVisual() { return aberto ? FRAME_FINAL : 0; }
 
     @Override
-    public String getDescricao() {
-        return aberto ? "Baú vazio" : textoTecla(null, "abrir");
-    }
+    protected String getAcao() { return "abrir"; }
 
     @Override
-    public String getDescricao(Player jogador) {
-        return aberto
-                ? "Baú vazio"
-                : "Premir " + jogador.getTeclaInteracao().toUpperCase() + " para abrir";
-    }
+    protected String getTextoConcluido() { return "Baú vazio"; }
+
+    @Override
+    protected boolean estaUtilizado() { return aberto; }
 
     @Override
     public void interagir(Player jogador) {

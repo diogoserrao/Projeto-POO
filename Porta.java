@@ -45,9 +45,10 @@ public class Porta extends ObjetoInteragivel {
 
     @Override public boolean temAnimacao() { return true; }
     @Override public int getFrameVisual() { return aberta ? FRAME_FINAL : 0; }
-    @Override public String getDescricao() {
-        return aberta ? "Porta aberta" : "Porta trancada (chave " + identificador + ")";
+    @Override protected String getAcao() {
+        return "abrir (chave " + identificador + ")";
     }
-    @Override public String getDescricao(Player jogador) { return getDescricao(); }
+    protected String getTextoConcluido() { return "Porta aberta"; }
+    @Override protected boolean estaUtilizado() { return aberta; }
     @Override public void interagir(Player jogador) { abrir(jogador); }
 }

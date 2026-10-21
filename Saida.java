@@ -33,7 +33,9 @@ public class Saida extends Porta {
     @Override
     public String getDescricao(Player jogador) {
         if (estaAberta()) return "Saída aberta";
-        return "Premir " + (jogador == null ? "E" : jogador.getTeclaInteracao().toUpperCase())
-                + " para sair (os dois jogadores devem estar juntos)";
+        String indicacaoTecla = jogador == null
+                ? ""
+                : "Premir " + jogador.getTeclaInteracao().toUpperCase() + " para ";
+        return indicacaoTecla + "sair (os dois jogadores devem estar juntos)";
     }
 }
