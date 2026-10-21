@@ -30,6 +30,8 @@ public class CarregadorTiled {
     private GreenfootImage imagemBase;
     private final ArrayList<Interagivel> interagiveis = new ArrayList<Interagivel>();
     private final ArrayList<Armadilha> armadilhas = new ArrayList<Armadilha>();
+    private final ArrayList<Chave> chaves = new ArrayList<Chave>();
+    private final ArrayList<Alavanca> alavancas = new ArrayList<Alavanca>();
     private final Map<Integer, TileAnimation> animacoesTiles = new HashMap<Integer, TileAnimation>();
     private final ArrayList<Porta> portas = new ArrayList<Porta>();
     private final Map<Interagivel, ArrayList<int[]>> tilesDosObjetos = new HashMap<Interagivel, ArrayList<int[]>>();
@@ -315,14 +317,20 @@ public class CarregadorTiled {
             if (tipo.startsWith("armadilha")) registarArmadilha(new Armadilha(nome, area));
             else if (tipo.startsWith("bau")) registarInteragivel(new Bau(nome, area));
             else if (tipo.startsWith("chave")) {
-                registarInteragivel(new Chave(nome, area));
+                Chave chave = new Chave(nome, area);
+                chaves.add(chave);
+                registarInteragivel(chave);
             } else if (tipo.startsWith("porta")) {
                 Porta porta = tipo.equals("porta_3")
                         ? new Saida(nome, area)
                         : new Porta(nome, area);
                 portas.add(porta);
                 registarInteragivel(porta);
-            } else if (tipo.startsWith("alavanca")) registarInteragivel(new Alavanca(nome, area));
+            } else if (tipo.startsWith("alavanca")) {
+                Alavanca alavanca = new Alavanca(nome, area);
+                alavancas.add(alavanca);
+                registarInteragivel(alavanca);
+            }
             else System.out.println("Objeto interativo desconhecido ignorado: " + nome);
         }
     }
@@ -330,9 +338,7 @@ public class CarregadorTiled {
     private void associarChavesEPortas() {
         Map<String, Porta> porId = new HashMap<String, Porta>();
         for (Porta porta : portas) porId.put(porta.getIdentificador(), porta);
-        for (Interagivel objeto : interagiveis) {
-            if (!(objeto instanceof Chave)) continue;
-            Chave chave = (Chave) objeto;
+        for (Chave chave : chaves) {
             Porta porta = porId.get(chave.getTipo());
             if (porta == null) {
                 System.out.println("Aviso: chave sem porta correspondente: chave_" + chave.getTipo());
@@ -342,17 +348,17 @@ public class CarregadorTiled {
         }
         for (Porta porta : portas) {
             boolean encontrada = false;
-            for (Interagivel objeto : interagiveis)
-                if (objeto instanceof Chave && ((Chave) objeto).getTipo().equals(porta.getIdentificador())) encontrada = true;
+            for (Chave chave : chaves)
+                if (chave.getTipo().equals(porta.getIdentificador())) encontrada = true;
             if (!encontrada) System.out.println("Aviso: porta sem chave correspondente: porta_" + porta.getIdentificador());
         }
-        Map<String, Alavanca> alavancas = new HashMap<String, Alavanca>();
-        for (Interagivel objeto : interagiveis)
-            if (objeto instanceof Alavanca) alavancas.put(((Alavanca) objeto).getIdentificador(), (Alavanca) objeto);
+        Map<String, Alavanca> alavancasPorId = new HashMap<String, Alavanca>();
+        for (Alavanca alavanca : alavancas)
+            alavancasPorId.put(alavanca.getIdentificador(), alavanca);
         for (Armadilha armadilha : armadilhas) {
             if (!armadilha.podeSerDesativada()) continue;
             String numero = armadilha.getIdentificador().substring("armadilha_".length());
-            Alavanca alavanca = alavancas.get("alavanca_" + numero);
+            Alavanca alavanca = alavancasPorId.get("alavanca_" + numero);
             if (alavanca == null) {
                 System.out.println("Aviso: armadilha sem alavanca correspondente: " + armadilha.getIdentificador());
             } else {

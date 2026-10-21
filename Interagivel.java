@@ -14,6 +14,9 @@ public interface Interagivel {
 
     default boolean temAnimacao() { return false; }
 
+    /** Indica se o objeto deve ser selecionado pela tecla de interação. */
+    default boolean usaTeclaInteracao() { return true; }
+
     default int getFrameVisual() { return 0; }
 
     default int getRaioSprite() { return 1; }

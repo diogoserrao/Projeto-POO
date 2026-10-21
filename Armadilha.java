@@ -1,5 +1,6 @@
 import greenfoot.Actor;
 import greenfoot.GreenfootImage;
+import greenfoot.World;
 import java.awt.Rectangle;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -49,6 +50,12 @@ public class Armadilha extends Actor implements Interagivel {
     public boolean estaDesativadaPermanentemente() { return desativadaPermanentemente; }
     public Rectangle getArea() { return new Rectangle(area); }
 
+    /** Devolve o mundo do jogo quando a armadilha já foi adicionada a ele. */
+    public MyWorld getMundo() {
+        World mundo = getWorld();
+        return mundo instanceof MyWorld ? (MyWorld) mundo : null;
+    }
+
     public void configurarAnimacao(int[] duracoesFrames) {
         if (duracoesFrames == null || duracoesFrames.length == 0) return;
         duracoes = duracoesFrames.clone();
@@ -79,8 +86,9 @@ public class Armadilha extends Actor implements Interagivel {
     }
 
     private void aplicarDanoAosJogadores() {
-        if (!podeCausarDano() || !(getWorld() instanceof MyWorld)) return;
-        for (Player jogador : ((MyWorld) getWorld()).getJogadores()) aplicarDano(jogador);
+        MyWorld mundo = getMundo();
+        if (!podeCausarDano() || mundo == null) return;
+        for (Player jogador : mundo.getJogadores()) aplicarDano(jogador);
     }
 
     public boolean podeCausarDano() {

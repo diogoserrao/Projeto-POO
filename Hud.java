@@ -4,7 +4,7 @@ import java.util.function.IntSupplier;
 
 /** Responsavel pelos textos e informacao visual do mundo. */
 public class Hud {
-    private final World mundo;
+    private final MyWorld mundo;
     private final List<Player> jogadores;
     private final IntSupplier faseAtual;
     private final int maxFases;
@@ -14,7 +14,7 @@ public class Hud {
     private String ultimosControlos;
     private String ultimasInteracoes;
 
-    public Hud(World mundo, List<Player> jogadores,
+    public Hud(MyWorld mundo, List<Player> jogadores,
             IntSupplier faseAtual, int maxFases) {
         this.mundo = mundo;
         this.jogadores = jogadores;
@@ -40,13 +40,10 @@ public class Hud {
             ultimaFase = fase;
         }
 
-        if (mundo instanceof MyWorld) {
-            String pontuacao = "Pontuação: "
-                    + ((MyWorld) mundo).getPontuacao();
-            if (!pontuacao.equals(ultimaPontuacao)) {
-                mundo.showText(pontuacao, mundo.getWidth() / 2, 50);
-                ultimaPontuacao = pontuacao;
-            }
+        String pontuacao = "Pontuação: " + mundo.getPontuacao();
+        if (!pontuacao.equals(ultimaPontuacao)) {
+            mundo.showText(pontuacao, mundo.getWidth() / 2, 50);
+            ultimaPontuacao = pontuacao;
         }
 
         String controlos = "";

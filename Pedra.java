@@ -101,9 +101,9 @@ public class Pedra extends Actor implements Interagivel {
                 contadorNoChao--;
             }
             if (contadorNoChao == 0) {
-                World mundo = getWorld();
+                MyWorld mundo = getMundo();
                 if (mundo != null) {
-                    if (mundo instanceof MyWorld) ((MyWorld) mundo).removerPedra(this);
+                    mundo.removerPedra(this);
                     mundo.removeObject(this);
                 }
             }
@@ -162,6 +162,18 @@ public class Pedra extends Actor implements Interagivel {
                         + " para apanhar a pedra";
     }
 
+    /** Devolve o mundo do jogo quando a pedra já foi adicionada a ele. */
+    public MyWorld getMundo() {
+        World mundo = getWorld();
+        return mundo instanceof MyWorld ? (MyWorld) mundo : null;
+    }
+
+    /** Pedras são recolhidas automaticamente e não usam a tecla de interação. */
+    @Override
+    public boolean usaTeclaInteracao() {
+        return false;
+    }
+
     /** Recolhe a pedra apenas enquanto ela é um ponto inicial disponível. */
     @Override
     public void interagir(Player jogador) {
@@ -175,8 +187,11 @@ public class Pedra extends Actor implements Interagivel {
         if (jogador.getMapa() != null) {
             jogador.getMapa().removerInteragivel(this);
         }
-        if (getWorld() instanceof MyWorld) ((MyWorld) getWorld()).removerPedra(this);
-        getWorld().removeObject(this);
+        MyWorld mundo = getMundo();
+        if (mundo != null) {
+            mundo.removerPedra(this);
+            mundo.removeObject(this);
+        }
     }
 
     public boolean fazDistracao() {

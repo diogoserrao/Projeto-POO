@@ -134,7 +134,7 @@ public class Player extends Personagem {
         pedras--;
         Pedra pedra = new Pedra(direcao, mapa);
         mundo.addObject(pedra, x, y);
-        if (mundo instanceof MyWorld) ((MyWorld) mundo).adicionarPedra(pedra);
+        mundo.adicionarPedra(pedra);
         // O som só é emitido depois de a pedra ser efetivamente criada.
         Greenfoot.playSound("pedra.mp3");
     }
@@ -248,7 +248,7 @@ public class Player extends Personagem {
         Interagivel resultado = null;
 
         for (Interagivel interagivel : mapa.getInteragiveis()) {
-            if (!(interagivel instanceof Pedra)
+            if (interagivel.usaTeclaInteracao()
                     && interagivel.getArea().intersects(areaDosPes)) {
                 resultado = interagivel;
                 break;
