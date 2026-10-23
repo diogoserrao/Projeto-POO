@@ -32,6 +32,7 @@ public class DungeonMap {
     private final ArrayList<Point> posicoesPedras;
     private final ArrayList<Point> spawnsJogadores;
     private final ArrayList<Rectangle> zonasVazio;
+    private final ArrayList<Rectangle> zonasVazioSolido;
     private final ArrayList<Plataforma> plataformas;
     private final boolean[][] colisaoComum;
     private final ArrayList<CarregadorTiled.Tileset> tilesets;
@@ -58,6 +59,7 @@ public class DungeonMap {
         posicoesPedras = new ArrayList<Point>(dados.getPosicoesPedras());
         spawnsJogadores = new ArrayList<Point>(dados.getSpawnsJogadores());
         zonasVazio = copiarRetangulos(dados.getZonasVazio());
+        zonasVazioSolido = copiarRetangulos(dados.getZonasVazioSolido());
         plataformas = new ArrayList<Plataforma>(dados.getPlataformas());
         colisaoComum = dados.getColisaoComum();
         tilesets = new ArrayList<CarregadorTiled.Tileset>(dados.getTilesets());
@@ -132,7 +134,8 @@ public class DungeonMap {
     public void redesenharObjetos() {
         CarregadorTiled.redesenharObjetos(new CarregadorTiled.DadosMapa(
                 imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
-                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, plataformas, colisaoComum,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, zonasVazioSolido,
+                plataformas, colisaoComum,
                 tilesets, animacoesTiles, fase));
     }
 
@@ -182,7 +185,10 @@ public class DungeonMap {
     /** Indica se a área dos pés intersecta uma zona sem chão. */
     public boolean estaNoVazio(Rectangle pes) {
         if (pes == null) return false;
-        for (Rectangle vazio : zonasVazio) if (vazio.intersects(pes)) return true;
+        for (Rectangle vazio : zonasVazio) {
+            if (zonasVazioSolido.contains(vazio)) continue;
+            if (vazio.intersects(pes)) return true;
+        }
         return false;
     }
 
@@ -207,6 +213,14 @@ public class DungeonMap {
     /** Considera bloqueada uma área que toca parede, limite ou porta fechada. */
     public boolean estaBloqueado(Rectangle pes) {
         if (pes == null) return true;
+        // Uma plataforma é precisamente o apoio que permite atravessar uma
+        // zona vazio_1. Sem esta exceção, a colisão do vazio também bloqueia
+        // a posição dos pés sobre a caixa e impede o jogador de subir para
+        // cima dela.
+        if (!estaSuportado(pes)) {
+            for (Rectangle vazio : zonasVazioSolido)
+                if (vazio.intersects(pes)) return true;
+        }
         if (temColisaoNaZona(pes.x, pes.y, pes.x + pes.width - 1,
                 pes.y + pes.height - 1)) return true;
         return encontrarPortaFechada(pes) != null;

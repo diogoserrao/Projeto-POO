@@ -49,6 +49,7 @@ public class CarregadorTiled {
     private final ArrayList<Point> posicoesPedras = new ArrayList<Point>();
     private final ArrayList<Point> spawnsJogadores = new ArrayList<Point>();
     private final ArrayList<Rectangle> zonasVazio = new ArrayList<Rectangle>();
+    private final ArrayList<Rectangle> zonasVazioSolido = new ArrayList<Rectangle>();
     private final ArrayList<Plataforma> plataformas = new ArrayList<Plataforma>();
     private final boolean[][] colisaoComum = new boolean[MAP_WIDTH][MAP_HEIGHT];
     private static final Map<String, GreenfootImage> folhasCache = new HashMap<String, GreenfootImage>();
@@ -100,7 +101,8 @@ public class CarregadorTiled {
     /** Devolve a estrutura com os dados interpretados da fase. */
     public DadosMapa getDados() {
         return new DadosMapa(imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
-                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, plataformas, colisaoComum,
+                configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, zonasVazioSolido,
+                plataformas, colisaoComum,
                 tilesetsAtuais, animacoesTiles, fase);
     }
 
@@ -120,6 +122,7 @@ public class CarregadorTiled {
         private final ArrayList<Point> posicoesPedras;
         private final ArrayList<Point> spawnsJogadores;
         private final ArrayList<Rectangle> zonasVazio;
+        private final ArrayList<Rectangle> zonasVazioSolido;
         private final ArrayList<Plataforma> plataformas;
         private final boolean[][] colisaoComum;
         private final ArrayList<Tileset> tilesets;
@@ -132,6 +135,7 @@ public class CarregadorTiled {
                 ArrayList<ConfiguracaoInimigo> configuracoesInimigos,
                 ArrayList<Point> posicoesPedras,
                 ArrayList<Point> spawnsJogadores, ArrayList<Rectangle> zonasVazio,
+                ArrayList<Rectangle> zonasVazioSolido,
                 ArrayList<Plataforma> plataformas, boolean[][] colisaoComum,
                 ArrayList<Tileset> tilesets, Map<Integer, TileAnimation> animacoesTiles, int fase) {
             this.imagem = imagem;
@@ -144,6 +148,7 @@ public class CarregadorTiled {
             this.posicoesPedras = posicoesPedras;
             this.spawnsJogadores = spawnsJogadores;
             this.zonasVazio = zonasVazio;
+            this.zonasVazioSolido = zonasVazioSolido;
             this.plataformas = plataformas;
             this.colisaoComum = colisaoComum;
             this.tilesets = tilesets;
@@ -206,6 +211,13 @@ public class CarregadorTiled {
         public List<Rectangle> getZonasVazio() {
             ArrayList<Rectangle> copia = new ArrayList<Rectangle>();
             for (Rectangle zona : zonasVazio) copia.add(new Rectangle(zona));
+            return Collections.unmodifiableList(copia);
+        }
+
+        /** Devolve as zonas vazio_1, que são obstáculos sólidos no mapa. */
+        public List<Rectangle> getZonasVazioSolido() {
+            ArrayList<Rectangle> copia = new ArrayList<Rectangle>();
+            for (Rectangle zona : zonasVazioSolido) copia.add(new Rectangle(zona));
             return Collections.unmodifiableList(copia);
         }
 
@@ -398,10 +410,14 @@ public class CarregadorTiled {
         for (int i = 0; i < objetos.getLength(); i++) {
             Element objeto = (Element) objetos.item(i);
             if (!objeto.hasAttribute("width") || !objeto.hasAttribute("height")) continue;
-            zonasVazio.add(converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
+            Rectangle zona = converterParaMundo(Double.parseDouble(objeto.getAttribute("x")),
                     Double.parseDouble(objeto.getAttribute("y")),
                     Double.parseDouble(objeto.getAttribute("width")),
-                    Double.parseDouble(objeto.getAttribute("height")), false));
+                    Double.parseDouble(objeto.getAttribute("height")), false);
+            zonasVazio.add(zona);
+            if ("vazio_1".equalsIgnoreCase(objeto.getAttribute("name").trim())) {
+                zonasVazioSolido.add(zona);
+            }
         }
     }
 

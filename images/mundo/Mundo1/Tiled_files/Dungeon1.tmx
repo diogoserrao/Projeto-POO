@@ -6364,7 +6364,7 @@
   <object id="13" name="Spawn_2" x="101.333" y="51.3333"/>
   <object id="14" name="Spawn_4" x="91.3333" y="275.333"/>
   <object id="15" name="Spawn_3" x="154" y="271.667"/>
-  <object id="16" name="Patrulha_4" x="88.6667" y="210.667" width="7.33333" height="84.6667"/>
+  <object id="16" name="Patrulha_4" x="88.6667" y="210.667" width="7.33333" height="73.3334"/>
   <object id="40" name="armadilha" x="76" y="188.667" width="35.3333" height="16"/>
  </objectgroup>
  <objectgroup id="42" name="Jogadores">
