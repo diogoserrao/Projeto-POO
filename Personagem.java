@@ -51,6 +51,7 @@ public abstract class Personagem extends Actor {
     private boolean emMorte;
     private boolean terminouMorte;
     private int contadorFlashDano;
+    private int elevacaoVisualSalto;
 
     /**
      * Carrega as animações padrão da personagem identificada pela skin.
@@ -201,11 +202,25 @@ public abstract class Personagem extends Actor {
             imagensAnimacao[tipoAnimacao][linhaSpritesheet][frame] = imagem;
         }
 
-        if (contadorFlashDano > 0) {
-            setImage(tingirDeVermelho(imagem));
-        } else {
-            setImage(imagem);
-        }
+        GreenfootImage imagemAtual = contadorFlashDano > 0
+                ? tingirDeVermelho(imagem) : imagem;
+        setImage(aplicarElevacaoVisual(imagemAtual));
+    }
+
+    /**
+     * Desloca apenas o sprite para cima, mantendo o ator e os seus pés nas
+     * coordenadas lógicas usadas pelas colisões, armadilhas e interações.
+     */
+    protected void definirElevacaoVisualSalto(int elevacao) {
+        elevacaoVisualSalto = Math.max(0, elevacao);
+        mostrarFrame();
+    }
+
+    private GreenfootImage aplicarElevacaoVisual(GreenfootImage imagem) {
+        if (elevacaoVisualSalto <= 0) return imagem;
+        GreenfootImage elevada = new GreenfootImage(imagem.getWidth(), imagem.getHeight());
+        elevada.drawImage(imagem, 0, -elevacaoVisualSalto);
+        return elevada;
     }
 
     /** Inicia o efeito visual de dano e atualiza imediatamente a imagem. */

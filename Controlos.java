@@ -13,6 +13,7 @@ public class Controlos {
     private final String baixo;
     private final String interagir;
     private final String lancar;
+    private final String saltar;
 
     public Controlos(String esquerda, String direita, String cima, String baixo) {
         this(esquerda, direita, cima, baixo, "e");
@@ -26,12 +27,19 @@ public class Controlos {
     /** Cria a configuração completa, incluindo interação e lançamento. */
     public Controlos(String esquerda, String direita, String cima, String baixo,
             String interagir, String lancar) {
+        this(esquerda, direita, cima, baixo, interagir, lancar, "space");
+    }
+
+    /** Cria a configuração completa, incluindo a tecla independente de salto. */
+    public Controlos(String esquerda, String direita, String cima, String baixo,
+            String interagir, String lancar, String saltar) {
         this.esquerda = esquerda;
         this.direita = direita;
         this.cima = cima;
         this.baixo = baixo;
         this.interagir = interagir;
         this.lancar = lancar;
+        this.saltar = saltar;
     }
 
     /** Devolve a tecla de movimento para a esquerda. */
@@ -62,5 +70,10 @@ public class Controlos {
     /** Devolve a tecla usada para lançar pedras. */
     public String getLancar() {
         return lancar;
+    }
+
+    /** Devolve a tecla usada para iniciar um salto. */
+    public String getSaltar() {
+        return saltar;
     }
 }

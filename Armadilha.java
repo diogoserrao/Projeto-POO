@@ -128,7 +128,7 @@ public class Armadilha extends Actor implements Interagivel {
     /** Aplica dano no máximo uma vez por intervalo ao jogador sobre a área. */
     public void aplicarDano(Player jogador) {
         if (jogador == null || !podeCausarDano() || !jogador.estaVivo()
-                || !area.intersects(jogador.getPes())) return;
+                || jogador.estaEmSalto() || !area.intersects(jogador.getPes())) return;
         Integer cooldown = cooldowns.get(jogador);
         if (cooldown == null || cooldown <= 0) {
             jogador.receberDano();

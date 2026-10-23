@@ -21,6 +21,10 @@ public class Player extends Personagem {
     private static final int VELOCIDADE = EscalaJogo.px(4);
     private boolean teclaInteracaoPressionada;
     private boolean teclaLancarPressionada;
+    private boolean teclaSaltoPressionada;
+    private int frameSalto;
+    private static final int DURACAO_SALTO = 24;
+    private static final int ALTURA_SALTO = EscalaJogo.px(28);
     private int pedras = 0;
     private final List<Chave> chaves = new ArrayList<Chave>();
     private Interagivel interagivelPertoCache;
@@ -44,6 +48,8 @@ public class Player extends Personagem {
      * uma pedra apenas quando a tecla correspondente é pressionada de novo.
      */
     protected void agir() {
+        processarSalto();
+        atualizarSalto();
         if (estaEmAtaque()) {
             atualizarAnimacao(false);
             return;
@@ -90,6 +96,45 @@ public class Player extends Personagem {
         recolherPedras();
         processarLancamento();
 
+    }
+
+    /** Inicia o salto apenas na transição de tecla libertada para pressionada. */
+    private void processarSalto() {
+        boolean teclaPressionada = Greenfoot.isKeyDown(controlos.getSaltar());
+        if (teclaPressionada && !teclaSaltoPressionada && !estaEmSalto()
+                && podeIniciarSalto()) {
+            frameSalto = 1;
+            definirElevacaoVisualSalto(calcularElevacaoSalto());
+        }
+        teclaSaltoPressionada = teclaPressionada;
+    }
+
+    /** Atualiza a parábola visual do salto sem alterar a posição lógica. */
+    private void atualizarSalto() {
+        if (!estaEmSalto()) return;
+        definirElevacaoVisualSalto(calcularElevacaoSalto());
+        frameSalto++;
+        if (frameSalto > DURACAO_SALTO) {
+            frameSalto = 0;
+            definirElevacaoVisualSalto(0);
+        }
+    }
+
+    private int calcularElevacaoSalto() {
+        double progresso = (double) frameSalto / DURACAO_SALTO;
+        return (int) Math.round(ALTURA_SALTO * 4.0 * progresso * (1.0 - progresso));
+    }
+
+    /** Indica se o jogador está na fase visual de salto. */
+    public boolean estaEmSalto() {
+        return frameSalto > 0;
+    }
+
+    private boolean podeIniciarSalto() {
+        DungeonMap mapa = getMapa();
+        if (mapa == null) return true;
+        Rectangle pes = getPes();
+        return !mapa.estaNoVazio(pes) || mapa.estaSuportado(pes);
     }
 
     /** Move o jogador com uma plataforma, preservando a colisão visual relativa. */
