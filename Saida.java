@@ -33,7 +33,9 @@ public class Saida extends Porta {
         for (Player outro : mundo.getJogadores()) {
             // A área de proximidade de cada jogador é comparada com a saída;
             // basta um jogador ficar fora para impedir a cooperação.
-            Rectangle proximidade = new Rectangle(outro.getX() - 24, outro.getY() - 24, 48, 48);
+            int margem = EscalaJogo.px(24);
+            Rectangle proximidade = new Rectangle(outro.getX() - margem,
+                    outro.getY() - margem, EscalaJogo.px(48), EscalaJogo.px(48));
             if (!getArea().intersects(proximidade)) return false;
         }
         return true;

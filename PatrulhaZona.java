@@ -10,7 +10,7 @@ import java.awt.Rectangle;
  */
 public class PatrulhaZona implements Movimento {
     private static final int TEMPO_PAUSA_NA_EXTREMIDADE = 8;
-    private static final int DISTANCIA_DESACELERACAO = 4;
+    private static final int DISTANCIA_DESACELERACAO = EscalaJogo.px(4);
 
     /** Fase interna usada para separar deslocamento e pausa na extremidade. */
     private enum EstadoPatrulha {

@@ -8,8 +8,9 @@ import greenfoot.*;
  * de estado.</p>
  */
 public abstract class Ecra extends World {
-    protected static final int LARGURA = 1280;
-    protected static final int ALTURA = 960;
+    /** Todos os mundos usam exatamente a mesma área de apresentação. */
+    protected static final int LARGURA = EscalaJogo.WORLD_WIDTH;
+    protected static final int ALTURA = EscalaJogo.WORLD_HEIGHT;
     protected static final Color FUNDO = new Color(8, 10, 18);
     protected static final Color TEXTO = new Color(230, 235, 242);
     protected static final Color SECUNDARIO = new Color(165, 175, 192);
@@ -25,20 +26,29 @@ public abstract class Ecra extends World {
         imagem.setColor(FUNDO);
         imagem.fill();
         imagem.setColor(new Color(21, 26, 39));
-        imagem.fillRect(0, 0, getWidth(), 14);
-        imagem.fillRect(0, getHeight() - 14, getWidth(), 14);
+        int espessuraBarra = EscalaJogo.px(14);
+        imagem.fillRect(0, 0, getWidth(), espessuraBarra);
+        imagem.fillRect(0, getHeight() - espessuraBarra,
+                getWidth(), espessuraBarra);
         imagem.setColor(corBarra);
-        imagem.fillRect(150, 190, getWidth() - 300, 2);
-        imagem.fillRect(150, getHeight() - 190, getWidth() - 300, 2);
+        int margem = EscalaJogo.px(150);
+        int linha = EscalaJogo.px(190);
+        imagem.fillRect(margem, EscalaJogo.px(190),
+                getWidth() - 2 * margem, EscalaJogo.px(2));
+        imagem.fillRect(margem, getHeight() - linha,
+                getWidth() - 2 * margem, EscalaJogo.px(2));
     }
 
     /** Desenha texto centrado aproximadamente na coordenada horizontal pedida. */
     protected void desenharTexto(GreenfootImage imagem, String texto, int centroX,
             int linhaBase, Font fonte, Color cor) {
-        imagem.setFont(fonte);
+        Font fonteEscalada = new Font(fonte.getName(), fonte.isBold(),
+                fonte.isItalic(), EscalaJogo.px(fonte.getSize()));
+        imagem.setFont(fonteEscalada);
         imagem.setColor(cor);
-        int largura = fonte.getSize() * texto.length() / 2;
-        imagem.drawString(texto, centroX - largura / 2, linhaBase);
+        int largura = fonteEscalada.getSize() * texto.length() / 2;
+        imagem.drawString(texto, centroX - largura / 2,
+                EscalaJogo.px(linhaBase));
     }
 
     /** Deteta apenas o instante inicial de pressão de uma tecla. */

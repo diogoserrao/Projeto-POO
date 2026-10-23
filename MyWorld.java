@@ -38,7 +38,7 @@ public class MyWorld extends World {
 
     /** Cria o mundo com a primeira fase carregada. */
     public MyWorld() {
-        super(1280, 960, 1, false);
+        super(EscalaJogo.WORLD_WIDTH, EscalaJogo.WORLD_HEIGHT, 1, false);
         carregarFase(1);
     }
 
@@ -101,8 +101,10 @@ public class MyWorld extends World {
     private void configurarSpawnAtor() {
 
         List<Point> spawns = mapa.getSpawnsJogadores();
-        Point p1 = spawns.size() > 0 ? spawns.get(0) : new Point(220, 280);
-        Point p2 = spawns.size() > 1 ? spawns.get(1) : new Point(p1.x + 32, p1.y);
+        Point p1 = spawns.size() > 0 ? spawns.get(0)
+                : new Point(EscalaJogo.px(220), EscalaJogo.px(280));
+        Point p2 = spawns.size() > 1 ? spawns.get(1)
+                : new Point(p1.x + EscalaJogo.TILE, p1.y);
 
         jogadores.clear();
         pedras.clear();

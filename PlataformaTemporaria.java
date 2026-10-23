@@ -14,7 +14,9 @@ public class PlataformaTemporaria extends Plataforma {
     private final int tempoEscondida;
     private final greenfoot.GreenfootImage imagem;
 
-    public PlataformaTemporaria(Rectangle area) { this(area, 120, 90); }
+    public PlataformaTemporaria(Rectangle area) {
+        this(area, EscalaJogo.px(120), EscalaJogo.px(90));
+    }
 
     public PlataformaTemporaria(Rectangle area, int tempoVisivel, int tempoEscondida) {
         super(area);

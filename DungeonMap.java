@@ -16,9 +16,9 @@ import java.util.Map;
  * redesenho dos objetos sem voltar a interpretar o ficheiro TMX.</p>
  */
 public class DungeonMap {
-    private static final int TILE = 32;
-    private static final int MAP_WIDTH = 40;
-    private static final int MAP_HEIGHT = 30;
+    private static final int TILE = EscalaJogo.TILE;
+    private static final int MAP_WIDTH = EscalaJogo.MAP_WIDTH;
+    private static final int MAP_HEIGHT = EscalaJogo.MAP_HEIGHT;
     private static final int WORLD_WIDTH = MAP_WIDTH * TILE;
     private static final int WORLD_HEIGHT = MAP_HEIGHT * TILE;
 

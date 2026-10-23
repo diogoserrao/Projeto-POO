@@ -5,7 +5,7 @@
  * perfil diferente sem alterar o comportamento comum de {@link Inimigo}.</p>
  */
 public class Vigia extends Inimigo {
-    private static final int VELOCIDADE = 3;
+    private static final int VELOCIDADE = EscalaJogo.px(3);
     private static final int DURACAO_DIRECAO = 24;
 
     public Vigia(int personagem) {
@@ -16,7 +16,7 @@ public class Vigia extends Inimigo {
     /** O Vigia desloca-se mais depressa e deteta numa area mais curta. */
     @Override
     protected int getRaioVisao() {
-        return 60;
+        return EscalaJogo.px(60);
     }
 
     @Override

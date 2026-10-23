@@ -18,7 +18,7 @@ public class Player extends Personagem {
     /* O som só é preparado quando ocorre dano, não durante a criação do mundo. */
     private static GreenfootSound somDano;
     private final Controlos controlos;
-    private static final int VELOCIDADE = 4;
+    private static final int VELOCIDADE = EscalaJogo.px(4);
     private boolean teclaInteracaoPressionada;
     private boolean teclaLancarPressionada;
     private int pedras = 0;
@@ -175,12 +175,14 @@ public class Player extends Personagem {
         }
 
         Direcao direcao = getDirecao();
-        int distanciaInicial = 20;
+        int distanciaInicial = EscalaJogo.px(20);
         int x = getX() + direcao.getDx() * distanciaInicial;
         int y = getY() + direcao.getDy() * distanciaInicial;
 
         DungeonMap mapa = getMapa();
-        if (mapa != null && mapa.estaBloqueado(new Rectangle(x - 4, y - 4, 9, 9))) {
+        int margemPedra = EscalaJogo.px(4);
+        if (mapa != null && mapa.estaBloqueado(new Rectangle(x - margemPedra,
+                y - margemPedra, EscalaJogo.px(9), EscalaJogo.px(9)))) {
             return;
         }
 
@@ -244,7 +246,8 @@ public class Player extends Personagem {
             }
             int dx = pedra.getX() - getX();
             int dy = pedra.getY() - getY();
-            if (dx * dx + dy * dy <= 24 * 24 && pedra.estaPorRecolher()) {
+            int raio = EscalaJogo.px(24);
+            if (dx * dx + dy * dy <= raio * raio && pedra.estaPorRecolher()) {
                 pedra.interagir(this, getMapa(), mundo);
                 removida = !pedrasPerto.contains(pedra);
             }
@@ -299,7 +302,9 @@ public class Player extends Personagem {
             return interagivelPertoCache;
         }
 
-        Rectangle areaDosPes = new Rectangle(getX() - 12, getY() + 12, 24, 24);
+        int margem = EscalaJogo.px(12);
+        Rectangle areaDosPes = new Rectangle(getX() - margem, getY() + margem,
+                EscalaJogo.px(24), EscalaJogo.px(24));
         Interagivel resultado = null;
 
         for (Interagivel interagivel : mapa.getInteragiveis()) {

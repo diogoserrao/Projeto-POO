@@ -11,7 +11,7 @@ import java.util.List;
  */
 public abstract class Inimigo extends Personagem {
     /* O alcance do golpe e a visão são regras independentes. */
-    private static final int ALCANCE_GOLPE = 100;
+    private static final int ALCANCE_GOLPE = EscalaJogo.px(100);
     private static final int ALCANCE_GOLPE_QUADRADO =
             ALCANCE_GOLPE * ALCANCE_GOLPE;
     private static final int COOLDOWN_ATAQUE = 60;
@@ -45,7 +45,7 @@ public abstract class Inimigo extends Personagem {
     /** Raio, em píxeis, do cone de visão por defeito. */
     /** Devolve o raio de deteção específico do tipo de inimigo. */
     protected int getRaioVisao() {
-        return 100;
+        return EscalaJogo.px(100);
     }
 
     /** Ângulo, em graus, do cone de visão por defeito. */

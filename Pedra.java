@@ -12,9 +12,9 @@ import java.awt.Rectangle;
  * responsabilidade da distração separada do movimento do jogador.</p>
  */
 public class Pedra extends Actor implements Interagivel {
-    private static final int TAMANHO = 16;
-    private static final int VELOCIDADE = 8;
-    private static final int ALCANCE_MAXIMO = 240;
+    private static final int TAMANHO = EscalaJogo.px(16);
+    private static final int VELOCIDADE = EscalaJogo.px(8);
+    private static final int ALCANCE_MAXIMO = EscalaJogo.px(240);
     private static final int TEMPO_NO_CHAO = 150;
     private static final GreenfootImage IMAGEM = carregarImagemPartilhada();
 
@@ -134,7 +134,8 @@ public class Pedra extends Actor implements Interagivel {
         // bloqueada, ficando disponível para a distração dos inimigos.
         if (mapa == null
                 || distanciaPercorrida + VELOCIDADE >= ALCANCE_MAXIMO
-                || mapa.estaBloqueado(new Rectangle(novoX - 4, novoY - 4, 9, 9))) {
+                || mapa.estaBloqueado(new Rectangle(novoX - EscalaJogo.px(4),
+                        novoY - EscalaJogo.px(4), EscalaJogo.px(9), EscalaJogo.px(9)))) {
             aterrar();
             return;
         }
@@ -155,7 +156,9 @@ public class Pedra extends Actor implements Interagivel {
     /** Área de interação da pedra disponível no chão. */
     @Override
     public Rectangle getArea() {
-        return new Rectangle(getX() - 24, getY() - 24, 48, 48);
+        int margem = EscalaJogo.px(24);
+        return new Rectangle(getX() - margem, getY() - margem,
+                EscalaJogo.px(48), EscalaJogo.px(48));
     }
 
     @Override

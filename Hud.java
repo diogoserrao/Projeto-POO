@@ -14,6 +14,7 @@ public class Hud {
     private final IntSupplier faseAtual;
     private final int maxFases;
     private final String[] ultimasVidas;
+    private final String[] ultimosInventarios;
     private String ultimaFase;
     private String ultimaPontuacao;
     private String ultimosControlos;
@@ -25,6 +26,7 @@ public class Hud {
         this.faseAtual = faseAtual;
         this.maxFases = maxFases;
         this.ultimasVidas = new String[mundo.getJogadores().size()];
+        this.ultimosInventarios = new String[mundo.getJogadores().size()];
     }
 
     /** Obtém os jogadores atuais sem duplicar a coleção mantida pelo mundo. */
@@ -43,20 +45,26 @@ public class Hud {
             Player jogador = jogadores().get(i);
             String vidas = formatarVidas(jogador, i);
             if (!vidas.equals(ultimasVidas[i])) {
-                mundo.showText(vidas, posicaoJogador(i), 25);
+                mundo.showText(vidas, posicaoJogador(i), 22);
                 ultimasVidas[i] = vidas;
+            }
+            String inventario = "Pedras: " + jogador.getPedras()
+                    + "  Chaves: " + jogador.getNumeroChaves();
+            if (!inventario.equals(ultimosInventarios[i])) {
+                mundo.showText(inventario, posicaoJogador(i), 42);
+                ultimosInventarios[i] = inventario;
             }
         }
 
         String fase = "FASE " + faseAtual.getAsInt() + " / " + maxFases;
         if (!fase.equals(ultimaFase)) {
-            mundo.showText(fase, mundo.getWidth() / 2, 25);
+            mundo.showText(fase, mundo.getWidth() / 2, 22);
             ultimaFase = fase;
         }
 
         String pontuacao = "Pontuação: " + mundo.getPontuacao();
         if (!pontuacao.equals(ultimaPontuacao)) {
-            mundo.showText(pontuacao, mundo.getWidth() / 2, 50);
+            mundo.showText(pontuacao, mundo.getWidth() / 2, 44);
             ultimaPontuacao = pontuacao;
         }
 
@@ -80,11 +88,11 @@ public class Hud {
         }
 
         if (!controlos.equals(ultimosControlos)) {
-            mundo.showText(controlos, mundo.getWidth() / 2, mundo.getHeight() - 20);
+            mundo.showText(controlos, mundo.getWidth() / 2, mundo.getHeight() - 18);
             ultimosControlos = controlos;
         }
         if (!interacoes.equals(ultimasInteracoes)) {
-            mundo.showText(interacoes, mundo.getWidth() / 2, mundo.getHeight() - 44);
+            mundo.showText(interacoes, mundo.getWidth() / 2, mundo.getHeight() - 42);
             ultimasInteracoes = interacoes;
         }
     }
@@ -132,8 +140,6 @@ public class Hud {
             }
         }
 
-        return "P" + (indiceJogador + 1) + ": " + coracoes
-                + " Pedras: " + jogador.getPedras()
-                + " Chaves: " + jogador.getNumeroChaves();
+        return "P" + (indiceJogador + 1) + ": " + coracoes;
     }
 }

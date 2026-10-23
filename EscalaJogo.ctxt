@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=EscalaJogo
+comment0.text=\r\n\ Escala\ visual\ comum\ ao\ mundo,\ ao\ mapa\ e\ aos\ atores.\r\n\r\n\ <p>O\ Greenfoot\ 3.1.0\ n\u00E3o\ exp\u00F5e\ um\ zoom\ do\ canvas.\ A\ escala\ \u00E9,\ por\ isso,\r\n\ escolhida\ antes\ da\ constru\u00E7\u00E3o\ do\ mundo,\ com\ base\ na\ \u00E1rea\ \u00FAtil\ do\ ecr\u00E3.\r\n\ Todas\ as\ coordenadas\ continuam\ a\ ser\ coordenadas\ do\ jogo;\ esta\ classe\r\n\ apenas\ converte\ as\ dimens\u00F5es\ para\ a\ apresenta\u00E7\u00E3o.</p>\r\n
+comment1.params=
+comment1.target=EscalaJogo()
+comment2.params=
+comment2.target=int\ calcularTile()
+comment3.params=valor
+comment3.target=int\ px(int)
+comment3.text=Converte\ uma\ dimens\u00E3o\ l\u00F3gica\ de\ 32\ px\ para\ a\ escala\ atual.
+numComments=4

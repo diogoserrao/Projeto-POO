@@ -21,16 +21,16 @@ import org.w3c.dom.*;
  */
 public class CarregadorTiled {
     private static final int SOURCE_TILE = 16;
-    private static final int TILE = 32;
+    private static final int TILE = EscalaJogo.TILE;
     private static final int MIN_X = -20;
     private static final int MIN_Y = -6;
     private static final int MAP_WIDTH = 40;
     private static final int MAP_HEIGHT = 30;
     private static final int WORLD_WIDTH = MAP_WIDTH * TILE;
     private static final int WORLD_HEIGHT = MAP_HEIGHT * TILE;
-    private static final int TAMANHO_OBJETO_PONTO = 48;
+    private static final int TAMANHO_OBJETO_PONTO = EscalaJogo.px(48);
     /* A caixa escolhida no tileset ocupa dois tiles por dois tiles. */
-    private static final int TAMANHO_PLATAFORMA = SOURCE_TILE * 2;
+    private static final int TAMANHO_PLATAFORMA = EscalaJogo.px(SOURCE_TILE * 2);
     private static final boolean MOSTRAR_COLISAO = false;
 
     private final int fase;

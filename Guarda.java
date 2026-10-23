@@ -7,12 +7,12 @@
 public class Guarda extends Inimigo {
     public Guarda(int personagem, java.awt.Rectangle zonaPatrulha) {
         super(personagem);
-        definirMovimento(new PatrulhaZona(zonaPatrulha, 2));
+        definirMovimento(new PatrulhaZona(zonaPatrulha, EscalaJogo.px(2)));
     }
 
     @Override
     protected int getRaioVisao() {
-        return 75;
+        return EscalaJogo.px(75);
     }
 
     @Override

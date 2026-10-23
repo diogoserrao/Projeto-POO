@@ -35,9 +35,13 @@ public class VitoriaWorld extends Ecra {
         GreenfootImage imagem = new GreenfootImage(getWidth(), getHeight());
         prepararFundo(imagem, DESTAQUE);
         imagem.setColor(new Color(25, 30, 44));
-        imagem.fillRect(220, 235, getWidth() - 440, 430);
+        int margem = EscalaJogo.px(220);
+        int topo = EscalaJogo.px(235);
+        imagem.fillRect(margem, topo, getWidth() - 2 * margem,
+                EscalaJogo.px(430));
         imagem.setColor(new Color(55, 61, 78));
-        imagem.drawRect(220, 235, getWidth() - 441, 429);
+        imagem.drawRect(margem, topo, getWidth() - 2 * margem - 1,
+                EscalaJogo.px(429));
         desenharTexto(imagem, "CONSEGUISTE ESCAPAR", getWidth() / 2, 345,
                 new Font("SansSerif", true, false, 56), DESTAQUE);
         desenharTexto(imagem, "DA MASMORRA!", getWidth() / 2, 415,

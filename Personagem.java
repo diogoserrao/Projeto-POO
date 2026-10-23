@@ -15,13 +15,13 @@ import java.util.Map;
  */
 public abstract class Personagem extends Actor {
     protected static final int FRAME_SIZE = 64;
-    protected static final int DISPLAY_SIZE = 96;
+    protected static final int DISPLAY_SIZE = EscalaJogo.px(96);
     private static final int IDLE_FRAMES_CIMA = 4;
 
-    private static final int PES_OFFSET_X = 7;
-    private static final int PES_OFFSET_Y = 18;
-    private static final int PES_LARGURA = 15;
-    private static final int PES_ALTURA = 11;
+    private static final int PES_OFFSET_X = EscalaJogo.px(7);
+    private static final int PES_OFFSET_Y = EscalaJogo.px(18);
+    private static final int PES_LARGURA = EscalaJogo.px(15);
+    private static final int PES_ALTURA = EscalaJogo.px(11);
     private static final int DURACAO_FLASH_DANO = 8;
     private static final Map<String, GreenfootImage> SPRITESHEETS =
             new HashMap<String, GreenfootImage>();

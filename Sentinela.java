@@ -12,7 +12,7 @@ public class Sentinela extends Inimigo {
 
     @Override
     protected int getRaioVisao() {
-        return 160;
+        return EscalaJogo.px(160);
     }
 
     @Override

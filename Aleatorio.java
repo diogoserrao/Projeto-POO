@@ -10,7 +10,7 @@ import greenfoot.*;
  * subclasses.</p>
  */
 public class Aleatorio implements Movimento {
-    private static final int VELOCIDADE_POR_DEFEITO = 2;
+    private static final int VELOCIDADE_POR_DEFEITO = EscalaJogo.px(2);
     private static final int DURACAO_DIRECAO_POR_DEFEITO = 18;
     private static final int FRAMES_ENTRE_TENTATIVAS = 8;
 
