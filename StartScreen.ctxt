@@ -1,8 +1,9 @@
 #BlueJ class context
 comment0.target=StartScreen
-comment0.text=Menu\ inicial\ do\ jogo.
+comment0.text=\r\n\ Menu\ inicial\ que\ apresenta\ os\ controlos\ e\ inicia\ uma\ nova\ partida\ ao\ premir\r\n\ Enter.\r\n
 comment1.params=
 comment1.target=StartScreen()
+comment1.text=Cria\ o\ menu\ e\ desenha\ a\ informa\u00E7\u00E3o\ inicial\ da\ miss\u00E3o.
 comment2.params=
 comment2.target=void\ act()
 comment3.params=

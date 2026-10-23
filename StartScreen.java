@@ -1,14 +1,19 @@
 import greenfoot.*;
 
-/** Menu inicial do jogo. */
+/**
+ * Menu inicial que apresenta os controlos e inicia uma nova partida ao premir
+ * Enter.
+ */
 public class StartScreen extends Ecra {
     private boolean teclaEnterPressionada;
 
+    /** Cria o menu e desenha a informação inicial da missão. */
     public StartScreen() {
         desenharMenu();
     }
 
     @Override
+    /** Inicia uma partida quando Enter passa de não pressionada a pressionada. */
     public void act() {
         boolean teclaEnter = Greenfoot.isKeyDown("enter")
                 || Greenfoot.isKeyDown("return");

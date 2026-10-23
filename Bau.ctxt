@@ -1,12 +1,14 @@
 #BlueJ class context
 comment0.target=Bau
-comment0.text=Representa\ um\ ba\u00FA\ interag\u00EDvel\ do\ mapa.
+comment0.text=\r\n\ Ba\u00FA\ interag\u00EDvel\ que\ passa\ uma\ \u00FAnica\ vez\ do\ estado\ fechado\ para\ aberto.\r\n\r\n\ <p>O\ estado\ \u00E9\ mantido\ no\ objeto\ para\ que\ a\ imagem,\ a\ mensagem\ do\ HUD\ e\ o\r\n\ som\ acompanhem\ a\ mesma\ transi\u00E7\u00E3o,\ sem\ repetir\ o\ efeito\ em\ intera\u00E7\u00F5es\ futuras.</p>\r\n
 comment1.params=nome\ area
 comment1.target=Bau(java.lang.String,\ java.awt.Rectangle)
 comment2.params=
 comment2.target=void\ abrir()
+comment2.text=Abre\ o\ ba\u00FA\ uma\ \u00FAnica\ vez\ e\ reproduz\ o\ som\ correspondente.
 comment3.params=
 comment3.target=boolean\ estaAberto()
+comment3.text=Indica\ se\ o\ ba\u00FA\ j\u00E1\ foi\ aberto.
 comment4.params=
 comment4.target=boolean\ temAnimacao()
 comment5.params=

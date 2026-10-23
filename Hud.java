@@ -2,7 +2,13 @@ import greenfoot.*;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-/** Responsavel pelos textos e informacao visual do mundo. */
+/**
+ * Responsável pela informação textual apresentada sobre o mundo de jogo.
+ *
+ * <p>Consulta os jogadores e o mundo, mas não altera a lógica da partida.
+ * Guarda os últimos textos para redesenhar apenas o que mudou e usa
+ * {@link IntSupplier} para obter a fase atual sem duplicar o seu estado.</p>
+ */
 public class Hud {
     private final MyWorld mundo;
     private final IntSupplier faseAtual;
@@ -13,6 +19,7 @@ public class Hud {
     private String ultimosControlos;
     private String ultimasInteracoes;
 
+    /** Liga o HUD ao mundo e à fonte que fornece a fase atual. */
     public Hud(MyWorld mundo, IntSupplier faseAtual, int maxFases) {
         this.mundo = mundo;
         this.faseAtual = faseAtual;
@@ -20,11 +27,17 @@ public class Hud {
         this.ultimasVidas = new String[mundo.getJogadores().size()];
     }
 
+    /** Obtém os jogadores atuais sem duplicar a coleção mantida pelo mundo. */
     private List<Player> jogadores() {
         return mundo.getJogadores();
     }
 
     /** Atualiza todos os textos do HUD sem conhecer a logica do jogo. */
+    /**
+     * Atualiza vidas, fase, pontuação, controlos e indicação de interação.
+     * Só chama {@code showText} quando o texto correspondente mudou, reduzindo
+     * trabalho visual sem alterar a informação apresentada.
+     */
     public void atualizar() {
         for (int i = 0; i < jogadores().size(); i++) {
             Player jogador = jogadores().get(i);
@@ -54,10 +67,6 @@ public class Hud {
             }
             controlos += formatarControlos(jogadores().get(i), i);
         }
-        if (!controlos.isEmpty()) {
-            controlos += " | ";
-        }
-        controlos += "N: Próxima Fase";
         String interacoes = "";
         for (int i = 0; i < jogadores().size(); i++) {
             Interagivel interagivel = jogadores().get(i).getInteragivelPerto();

@@ -1,4 +1,9 @@
-/** Inimigo que patrulha uma zona configurada no mapa. */
+/**
+ * Inimigo que percorre uma zona retangular configurada no mapa.
+ *
+ * <p>A classe especializa {@link Inimigo} escolhendo a estratégia
+ * {@link PatrulhaZona} e ajustando o alcance e o ângulo da deteção.</p>
+ */
 public class Guarda extends Inimigo {
     public Guarda(int personagem, java.awt.Rectangle zonaPatrulha) {
         super(personagem);

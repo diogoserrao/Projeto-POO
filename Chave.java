@@ -1,6 +1,12 @@
 import greenfoot.Greenfoot;
 
-/** Representa uma chave interagível do mapa. */
+/**
+ * Chave que o jogador pode recolher e que fica associada a uma porta concreta.
+ *
+ * <p>A associação por referência, em vez de apenas pelo texto do nome, garante
+ * que uma chave abre exatamente a porta definida pelo mapa. Depois de recolhida,
+ * deixa de ser desenhada e passa para o inventário do jogador.</p>
+ */
 public class Chave extends ObjetoInteragivel {
     private final String tipo;
     private Porta porta;
@@ -11,14 +17,19 @@ public class Chave extends ObjetoInteragivel {
         this.tipo = obterIdentificador(nome);
     }
 
+    /** Devolve o identificador da porta que esta chave pode abrir. */
     public String getTipo() {
         return tipo;
     }
 
+    /** Liga esta chave à instância concreta da porta correspondente. */
     public void associarPorta(Porta porta) { this.porta = porta; }
+    /** Devolve a porta associada à chave. */
     public Porta getPorta() { return porta; }
+    /** Indica se esta chave abre exatamente a porta recebida. */
     public boolean abre(Porta porta) { return porta != null && this.porta == porta; }
 
+    /** Indica se a chave já foi transferida para o inventário de um jogador. */
     public boolean estaRecolhida() {
         return recolhida;
     }
@@ -41,6 +52,8 @@ public class Chave extends ObjetoInteragivel {
 
     @Override
     public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
+        // A ordem garante que o som e a remoção visual só ocorrem depois de a
+        // chave ter sido efetivamente adicionada ao inventário.
         if (recolhida || jogador == null) {
             return;
         }

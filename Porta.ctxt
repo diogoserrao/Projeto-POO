@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Porta
-comment0.text=Representa\ uma\ porta\ trancada\ definida\ no\ mapa\ Tiled.
+comment0.text=\r\n\ Porta\ trancada\ que\ s\u00F3\ pode\ ser\ aberta\ com\ a\ chave\ que\ lhe\ est\u00E1\ associada.\r\n\r\n\ <p>A\ porta\ encapsula\ o\ consumo\ da\ chave\ e\ a\ atualiza\u00E7\u00E3o\ visual.\ A\ classe\r\n\ {@link\ Saida}\ herda\ este\ mecanismo\ e\ acrescenta\ as\ condi\u00E7\u00F5es\ de\ conclus\u00E3o\ da\r\n\ fase,\ demonstrando\ especializa\u00E7\u00E3o\ por\ heran\u00E7a\ e\ sobrescrita.</p>\r\n
 comment1.params=nome\ area
 comment1.target=Porta(java.lang.String,\ java.awt.Rectangle)
 comment10.params=
@@ -13,10 +13,13 @@ comment13.params=jogador\ mapa\ mundo
 comment13.target=void\ interagir(Player,\ DungeonMap,\ MyWorld)
 comment2.params=
 comment2.target=java.lang.String\ getIdentificador()
+comment2.text=Devolve\ o\ identificador\ normalizado\ desta\ porta.
 comment3.params=
 comment3.target=boolean\ estaAberta()
+comment3.text=Indica\ se\ a\ porta\ j\u00E1\ foi\ aberta.
 comment4.params=
 comment4.target=boolean\ estaFechada()
+comment4.text=Indica\ se\ a\ porta\ ainda\ bloqueia\ a\ passagem.
 comment5.params=jogador\ mapa\ mundo
 comment5.target=boolean\ abrir(Player,\ DungeonMap,\ MyWorld)
 comment5.text=Abre\ apenas\ com\ a\ chave\ desta\ porta\ e\ consome-a\ do\ jogador.

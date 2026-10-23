@@ -5,7 +5,14 @@ import java.awt.Rectangle;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/** Zona de perigo autónoma: estado lógico, animação e dano pertencem ao ator. */
+/**
+ * Zona de perigo animada que aplica dano aos jogadores que a atravessam.
+ *
+ * <p>É simultaneamente um ator Greenfoot e um {@link Interagivel}: o ator
+ * atualiza os frames e os intervalos de dano, enquanto o contrato permite ao
+ * carregador e ao mapa tratá-la juntamente com os restantes elementos. As
+ * armadilhas desativáveis podem ser controladas por uma {@link Alavanca}.</p>
+ */
 public class Armadilha extends Actor implements Interagivel {
     private static final int DURACAO_DANO = 30;
     private final String identificador;
@@ -43,11 +50,17 @@ public class Armadilha extends Actor implements Interagivel {
         setImage(this.imagens[0]);
     }
 
+    /** Devolve a coordenada horizontal usada para colocar o ator. */
     public int getCentroVisualX() { return centroVisualX; }
+    /** Devolve a coordenada vertical usada para colocar o ator. */
     public int getCentroVisualY() { return centroVisualY; }
+    /** Devolve o identificador lido do mapa. */
     public String getIdentificador() { return identificador; }
+    /** Indica se uma alavanca pode desativar esta armadilha. */
     public boolean podeSerDesativada() { return podeSerDesativada; }
+    /** Indica se a armadilha já foi desativada sem possibilidade de retorno. */
     public boolean estaDesativadaPermanentemente() { return desativadaPermanentemente; }
+    /** Devolve uma cópia da área lógica de dano. */
     public Rectangle getArea() { return new Rectangle(area); }
 
     /** A armadilha desenha os seus recursos visuais através do próprio ator. */
@@ -69,6 +82,8 @@ public class Armadilha extends Actor implements Interagivel {
 
     @Override
     public void act() {
+        // O cooldown é atualizado mesmo durante a animação; a armadilha só
+        // deixa de animar e causar dano depois de ser desativada.
         atualizarCooldowns();
         if (!desativadaPermanentemente) {
             tempoRestante--;
@@ -95,10 +110,12 @@ public class Armadilha extends Actor implements Interagivel {
         for (Player jogador : mundo.getJogadores()) aplicarDano(jogador);
     }
 
+    /** Indica se o frame atual corresponde à parte perigosa da animação. */
     public boolean podeCausarDano() {
         return !desativadaPermanentemente && frame > 0 && frame < duracoes.length - 1;
     }
 
+    /** Desliga a animação perigosa e limpa os cooldowns dos jogadores. */
     public void desativarPermanentemente() {
         if (!podeSerDesativada) return;
         desativadaPermanentemente = true;
@@ -108,6 +125,7 @@ public class Armadilha extends Actor implements Interagivel {
         if (imagens.length > 0) setImage(imagens[0]);
     }
 
+    /** Aplica dano no máximo uma vez por intervalo ao jogador sobre a área. */
     public void aplicarDano(Player jogador) {
         if (jogador == null || !podeCausarDano() || !jogador.estaVivo()
                 || !area.intersects(jogador.getPes())) return;

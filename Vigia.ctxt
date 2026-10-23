@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Vigia
-comment0.text=Inimigo\ rapido\ que\ percorre\ o\ mapa\ usando\ movimento\ aleatorio.
+comment0.text=\r\n\ Inimigo\ r\u00E1pido\ que\ percorre\ o\ mapa\ com\ movimento\ aleat\u00F3rio\ persistente.\r\n\r\n\ <p>Usa\ uma\ velocidade\ superior\ e\ um\ cone\ de\ vis\u00E3o\ mais\ curto,\ criando\ um\r\n\ perfil\ diferente\ sem\ alterar\ o\ comportamento\ comum\ de\ {@link\ Inimigo}.</p>\r\n
 comment1.params=personagem
 comment1.target=Vigia(int)
 comment2.params=

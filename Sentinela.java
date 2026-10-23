@@ -1,4 +1,9 @@
-/** Inimigo que permanece parado e vigia a sua área. */
+/**
+ * Inimigo imóvel que vigia uma área ampla.
+ *
+ * <p>Especializa {@link Inimigo} através da estratégia {@link Parado}; só a
+ * deteção e o ataque continuam ativos.</p>
+ */
 public class Sentinela extends Inimigo {
     public Sentinela(int personagem) {
         super(personagem);

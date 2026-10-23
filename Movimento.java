@@ -1,4 +1,9 @@
-/** Define um comportamento de movimento para um inimigo. */
+/**
+ * Estratégia de movimento que pode ser atribuída a um {@link Inimigo}.
+ *
+ * <p>A interface permite trocar patrulha, aleatoriedade ou imobilidade sem
+ * alterar o ciclo comum do inimigo, aplicando composição e polimorfismo.</p>
+ */
 public interface Movimento {
     /**
      * Tenta mover o inimigo.

@@ -1,6 +1,13 @@
 import java.awt.Rectangle;
 
-/** Base comum dos objetos do mapa com os quais o jogador pode interagir. */
+/**
+ * Classe abstrata com o comportamento comum dos objetos interagíveis estáticos.
+ *
+ * <p>Concentra a área de interação, a normalização dos identificadores vindos
+ * do Tiled e a construção da mensagem apresentada no HUD. As subclasses só
+ * precisam definir a ação, o texto final e a condição que indica utilização,
+ * seguindo um pequeno Template Method.</p>
+ */
 public abstract class ObjetoInteragivel implements Interagivel {
     public static final int FRAME_FINAL = 4;
 
@@ -19,6 +26,7 @@ public abstract class ObjetoInteragivel implements Interagivel {
     }
 
     @Override
+    /** Devolve a área usada para proximidade e colisão lógica. */
     public Rectangle getArea() {
         return area;
     }
@@ -37,6 +45,10 @@ public abstract class ObjetoInteragivel implements Interagivel {
      * interagível.
      */
     @Override
+    /**
+     * Aplica o formato comum das mensagens: instrução enquanto disponível e
+     * texto de conclusão depois de o objeto ser utilizado.
+     */
     public String getDescricao(Player jogador) {
         return estaUtilizado() ? getTextoConcluido()
                 : textoTecla(jogador, getAcao());
@@ -44,6 +56,7 @@ public abstract class ObjetoInteragivel implements Interagivel {
 
     /** Mantém a sobrecarga prevista pela interface. */
     @Override
+    /** Sobrecarga que produz a descrição sem um jogador específico. */
     public String getDescricao() {
         return getDescricao(null);
     }

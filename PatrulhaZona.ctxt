@@ -1,8 +1,9 @@
 #BlueJ class context
 comment0.target=PatrulhaZona
-comment0.text=Move\ um\ inimigo\ para\ a\ frente\ e\ para\ tras\ dentro\ de\ uma\ zona.
+comment0.text=\r\n\ Estrat\u00E9gia\ que\ desloca\ um\ inimigo\ entre\ os\ extremos\ de\ uma\ zona.\r\n\r\n\ <p>A\ orienta\u00E7\u00E3o\ da\ zona\ determina\ se\ a\ patrulha\ \u00E9\ horizontal\ ou\ vertical.\r\n\ Ao\ chegar\ a\ um\ extremo,\ a\ estrat\u00E9gia\ abranda,\ evita\ ultrapassar\ o\ limite\ e\r\n\ mant\u00E9m\ uma\ pausa\ curta\ antes\ de\ inverter\ o\ sentido.</p>\r\n
 comment1.params=zona\ velocidade
 comment1.target=PatrulhaZona(java.awt.Rectangle,\ int)
+comment1.text=\r\n\ Cria\ uma\ patrulha\ para\ a\ zona\ indicada.\r\n\r\n\ @param\ zona\ ret\u00E2ngulo\ que\ define\ o\ eixo\ e\ os\ limites\ da\ patrulha\r\n\ @param\ velocidade\ passo\ m\u00E1ximo\ por\ frame\r\n
 comment2.params=inimigo
 comment2.target=boolean\ mover(Inimigo)
 comment3.params=inimigo

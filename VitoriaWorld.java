@@ -1,17 +1,23 @@
 import greenfoot.*;
 
-/** Ecrã final apresentado depois de os jogadores escaparem da masmorra. */
+/**
+ * Ecrã de vitória apresentado depois de os dois jogadores escaparem da
+ * masmorra. Conserva e mostra a pontuação recebida e permite reiniciar ou
+ * regressar ao menu.
+ */
 public class VitoriaWorld extends Ecra {
     private final int pontuacao;
     private boolean teclaReiniciarPressionada;
     private boolean teclaEscapePressionada;
 
+    /** Cria o ecrã final conservando a pontuação da partida. */
     public VitoriaWorld(int pontuacao) {
         this.pontuacao = pontuacao;
         desenharEcrã();
     }
 
     @Override
+    /** Trata o início de nova partida ou o regresso ao menu. */
     public void act() {
         boolean teclaR = Greenfoot.isKeyDown("r");
         boolean teclaEscape = Greenfoot.isKeyDown("escape")

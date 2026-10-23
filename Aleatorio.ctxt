@@ -1,11 +1,11 @@
 #BlueJ class context
 comment0.target=Aleatorio
-comment0.text=Movimento\ aleatorio\ com\ direcoes\ persistentes\ e\ verificacao\ de\ colisao.
+comment0.text=\r\n\ Estrat\u00E9gia\ de\ movimento\ aleat\u00F3rio\ com\ dire\u00E7\u00E3o\ persistente.\r\n\r\n\ <p>Escolhe\ uma\ nova\ dire\u00E7\u00E3o\ apenas\ quando\ a\ anterior\ termina\ ou\ fica\r\n\ bloqueada.\ Assim,\ o\ inimigo\ n\u00E3o\ muda\ de\ dire\u00E7\u00E3o\ a\ cada\ frame\ e\ todas\ as\r\n\ tentativas\ continuam\ a\ respeitar\ {@link\ Inimigo\#podeMoverPara(int,\ int)}.\r\n\ A\ estrat\u00E9gia\ \u00E9\ composta\ por\ {@link\ Inimigo},\ em\ vez\ de\ ser\ duplicada\ nas\r\n\ subclasses.</p>\r\n
 comment1.params=
 comment1.target=Aleatorio()
 comment2.params=velocidade\ duracaoDirecao
 comment2.target=Aleatorio(int,\ int)
-comment2.text=Permite\ ajustar\ a\ velocidade\ e\ a\ fluidez\ de\ cada\ tipo\ de\ inimigo.
+comment2.text=\r\n\ Cria\ a\ estrat\u00E9gia\ com\ velocidade\ e\ dura\u00E7\u00E3o\ de\ dire\u00E7\u00E3o\ configur\u00E1veis.\r\n\ Valores\ inferiores\ a\ um\ s\u00E3o\ limitados\ para\ manter\ passos\ v\u00E1lidos.\r\n\r\n\ @param\ velocidade\ pixels\ percorridos\ por\ frame\r\n\ @param\ duracaoDirecao\ n\u00FAmero\ de\ frames\ durante\ os\ quais\ uma\ dire\u00E7\u00E3o\ pode\ persistir\r\n
 comment3.params=inimigo
 comment3.target=boolean\ mover(Inimigo)
 comment4.params=inimigo\ direcao

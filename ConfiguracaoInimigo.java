@@ -1,7 +1,11 @@
 import java.awt.Rectangle;
 
 /**
- * Guarda a posição inicial e a zona de patrulha de um inimigo.
+ * Dados imutáveis de colocação de um inimigo lidos a partir do mapa.
+ *
+ * <p>A configuração mantém o ponto de nascimento e, quando existe, o
+ * retângulo de patrulha. As cópias devolvidas evitam que o carregador ou o
+ * mundo alterem acidentalmente a geometria original.</p>
  */
 public class ConfiguracaoInimigo {
 

@@ -1,13 +1,15 @@
 #BlueJ class context
 comment0.target=Plataforma
-comment0.text=Base\ comum\ \u00E0s\ plataformas\ que\ podem\ suportar\ jogadores.
+comment0.text=\r\n\ Abstra\u00E7\u00E3o\ das\ plataformas\ que\ podem\ suportar\ jogadores.\r\n\r\n\ <p>Define\ a\ geometria\ e\ o\ teste\ de\ suporte\ partilhados\ por\ plataformas\r\n\ m\u00F3veis\ e\ tempor\u00E1rias.\ As\ subclasses\ especializam\ apenas\ a\ forma\ como\ essa\r\n\ geometria\ e\ a\ disponibilidade\ mudam\ ao\ longo\ dos\ frames.</p>\r\n
 comment1.params=area
 comment1.target=Plataforma(java.awt.Rectangle)
 comment2.params=
 comment2.target=java.awt.Rectangle\ getArea()
+comment2.text=Devolve\ uma\ c\u00F3pia\ da\ \u00E1rea\ atual\ da\ plataforma.
 comment3.params=novaArea
 comment3.target=void\ atualizarArea(java.awt.Rectangle)
+comment3.text=Atualiza\ a\ geometria\ l\u00F3gica\ quando\ uma\ plataforma\ se\ desloca.
 comment4.params=pes
 comment4.target=boolean\ suporta(java.awt.Rectangle)
-comment4.text=Considera\ suportado\ um\ jogador\ cujo\ ret\u00E2ngulo\ dos\ p\u00E9s\ toca\ o\ topo.
+comment4.text=\r\n\ Verifica\ se\ o\ centro\ da\ \u00E1rea\ dos\ p\u00E9s\ est\u00E1\ dentro\ da\ plataforma.\r\n\r\n\ @param\ pes\ ret\u00E2ngulo\ l\u00F3gico\ dos\ p\u00E9s\ do\ jogador\r\n\ @return\ true\ quando\ a\ plataforma\ pode\ servir\ de\ apoio\r\n
 numComments=5

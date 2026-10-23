@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=ObjetoInteragivel
-comment0.text=Base\ comum\ dos\ objetos\ do\ mapa\ com\ os\ quais\ o\ jogador\ pode\ interagir.
+comment0.text=\r\n\ Classe\ abstrata\ com\ o\ comportamento\ comum\ dos\ objetos\ interag\u00EDveis\ est\u00E1ticos.\r\n\r\n\ <p>Concentra\ a\ \u00E1rea\ de\ intera\u00E7\u00E3o,\ a\ normaliza\u00E7\u00E3o\ dos\ identificadores\ vindos\r\n\ do\ Tiled\ e\ a\ constru\u00E7\u00E3o\ da\ mensagem\ apresentada\ no\ HUD.\ As\ subclasses\ s\u00F3\r\n\ precisam\ definir\ a\ a\u00E7\u00E3o,\ o\ texto\ final\ e\ a\ condi\u00E7\u00E3o\ que\ indica\ utiliza\u00E7\u00E3o,\r\n\ seguindo\ um\ pequeno\ Template\ Method.</p>\r\n
 comment1.params=area
 comment1.target=ObjetoInteragivel(java.awt.Rectangle)
 comment2.params=nome

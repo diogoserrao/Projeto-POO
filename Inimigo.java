@@ -1,7 +1,14 @@
 import greenfoot.*;
 import java.util.List;
 
-/** Um inimigo delega o movimento para a implementacao recebida. */
+/**
+ * Classe abstrata dos inimigos controlados pelo jogo.
+ *
+ * <p>Todos os inimigos partilham deteção em cone, ataques, invulnerabilidade,
+ * reação a pedras e pontuação. O deslocamento é delegado a uma estratégia
+ * {@link Movimento}, permitindo que guarda, sentinela e vigia variem por
+ * composição sem duplicar o ciclo de decisão.</p>
+ */
 public abstract class Inimigo extends Personagem {
     /* O alcance do golpe e a visão são regras independentes. */
     private static final int ALCANCE_GOLPE = 100;
@@ -36,11 +43,13 @@ public abstract class Inimigo extends Personagem {
     }
 
     /** Raio, em píxeis, do cone de visão por defeito. */
+    /** Devolve o raio de deteção específico do tipo de inimigo. */
     protected int getRaioVisao() {
         return 100;
     }
 
     /** Ângulo, em graus, do cone de visão por defeito. */
+    /** Devolve o ângulo, em graus, do cone de deteção. */
     protected double getAnguloVisao() {
         return 60.0;
     }
@@ -53,6 +62,10 @@ public abstract class Inimigo extends Personagem {
         this.movimento = movimento;
     }
 
+    /**
+     * Atualiza a decisão do inimigo: distração, deteção, movimento, animação e
+     * ataque são avaliados nesta ordem a cada frame.
+     */
     @Override
     protected void agir() {
         if (movimento == null) {
@@ -127,6 +140,13 @@ public abstract class Inimigo extends Personagem {
      * Este método pertence à classe Inimigo, por isso é executado por todos os
      * inimigos, independentemente do movimento que cada um utiliza.
      */
+    /**
+     * Aplica dano ao alvo detetado quando termina o intervalo entre ataques.
+     * O cooldown é partilhado pelo inimigo e impede golpes consecutivos em
+     * frames adjacentes.
+     *
+     * @param alvo jogador escolhido pelo algoritmo de deteção
+     */
     public void detetarEAtacarJogador(Player alvo) {
         if (!ATAQUES_ATIVOS) {
             return;
@@ -148,6 +168,7 @@ public abstract class Inimigo extends Personagem {
     }
 
     /** Recebe um golpe do jogador e inicia a morte quando perde a última vida. */
+    /** Recebe um golpe normal, respeitando a invulnerabilidade temporária. */
     public void receberAtaque() {
         if (!estaVivo() || estaEmMorte() || contadorInvulnerabilidade > 0) {
             return;
@@ -162,6 +183,12 @@ public abstract class Inimigo extends Personagem {
     }
 
     /** Recebe um golpe do jogador, eliminando imediatamente um golpe pelas costas. */
+    /**
+     * Recebe um ataque de jogador e elimina o inimigo quando o golpe é pelas
+     * costas; caso contrário, aplica a regra de dano normal.
+     *
+     * @param atacante jogador que iniciou o ataque
+     */
     public void receberAtaque(Player atacante) {
         if (!estaVivo() || estaEmMorte()) {
             return;
@@ -248,6 +275,7 @@ public abstract class Inimigo extends Personagem {
      * O ataque depende da proximidade e da direção do jogador, não do lado
      * para o qual o inimigo está virado.
      */
+    /** Verifica se o jogador está à distância e na direção do seu ataque. */
     public boolean podeSerAtacadoPor(Player jogador) {
         if (jogador == null || !estaVivo() || estaEmMorte()) {
             return false;
@@ -273,6 +301,8 @@ public abstract class Inimigo extends Personagem {
         double raioVisaoQuadrado = getRaioDetecaoQuadrado();
         double cosenoMeioCone = getCosenoMeioConeVisao();
 
+        // Primeiro filtra por raio e depois pelo cone; comparar distâncias ao
+        // quadrado evita calcular raízes quadradas a cada frame.
         for (Player jogador : jogadores) {
             if (jogador == null || !jogador.estaVivo()) {
                 continue;
@@ -339,6 +369,8 @@ public abstract class Inimigo extends Personagem {
             break;
         }
 
+        // O produto escalar confirma que o alvo está à frente e a comparação
+        // com o cosseno limita a direção ao ângulo configurado do cone.
         double produto = dx * frenteX + dy * frenteY;
         return produto > 0
                 && produto * produto >= distanciaQuadrado
@@ -349,13 +381,17 @@ public abstract class Inimigo extends Personagem {
         DungeonMap mapa = getMapa();
         if (mapa == null) return false;
         java.awt.Rectangle proximaArea = getPes(x, y);
+        // Inimigos não entram em paredes, portas fechadas nem zonas sem chão;
+        // cada estratégia de movimento usa este mesmo teste.
         return !mapa.estaBloqueado(proximaArea) && !mapa.estaNoVazio(proximaArea);
     }
 
+    /** Aplica uma posição já validada pela estratégia de movimento. */
     public void moverPara(int x, int y) {
         setLocation(x, y);
     }
 
+    /** Expõe à estratégia a alteração da direção visual do inimigo. */
     public void definirDirecaoMovimento(Direcao direcao) {
         definirDirecao(direcao);
     }

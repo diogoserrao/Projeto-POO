@@ -1,6 +1,12 @@
 import java.awt.Rectangle;
 
-/** Plataforma parada, com ciclos de visibilidade e piscar antes de desaparecer. */
+/**
+ * Plataforma fixa que alterna entre visível e escondida.
+ *
+ * <p>O piscar nos últimos frames avisa da mudança de estado. O método
+ * {@link #suporta(java.awt.Rectangle)} também depende da visibilidade, pelo
+ * que uma plataforma escondida deixa de servir de apoio e de colisão lógica.</p>
+ */
 public class PlataformaTemporaria extends Plataforma {
     private boolean visivel = true;
     private int contador;
@@ -24,6 +30,8 @@ public class PlataformaTemporaria extends Plataforma {
     @Override
     public void act() {
         contador++;
+        // O piscar anuncia a próxima ocultação; quando invisível, a plataforma
+        // mantém a imagem transparente até terminar o intervalo de repouso.
         if (visivel) {
             if (contador > tempoVisivel) {
                 visivel = false;

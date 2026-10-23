@@ -1,7 +1,13 @@
 import greenfoot.Greenfoot;
 import java.awt.Rectangle;
 
-/** Representa uma porta trancada definida no mapa Tiled. */
+/**
+ * Porta trancada que só pode ser aberta com a chave que lhe está associada.
+ *
+ * <p>A porta encapsula o consumo da chave e a atualização visual. A classe
+ * {@link Saida} herda este mecanismo e acrescenta as condições de conclusão da
+ * fase, demonstrando especialização por herança e sobrescrita.</p>
+ */
 public class Porta extends ObjetoInteragivel {
     private final String identificador;
     private boolean aberta;
@@ -11,20 +17,25 @@ public class Porta extends ObjetoInteragivel {
         identificador = obterIdentificador(nome);
     }
 
+    /** Devolve o identificador normalizado desta porta. */
     public String getIdentificador() {
         return identificador;
     }
 
+    /** Indica se a porta já foi aberta. */
     public boolean estaAberta() {
         return aberta;
     }
 
+    /** Indica se a porta ainda bloqueia a passagem. */
     public boolean estaFechada() {
         return !aberta;
     }
 
     /** Abre apenas com a chave desta porta e consome-a do jogador. */
     public boolean abrir(Player jogador, DungeonMap mapa, MyWorld mundo) {
+        // A porta valida a chave antes de alterar o próprio estado; por isso
+        // uma tentativa sem chave não produz som nem redesenho.
         if (aberta)
             return true;
         if (jogador == null)

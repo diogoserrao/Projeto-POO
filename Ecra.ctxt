@@ -1,12 +1,16 @@
 #BlueJ class context
 comment0.target=Ecra
-comment0.text=Base\ visual\ comum\ aos\ ecr\u00E3s\ fora\ da\ partida.
+comment0.text=\r\n\ Classe\ abstrata\ com\ o\ aspeto\ e\ utilit\u00E1rios\ comuns\ aos\ ecr\u00E3s\ fora\ da\ partida.\r\n\r\n\ <p>O\ menu\ inicial,\ o\ ecr\u00E3\ de\ derrota\ e\ o\ ecr\u00E3\ de\ vit\u00F3ria\ herdam\ as\ dimens\u00F5es,\r\n\ cores\ e\ opera\u00E7\u00F5es\ de\ desenho,\ mas\ mant\u00EAm\ a\ sua\ pr\u00F3pria\ mensagem\ e\ transi\u00E7\u00E3o\r\n\ de\ estado.</p>\r\n
 comment1.params=
 comment1.target=Ecra()
+comment1.text=Cria\ um\ mundo\ de\ ecr\u00E3\ com\ as\ dimens\u00F5es\ comuns\ \u00E0\ interface.
 comment2.params=imagem\ corBarra
 comment2.target=void\ prepararFundo(greenfoot.GreenfootImage,\ greenfoot.Color)
+comment2.text=Desenha\ o\ fundo\ escuro,\ barras\ decorativas\ e\ cor\ de\ destaque.
 comment3.params=imagem\ texto\ centroX\ linhaBase\ fonte\ cor
 comment3.target=void\ desenharTexto(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int,\ greenfoot.Font,\ greenfoot.Color)
+comment3.text=Desenha\ texto\ centrado\ aproximadamente\ na\ coordenada\ horizontal\ pedida.
 comment4.params=tecla\ estavaPressionada
 comment4.target=boolean\ teclaNova(java.lang.String,\ boolean)
+comment4.text=Deteta\ apenas\ o\ instante\ inicial\ de\ press\u00E3o\ de\ uma\ tecla.
 numComments=5

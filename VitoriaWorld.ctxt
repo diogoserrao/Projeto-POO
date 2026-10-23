@@ -1,8 +1,9 @@
 #BlueJ class context
 comment0.target=VitoriaWorld
-comment0.text=Ecr\u00E3\ final\ apresentado\ depois\ de\ os\ jogadores\ escaparem\ da\ masmorra.
+comment0.text=\r\n\ Ecr\u00E3\ de\ vit\u00F3ria\ apresentado\ depois\ de\ os\ dois\ jogadores\ escaparem\ da\r\n\ masmorra.\ Conserva\ e\ mostra\ a\ pontua\u00E7\u00E3o\ recebida\ e\ permite\ reiniciar\ ou\r\n\ regressar\ ao\ menu.\r\n
 comment1.params=pontuacao
 comment1.target=VitoriaWorld(int)
+comment1.text=Cria\ o\ ecr\u00E3\ final\ conservando\ a\ pontua\u00E7\u00E3o\ da\ partida.
 comment2.params=
 comment2.target=void\ act()
 comment3.params=

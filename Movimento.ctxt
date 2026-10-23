@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Movimento
-comment0.text=Define\ um\ comportamento\ de\ movimento\ para\ um\ inimigo.
+comment0.text=\r\n\ Estrat\u00E9gia\ de\ movimento\ que\ pode\ ser\ atribu\u00EDda\ a\ um\ {@link\ Inimigo}.\r\n\r\n\ <p>A\ interface\ permite\ trocar\ patrulha,\ aleatoriedade\ ou\ imobilidade\ sem\r\n\ alterar\ o\ ciclo\ comum\ do\ inimigo,\ aplicando\ composi\u00E7\u00E3o\ e\ polimorfismo.</p>\r\n
 comment1.params=inimigo
 comment1.target=boolean\ mover(Inimigo)
 comment1.text=\r\n\ Tenta\ mover\ o\ inimigo.\r\n\r\n\ @return\ true\ quando\ o\ inimigo\ se\ moveu;\ false\ caso\ contrario\r\n

@@ -2,7 +2,12 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Plataforma que percorre horizontalmente a área indicada pelo Tiled. */
+/**
+ * Plataforma que percorre horizontalmente o percurso definido no mapa.
+ *
+ * <p>Antes de se mover, regista os jogadores apoiados nela e aplica-lhes o
+ * mesmo deslocamento horizontal, preservando a posição relativa à plataforma.</p>
+ */
 public class PlataformaMovel extends Plataforma {
     private final Rectangle percurso;
     private final int velocidade;
@@ -26,6 +31,8 @@ public class PlataformaMovel extends Plataforma {
     @Override
     public void act() {
         if (getWorld() == null) return;
+        // Guarda os jogadores antes do deslocamento para transportar apenas
+        // quem estava efetivamente apoiado nesta plataforma neste frame.
         List<Player> suportados = new ArrayList<Player>();
         for (Player jogador : getWorld().getObjects(Player.class)) {
             if (suporta(jogador.getPes())) suportados.add(jogador);
@@ -37,6 +44,8 @@ public class PlataformaMovel extends Plataforma {
         int novoX = antiga.x + sentido * velocidade;
         if (novoX <= minimo) { novoX = minimo; sentido = 1; }
         if (novoX >= maximo) { novoX = maximo; sentido = -1; }
+        // O percurso é limitado para que a área completa da plataforma nunca
+        // ultrapasse os extremos configurados no mapa.
         int dx = novoX - antiga.x;
         Rectangle nova = new Rectangle(novoX, antiga.y, antiga.width, antiga.height);
         setLocation(nova.x + nova.width / 2, nova.y + nova.height / 2);

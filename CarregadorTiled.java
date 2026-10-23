@@ -11,7 +11,14 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 
-/** Lê um mapa TMX e prepara os dados usados pelo jogo. */
+/**
+ * Interpreta um mapa TMX do Tiled e prepara os dados consumidos pelo jogo.
+ *
+ * <p>Converte camadas, tilesets e grupos de objetos em imagens, colisões,
+ * zonas, spawns, plataformas e entidades interagíveis. A classe concentra a
+ * dependência do formato TMX; {@link DungeonMap} e {@link MyWorld} recebem um
+ * objeto {@link DadosMapa} e trabalham com estruturas Java já prontas.</p>
+ */
 public class CarregadorTiled {
     private static final int SOURCE_TILE = 16;
     private static final int TILE = 32;
@@ -48,6 +55,7 @@ public class CarregadorTiled {
     private static final Map<String, GreenfootImage> tilesCache = new HashMap<String, GreenfootImage>();
     private final ArrayList<Tileset> tilesetsAtuais = new ArrayList<Tileset>();
 
+    /** Metadados mínimos necessários para converter um GID num tile visual. */
     static final class Tileset {
         private int firstGid;
         private int columns;
@@ -62,6 +70,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Frames e durações de uma animação declarada num tileset. */
     static final class TileAnimation {
         private int[] frames;
         private int[] duracoes;
@@ -74,6 +83,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Carrega e prepara todos os recursos da fase indicada. */
     public CarregadorTiled(int fase) {
         this.fase = Math.max(1, Math.min(2, fase));
         imagem = new GreenfootImage(WORLD_WIDTH, WORLD_HEIGHT);
@@ -87,12 +97,18 @@ public class CarregadorTiled {
         redesenharObjetos(getDados());
     }
 
+    /** Devolve a estrutura com os dados interpretados da fase. */
     public DadosMapa getDados() {
         return new DadosMapa(imagem, imagemBase, interagiveis, armadilhas, portas, tilesDosObjetos,
                 configuracoesInimigos, posicoesPedras, spawnsJogadores, zonasVazio, plataformas, colisaoComum,
                 tilesetsAtuais, animacoesTiles, fase);
     }
 
+    /**
+     * Resultado da leitura do TMX, exposto com cópias e vistas não modificáveis.
+     * Esta fronteira protege os dados internos do carregador contra alterações
+     * acidentais durante a construção do mundo.
+     */
     public static final class DadosMapa {
         private final GreenfootImage imagem;
         private final GreenfootImage imagemBase;
@@ -141,18 +157,22 @@ public class CarregadorTiled {
         /** Devolve uma cópia para impedir alterações à imagem interna. */
         public GreenfootImage getImagemBase() { return new GreenfootImage(imagemBase); }
 
+        /** Devolve os objetos interagíveis lidos do mapa. */
         public List<Interagivel> getInteragiveis() {
             return Collections.unmodifiableList(interagiveis);
         }
 
+        /** Devolve as armadilhas lidas do mapa. */
         public List<Armadilha> getArmadilhas() {
             return Collections.unmodifiableList(armadilhas);
         }
 
+        /** Devolve as portas lidas do mapa. */
         public List<Porta> getPortas() {
             return Collections.unmodifiableList(portas);
         }
 
+        /** Devolve a associação entre objetos e tiles usados no seu desenho. */
         public Map<Interagivel, List<int[]>> getTilesDosObjetos() {
             Map<Interagivel, List<int[]>> copia =
                     new HashMap<Interagivel, List<int[]>>();
@@ -167,28 +187,34 @@ public class CarregadorTiled {
             return Collections.unmodifiableMap(copia);
         }
 
+        /** Devolve as configurações iniciais dos inimigos. */
         public List<ConfiguracaoInimigo> getConfiguracoesInimigos() {
             return Collections.unmodifiableList(configuracoesInimigos);
         }
 
+        /** Devolve cópias dos pontos iniciais das pedras. */
         public List<Point> getPosicoesPedras() {
             return copiarPontos(posicoesPedras);
         }
 
+        /** Devolve cópias dos pontos de spawn dos jogadores. */
         public List<Point> getSpawnsJogadores() {
             return copiarPontos(spawnsJogadores);
         }
 
+        /** Devolve cópias das áreas sem chão. */
         public List<Rectangle> getZonasVazio() {
             ArrayList<Rectangle> copia = new ArrayList<Rectangle>();
             for (Rectangle zona : zonasVazio) copia.add(new Rectangle(zona));
             return Collections.unmodifiableList(copia);
         }
 
+        /** Devolve as plataformas descritas no mapa. */
         public List<Plataforma> getPlataformas() {
             return Collections.unmodifiableList(plataformas);
         }
 
+        /** Devolve uma cópia da grelha de colisão comum. */
         public boolean[][] getColisaoComum() {
             boolean[][] copia = new boolean[colisaoComum.length][];
             for (int i = 0; i < colisaoComum.length; i++) {
@@ -197,6 +223,7 @@ public class CarregadorTiled {
             return copia;
         }
 
+        /** Devolve cópias dos metadados dos tilesets. */
         public List<Tileset> getTilesets() {
             ArrayList<Tileset> copia = new ArrayList<Tileset>();
             for (Tileset tileset : tilesets) {
@@ -205,6 +232,7 @@ public class CarregadorTiled {
             return Collections.unmodifiableList(copia);
         }
 
+        /** Devolve cópias das animações declaradas nos tilesets. */
         public Map<Integer, TileAnimation> getAnimacoesTiles() {
             Map<Integer, TileAnimation> copia = new HashMap<Integer, TileAnimation>();
             for (Map.Entry<Integer, TileAnimation> entrada
@@ -225,6 +253,7 @@ public class CarregadorTiled {
         public int getFase() { return fase; }
     }
 
+    /** Lê o TMX escolhido para a fase e processa as suas camadas e grupos. */
     private void carregar() {
         File ficheiro = new File("images/mundo/Mundo" + fase + "/Tiled_files/Dungeon" + fase + ".tmx");
         ficheiroMapa = ficheiro;
@@ -274,6 +303,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Converte a camada de colisão do Tiled na grelha booleana do mapa. */
     private void lerCamadaColisao(Element layer) {
         for (int[] t : listarTiles(layer)) {
             int cx = t[0] - MIN_X, cy = t[1] - MIN_Y;
@@ -281,6 +311,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Lê os pontos de nascimento e as zonas de patrulha dos inimigos. */
     private void lerInimigos(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         Map<String, Rectangle> patrulhas = new HashMap<String, Rectangle>();
@@ -310,6 +341,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Lê os pontos onde começam as pedras recolhíveis. */
     private void lerPedras(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         for (int i = 0; i < objetos.getLength(); i++) {
@@ -323,6 +355,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Cria as entidades interagíveis e guarda a relação com os seus tiles. */
     private void lerInteracoes(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         for (int i = 0; i < objetos.getLength(); i++) {
@@ -359,6 +392,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Lê as áreas sem chão usadas para detetar quedas dos jogadores. */
     private void lerVazios(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         for (int i = 0; i < objetos.getLength(); i++) {
@@ -371,6 +405,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Lê os percursos usados pelas plataformas móveis. */
     private void lerPercursos(Element grupo) {
         NodeList objetos = grupo.getElementsByTagName("object");
         for (int i = 0; i < objetos.getLength(); i++) {
@@ -386,6 +421,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Cria plataformas a partir das propriedades dos objetos do mapa. */
     private void lerPlataformas(NodeList filhos) {
         for (int i = 0; i < filhos.getLength(); i++) {
             Node node = filhos.item(i);
@@ -448,6 +484,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Liga cada chave à porta identificada pelos dados do Tiled. */
     private void associarChavesEPortas() {
         Map<String, Porta> porId = new HashMap<String, Porta>();
         for (Porta porta : portas) porId.put(porta.getIdentificador(), porta);
@@ -500,6 +537,7 @@ public class CarregadorTiled {
         return new Rectangle(ponto ? mundoX - mundoLargura / 2 : mundoX, ponto ? mundoY - mundoAltura / 2 : mundoY, mundoLargura, mundoAltura);
     }
 
+    /** Resolve os tilesets e guarda os metadados necessários para desenhá-los. */
     private ArrayList<Tileset> lerTilesets(Element mapa, File pastaReferencia) {
         ArrayList<Tileset> resultado = new ArrayList<Tileset>();
         NodeList nodes = mapa.getChildNodes();
@@ -552,6 +590,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Lê as animações declaradas nos tilesets do mapa. */
     private void lerAnimacoesTiles(Element mapa, ArrayList<Tileset> tilesets) {
         NodeList nodes = mapa.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -589,6 +628,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Desenha uma camada de tiles e regista os tiles especiais dos objetos. */
     private void desenharCamada(Element layer, ArrayList<Tileset> tilesets) {
         boolean armadilhasLayer = "traps".equalsIgnoreCase(layer.getAttribute("name").trim());
         boolean objetos = "objects".equalsIgnoreCase(layer.getAttribute("name"))
@@ -700,7 +740,7 @@ public class CarregadorTiled {
         }
     }
 
-    /** Compõe uma vez os quadros dos atores, sem tocar na imagem de fundo. */
+    /** Prepara sprites e temporização das armadilhas depois da leitura do mapa. */
     private void prepararRecursosDasArmadilhas() {
         for (Armadilha armadilha : armadilhas) {
             ArrayList<int[]> tiles = tilesDosObjetos.get(armadilha);
@@ -773,6 +813,7 @@ public class CarregadorTiled {
         }
     }
 
+    /** Reconstrói a imagem base e reaplica o estado visual dos objetos. */
     static void redesenharObjetos(DadosMapa dados) {
         dados.imagem.drawImage(dados.imagemBase, 0, 0);
         for (Map.Entry<Interagivel, ArrayList<int[]>> entrada : dados.tilesDosObjetos.entrySet()) {

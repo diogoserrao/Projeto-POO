@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Chave
-comment0.text=Representa\ uma\ chave\ interag\u00EDvel\ do\ mapa.
+comment0.text=\r\n\ Chave\ que\ o\ jogador\ pode\ recolher\ e\ que\ fica\ associada\ a\ uma\ porta\ concreta.\r\n\r\n\ <p>A\ associa\u00E7\u00E3o\ por\ refer\u00EAncia,\ em\ vez\ de\ apenas\ pelo\ texto\ do\ nome,\ garante\r\n\ que\ uma\ chave\ abre\ exatamente\ a\ porta\ definida\ pelo\ mapa.\ Depois\ de\ recolhida,\r\n\ deixa\ de\ ser\ desenhada\ e\ passa\ para\ o\ invent\u00E1rio\ do\ jogador.</p>\r\n
 comment1.params=nome\ area
 comment1.target=Chave(java.lang.String,\ java.awt.Rectangle)
 comment10.params=
@@ -11,14 +11,19 @@ comment12.params=jogador\ mapa\ mundo
 comment12.target=void\ interagir(Player,\ DungeonMap,\ MyWorld)
 comment2.params=
 comment2.target=java.lang.String\ getTipo()
+comment2.text=Devolve\ o\ identificador\ da\ porta\ que\ esta\ chave\ pode\ abrir.
 comment3.params=porta
 comment3.target=void\ associarPorta(Porta)
+comment3.text=Liga\ esta\ chave\ \u00E0\ inst\u00E2ncia\ concreta\ da\ porta\ correspondente.
 comment4.params=
 comment4.target=Porta\ getPorta()
+comment4.text=Devolve\ a\ porta\ associada\ \u00E0\ chave.
 comment5.params=porta
 comment5.target=boolean\ abre(Porta)
+comment5.text=Indica\ se\ esta\ chave\ abre\ exatamente\ a\ porta\ recebida.
 comment6.params=
 comment6.target=boolean\ estaRecolhida()
+comment6.text=Indica\ se\ a\ chave\ j\u00E1\ foi\ transferida\ para\ o\ invent\u00E1rio\ de\ um\ jogador.
 comment7.params=
 comment7.target=boolean\ estaVisivel()
 comment8.params=

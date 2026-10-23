@@ -1,17 +1,22 @@
 import greenfoot.*;
 
-/** Ecrã apresentado quando um dos agentes fica sem vidas. */
+/**
+ * Ecrã de derrota apresentado quando um dos jogadores fica sem vidas.
+ * Permite reiniciar a partida ou regressar ao menu inicial.
+ */
 public class GameOverWorld extends Ecra {
     private static final Color FUNDO = new Color(12, 8, 14);
     private static final Color VERMELHO = new Color(205, 48, 58);
     private boolean teclaReiniciarPressionada;
     private boolean teclaEscapePressionada;
 
+    /** Cria o ecrã de derrota. */
     public GameOverWorld() {
         desenharEcrã();
     }
 
     @Override
+    /** Trata o reinício da partida ou o regresso ao menu. */
     public void act() {
         boolean teclaR = Greenfoot.isKeyDown("r");
         boolean teclaEscape = Greenfoot.isKeyDown("escape")

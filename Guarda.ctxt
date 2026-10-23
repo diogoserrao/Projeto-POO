@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Guarda
-comment0.text=Inimigo\ que\ patrulha\ uma\ zona\ configurada\ no\ mapa.
+comment0.text=\r\n\ Inimigo\ que\ percorre\ uma\ zona\ retangular\ configurada\ no\ mapa.\r\n\r\n\ <p>A\ classe\ especializa\ {@link\ Inimigo}\ escolhendo\ a\ estrat\u00E9gia\r\n\ {@link\ PatrulhaZona}\ e\ ajustando\ o\ alcance\ e\ o\ \u00E2ngulo\ da\ dete\u00E7\u00E3o.</p>\r\n
 comment1.params=personagem\ zonaPatrulha
 comment1.target=Guarda(int,\ java.awt.Rectangle)
 comment2.params=

@@ -1,6 +1,14 @@
 import greenfoot.*;
 
-/** Movimento aleatorio com direcoes persistentes e verificacao de colisao. */
+/**
+ * Estratégia de movimento aleatório com direção persistente.
+ *
+ * <p>Escolhe uma nova direção apenas quando a anterior termina ou fica
+ * bloqueada. Assim, o inimigo não muda de direção a cada frame e todas as
+ * tentativas continuam a respeitar {@link Inimigo#podeMoverPara(int, int)}.
+ * A estratégia é composta por {@link Inimigo}, em vez de ser duplicada nas
+ * subclasses.</p>
+ */
 public class Aleatorio implements Movimento {
     private static final int VELOCIDADE_POR_DEFEITO = 2;
     private static final int DURACAO_DIRECAO_POR_DEFEITO = 18;
@@ -14,7 +22,13 @@ public class Aleatorio implements Movimento {
         this(VELOCIDADE_POR_DEFEITO, DURACAO_DIRECAO_POR_DEFEITO);
     }
 
-    /** Permite ajustar a velocidade e a fluidez de cada tipo de inimigo. */
+    /**
+     * Cria a estratégia com velocidade e duração de direção configuráveis.
+     * Valores inferiores a um são limitados para manter passos válidos.
+     *
+     * @param velocidade pixels percorridos por frame
+     * @param duracaoDirecao número de frames durante os quais uma direção pode persistir
+     */
     public Aleatorio(int velocidade, int duracaoDirecao) {
         this.velocidade = Math.max(1, velocidade);
         this.duracaoDirecao = Math.max(1, duracaoDirecao);
@@ -22,6 +36,7 @@ public class Aleatorio implements Movimento {
 
     @Override
     public boolean mover(Inimigo inimigo) {
+        // A direção atual é mantida enquanto ainda for possível avançar.
         Direcao direcaoAtual = inimigo.getDirecao();
         if (contadorDirecao > 0 && podeAvancar(inimigo, direcaoAtual)) {
             contadorDirecao--;

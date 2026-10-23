@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Pedra
-comment0.text=Um\ objeto\ n\u00E3o\ letal\ que\ pode\ ser\ lan\u00E7ado\ para\ distrair\ inimigos.
+comment0.text=\r\n\ Pedra\ que\ pode\ ser\ recolhida,\ lan\u00E7ada\ para\ criar\ uma\ distra\u00E7\u00E3o\ e\ depois\r\n\ desaparecer\ quando\ permanece\ demasiado\ tempo\ no\ ch\u00E3o.\r\n\r\n\ <p>O\ estado\ interno\ distingue\ a\ pedra\ dispon\u00EDvel,\ em\ voo,\ aterrada\ e\r\n\ recolhida.\ Os\ inimigos\ observam\ apenas\ as\ pedras\ aterradas,\ mantendo\ a\r\n\ responsabilidade\ da\ distra\u00E7\u00E3o\ separada\ do\ movimento\ do\ jogador.</p>\r\n
 comment1.params=
 comment1.target=Pedra()
 comment1.text=Cria\ uma\ pedra\ dispon\u00EDvel\ para\ ser\ recolhida.

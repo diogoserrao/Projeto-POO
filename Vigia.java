@@ -1,4 +1,9 @@
-/** Inimigo rapido que percorre o mapa usando movimento aleatorio. */
+/**
+ * Inimigo rápido que percorre o mapa com movimento aleatório persistente.
+ *
+ * <p>Usa uma velocidade superior e um cone de visão mais curto, criando um
+ * perfil diferente sem alterar o comportamento comum de {@link Inimigo}.</p>
+ */
 public class Vigia extends Inimigo {
     private static final int VELOCIDADE = 3;
     private static final int DURACAO_DIRECAO = 24;

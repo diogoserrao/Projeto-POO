@@ -7,7 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Consultas de runtime sobre o mapa de uma única camada de colisão. */
+/**
+ * Fachada de runtime sobre os dados de uma fase carregada do Tiled.
+ *
+ * <p>Conserva a imagem, a grelha de colisões, as áreas especiais, os objetos
+ * interagíveis e as configurações de atores. O mundo consulta esta classe
+ * para testar movimento e suporte, enquanto as alterações de estado pedem o
+ * redesenho dos objetos sem voltar a interpretar o ficheiro TMX.</p>
+ */
 public class DungeonMap {
     private static final int TILE = 32;
     private static final int MAP_WIDTH = 40;
@@ -32,10 +39,13 @@ public class DungeonMap {
     private final int fase;
     private long revisaoInteracoes;
 
+    /** Cria o mapa da primeira fase. */
     public DungeonMap() { this(1); }
 
+    /** Carrega o mapa da fase indicada. */
     public DungeonMap(int fase) { this(new CarregadorTiled(fase).getDados()); }
 
+    /** Constrói uma fachada a partir dos dados já interpretados pelo carregador. */
     public DungeonMap(CarregadorTiled.DadosMapa dados) {
         imagem = dados.getImagem();
         imagemBase = dados.getImagemBase();
@@ -84,11 +94,13 @@ public class DungeonMap {
     GreenfootImage getImagemParaRenderizacao() { return imagem; }
 
     /** Devolve uma vista não modificável dos objetos do mapa. */
+    /** Devolve os objetos interagíveis sem permitir alterar a coleção interna. */
     public List<Interagivel> getInteragiveis() {
         return Collections.unmodifiableList(interagiveis);
     }
 
     /** Regista um objeto interagível criado durante a execução do mundo. */
+    /** Regista um objeto criado depois da leitura inicial do mapa. */
     public void adicionarInteragivel(Interagivel interagivel) {
         if (interagivel != null && !interagiveis.contains(interagivel)) {
             interagiveis.add(interagivel);
@@ -105,6 +117,7 @@ public class DungeonMap {
     }
 
     /** Remove um objeto interagível sem expor a coleção interna. */
+    /** Remove um objeto e redesenha a imagem para refletir o novo estado. */
     public void removerInteragivel(Interagivel interagivel) {
         interagiveis.remove(interagivel);
         tilesDosObjetos.remove(interagivel);
@@ -112,6 +125,7 @@ public class DungeonMap {
         redesenharObjetos();
     }
 
+    /** Devolve a revisão usada para invalidar caches de proximidade. */
     public long getRevisaoInteracoes() { return revisaoInteracoes; }
 
     /** Reconstrói o mapa base e reaplica o estado visual de todos os objetos. */
@@ -122,6 +136,7 @@ public class DungeonMap {
                 tilesets, animacoesTiles, fase));
     }
 
+    /** Devolve as armadilhas carregadas para o mundo. */
     public List<Armadilha> getArmadilhas() {
         return Collections.unmodifiableList(armadilhas);
     }
@@ -159,22 +174,26 @@ public class DungeonMap {
         return Collections.unmodifiableList(copiarRetangulos(zonasVazio));
     }
 
+    /** Devolve as plataformas criadas a partir dos objetos do mapa. */
     public List<Plataforma> getPlataformas() {
         return Collections.unmodifiableList(plataformas);
     }
 
+    /** Indica se a área dos pés intersecta uma zona sem chão. */
     public boolean estaNoVazio(Rectangle pes) {
         if (pes == null) return false;
         for (Rectangle vazio : zonasVazio) if (vazio.intersects(pes)) return true;
         return false;
     }
 
+    /** Indica se alguma plataforma suporta a área dos pés indicada. */
     public boolean estaSuportado(Rectangle pes) {
         if (pes == null) return false;
         for (Plataforma plataforma : plataformas) if (plataforma.suporta(pes)) return true;
         return false;
     }
 
+    /** Testa a grelha de colisão abrangida por uma área retangular. */
     public boolean temColisaoNaZona(int x1, int y1, int x2, int y2) {
         if (x1 < 0 || y1 < 0 || x2 >= WORLD_WIDTH || y2 >= WORLD_HEIGHT) return true;
         for (int cx = x1 / TILE; cx <= x2 / TILE; cx++) {
@@ -185,6 +204,7 @@ public class DungeonMap {
         return false;
     }
 
+    /** Considera bloqueada uma área que toca parede, limite ou porta fechada. */
     public boolean estaBloqueado(Rectangle pes) {
         if (pes == null) return true;
         if (temColisaoNaZona(pes.x, pes.y, pes.x + pes.width - 1,

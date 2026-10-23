@@ -4,21 +4,30 @@ import greenfoot.GreenfootImage;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Camada visual independente do inimigo, com imagens partilhadas por geometria. */
+/**
+ * Ator visual que desenha o cone de visão de um inimigo.
+ *
+ * <p>A imagem é criada uma vez por combinação de raio e ângulo e depois é
+ * reutilizada para as quatro direções. Esta classe só representa a camada
+ * visual; a deteção efetiva permanece em {@link Inimigo}.</p>
+ */
 public final class ConeVisao extends Actor {
     private static final Color COR_PREENCHIMENTO = new Color(255, 220, 70, 45);
     private static final Color COR_CONTORNO = new Color(255, 220, 70, 150);
     private static final Map<String, GreenfootImage[]> CACHE =
             new HashMap<String, GreenfootImage[]>();
 
+    /** Cria o ator visual com uma imagem inicial orientada para baixo. */
     public ConeVisao(int raio, double angulo) {
         setImage(obterImagem(raio, angulo, Direcao.BAIXO));
     }
 
+    /** Atualiza a geometria visual quando o inimigo muda de direção ou perfil. */
     public void atualizar(int raio, double angulo, Direcao direcao) {
         setImage(obterImagem(raio, angulo, direcao));
     }
 
+    /** Reutiliza a imagem em cache para a combinação geométrica recebida. */
     private static GreenfootImage obterImagem(int raio, double angulo, Direcao direcao) {
         String chave = raio + ":" + Double.toString(angulo);
         GreenfootImage[] imagens = CACHE.get(chave);
@@ -29,6 +38,7 @@ public final class ConeVisao extends Actor {
         return imagens[direcao.ordinal()];
     }
 
+    /** Desenha as quatro orientações do setor circular do cone de visão. */
     private static GreenfootImage[] criarImagens(int raio, double angulo) {
         GreenfootImage[] resultado = new GreenfootImage[Direcao.values().length];
         int tamanho = raio * 2 + 4;

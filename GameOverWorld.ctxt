@@ -1,8 +1,9 @@
 #BlueJ class context
 comment0.target=GameOverWorld
-comment0.text=Ecr\u00E3\ apresentado\ quando\ um\ dos\ agentes\ fica\ sem\ vidas.
+comment0.text=\r\n\ Ecr\u00E3\ de\ derrota\ apresentado\ quando\ um\ dos\ jogadores\ fica\ sem\ vidas.\r\n\ Permite\ reiniciar\ a\ partida\ ou\ regressar\ ao\ menu\ inicial.\r\n
 comment1.params=
 comment1.target=GameOverWorld()
+comment1.text=Cria\ o\ ecr\u00E3\ de\ derrota.
 comment2.params=
 comment2.target=void\ act()
 comment3.params=

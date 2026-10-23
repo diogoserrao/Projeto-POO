@@ -1,7 +1,13 @@
 import greenfoot.Actor;
 import java.awt.Rectangle;
 
-/** Base comum às plataformas que podem suportar jogadores. */
+/**
+ * Abstração das plataformas que podem suportar jogadores.
+ *
+ * <p>Define a geometria e o teste de suporte partilhados por plataformas
+ * móveis e temporárias. As subclasses especializam apenas a forma como essa
+ * geometria e a disponibilidade mudam ao longo dos frames.</p>
+ */
 public abstract class Plataforma extends Actor {
     private Rectangle area;
 
@@ -13,14 +19,22 @@ public abstract class Plataforma extends Actor {
         setImage(CarregadorTiled.criarImagemPlataforma(this.area.width, this.area.height));
     }
 
+    /** Devolve uma cópia da área atual da plataforma. */
     public Rectangle getArea() { return new Rectangle(area); }
 
+    /** Atualiza a geometria lógica quando uma plataforma se desloca. */
     protected void atualizarArea(Rectangle novaArea) {
         if (novaArea == null) throw new IllegalArgumentException("A área não pode ser nula");
         area = new Rectangle(novaArea);
     }
 
     /** Considera suportado um jogador cujo retângulo dos pés toca o topo. */
+    /**
+     * Verifica se o centro da área dos pés está dentro da plataforma.
+     *
+     * @param pes retângulo lógico dos pés do jogador
+     * @return true quando a plataforma pode servir de apoio
+     */
     public boolean suporta(Rectangle pes) {
     if (pes == null) {
         return false;

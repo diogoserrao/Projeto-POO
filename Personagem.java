@@ -4,7 +4,15 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/** Classe base para jogadores e inimigos. */
+/**
+ * Classe abstrata que concentra o estado e o comportamento visual comum a
+ * jogadores e inimigos.
+ *
+ * <p>Encapsula vidas, dano, morte, direção, sprites e animações. As subclasses
+ * implementam apenas {@link #agir()}, ficando o ciclo Greenfoot, a gestão dos
+ * frames e as transições de morte centralizados nesta classe. Assim, a mesma
+ * referência de tipo base pode representar personagens concretos diferentes.</p>
+ */
 public abstract class Personagem extends Actor {
     protected static final int FRAME_SIZE = 64;
     protected static final int DISPLAY_SIZE = 96;
@@ -44,6 +52,12 @@ public abstract class Personagem extends Actor {
     private boolean terminouMorte;
     private int contadorFlashDano;
 
+    /**
+     * Carrega as animações padrão da personagem identificada pela skin.
+     *
+     * @param personagem número usado no nome dos spritesheets
+     * @param vidasMaximas número inicial e máximo de vidas
+     */
     protected Personagem(int personagem, int vidasMaximas) {
         this(carregarSpritesheet(personagem, "Walk"),
              carregarSpritesheet(personagem, "Idle"),
@@ -51,6 +65,7 @@ public abstract class Personagem extends Actor {
              carregarSpritesheet(personagem, "Death"), vidasMaximas);
     }
 
+    /** Cria uma personagem usando sprites fornecidos pelo chamador. */
     protected Personagem(GreenfootImage walkSpritesheet,
                          GreenfootImage idleSpritesheet, int vidasMaximas) {
         this(walkSpritesheet, idleSpritesheet, idleSpritesheet,
@@ -95,6 +110,7 @@ public abstract class Personagem extends Actor {
         return spritesheet;
     }
 
+    /** Atualiza a linha direcional da animação sem interromper uma morte. */
     protected void definirDirecao(Direcao direcao) {
         if (emMorte) {
             return;
@@ -113,6 +129,7 @@ public abstract class Personagem extends Actor {
         return linhaDirecao;
     }
 
+    /** Avança a animação normal ou delega a uma animação especial em curso. */
     protected void atualizarAnimacao(boolean movimento) {
         if (contadorFlashDano > 0) {
             contadorFlashDano--;
@@ -149,6 +166,8 @@ public abstract class Personagem extends Actor {
     }
 
     protected void mostrarFrame() {
+        // Os frames são extraídos e guardados em cache por spritesheet para
+        // evitar repetir o recorte das imagens em todos os ciclos do jogo.
         int tipoAnimacao = emMorte ? 3 : emAtaque ? 2
                 : estavaEmMovimento ? 1 : 0;
         int linhaSpritesheet = linhaDirecao.ordinal();
@@ -245,19 +264,24 @@ public abstract class Personagem extends Actor {
         mostrarFrame();
     }
 
+    /** Indica se a personagem está a reproduzir a animação de morte. */
     public boolean estaEmMorte() {
         return emMorte;
     }
 
+    /** Indica se a animação de ataque ainda está a decorrer. */
     protected boolean estaEmAtaque() {
         return emAtaque;
     }
 
+    /** Indica se o último frame da morte já foi mostrado. */
     public boolean terminouMorte() {
         return terminouMorte;
     }
 
     private void atualizarAnimacaoEspecial() {
+        // Ataque e morte avançam até ao fim; ao contrário da caminhada, não
+        // reiniciam continuamente a animação especial.
         contadorAnimacao++;
         if (contadorAnimacao < 5) {
             return;
@@ -290,6 +314,8 @@ public abstract class Personagem extends Actor {
     /** Fluxo comum a todos os personagens (Template Method). */
     @Override
     public final void act() {
+        // Este método fixa o ciclo comum: um personagem morto já não executa
+        // a lógica da subclasse e só termina a animação antes do hook final.
         if (mundoEstaEmGameOver()) {
             return;
         }
@@ -369,6 +395,8 @@ public abstract class Personagem extends Actor {
         if (quantidade <= 0 || !estaVivo() || estaEmMorte()) {
             return;
         }
+        // O teste estaVivo no ciclo impede que um dano múltiplo reduza vidas
+        // abaixo de zero e mantém a transição para morte numa única vez.
         for (int i = 0; i < quantidade && estaVivo(); i++) {
             perderVida();
         }
@@ -384,10 +412,12 @@ public abstract class Personagem extends Actor {
         }
     }
 
+    /** Devolve a área de colisão correspondente aos pés atuais. */
     public Rectangle getPes() {
         return getPes(getX(), getY());
     }
 
+    /** Calcula a área dos pés para uma posição futura sem mover o ator. */
     public Rectangle getPes(int x, int y) {
         return new Rectangle(x - PES_OFFSET_X, y + PES_OFFSET_Y,
                              PES_LARGURA, PES_ALTURA);

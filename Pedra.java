@@ -3,7 +3,14 @@ import greenfoot.GreenfootImage;
 import greenfoot.World;
 import java.awt.Rectangle;
 
-/** Um objeto não letal que pode ser lançado para distrair inimigos. */
+/**
+ * Pedra que pode ser recolhida, lançada para criar uma distração e depois
+ * desaparecer quando permanece demasiado tempo no chão.
+ *
+ * <p>O estado interno distingue a pedra disponível, em voo, aterrada e
+ * recolhida. Os inimigos observam apenas as pedras aterradas, mantendo a
+ * responsabilidade da distração separada do movimento do jogador.</p>
+ */
 public class Pedra extends Actor implements Interagivel {
     private static final int TAMANHO = 16;
     private static final int VELOCIDADE = 8;
@@ -11,6 +18,7 @@ public class Pedra extends Actor implements Interagivel {
     private static final int TEMPO_NO_CHAO = 150;
     private static final GreenfootImage IMAGEM = carregarImagemPartilhada();
 
+    /** Estados do ciclo de vida de uma pedra no mundo. */
     private enum Estado {
         POR_RECOLHER,
         A_VOAR,
@@ -94,6 +102,8 @@ public class Pedra extends Actor implements Interagivel {
 
     @Override
     public void act() {
+        // Uma pedra só é removida depois de ficar aterrada durante o intervalo
+        // definido; pedras em voo e pedras iniciais seguem fluxos distintos.
         if (estado == Estado.A_VOAR) {
             voar();
         } else if (estado == Estado.ATERRADA) {
@@ -120,6 +130,8 @@ public class Pedra extends Actor implements Interagivel {
         int deslocamentoY = direcao.getDy() * VELOCIDADE;
         int novoX = getX() + deslocamentoX;
         int novoY = getY() + deslocamentoY;
+        // A pedra termina o voo ao atingir o alcance máximo ou uma zona
+        // bloqueada, ficando disponível para a distração dos inimigos.
         if (mapa == null
                 || distanciaPercorrida + VELOCIDADE >= ALCANCE_MAXIMO
                 || mapa.estaBloqueado(new Rectangle(novoX - 4, novoY - 4, 9, 9))) {

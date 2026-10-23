@@ -4,6 +4,15 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Personagem controlado por um utilizador.
+ *
+ * <p>Trata os comandos configurados, o movimento com colisões, a interação
+ * com o mapa, o inventário de chaves e pedras, os ataques e a queda em zonas
+ * vazias. O comportamento visual e as vidas são herdados de
+ * {@link Personagem}, enquanto as entidades do mapa são consultadas através
+ * de abstrações como {@link Interagivel}.</p>
+ */
 public class Player extends Personagem {
     private static final int MAX_PEDRAS = 3;
     /* O som só é preparado quando ocorre dano, não durante a criação do mundo. */
@@ -22,12 +31,18 @@ public class Player extends Personagem {
     private Rectangle ultimaPosicaoSegura;
     private boolean quedaEmCurso;
 
+    /** Cria um jogador com a skin e o conjunto de teclas indicados. */
     public Player(int skin, Controlos controlos) {
         super(skin, 3);
         this.controlos = controlos;
     }
 
     @Override
+    /**
+     * Processa um frame de jogo do jogador: lê teclas, tenta cada eixo do
+     * movimento, atualiza estados de queda, interage, recolhe pedras e lança
+     * uma pedra apenas quando a tecla correspondente é pressionada de novo.
+     */
     protected void agir() {
         if (estaEmAtaque()) {
             atualizarAnimacao(false);
@@ -57,6 +72,8 @@ public class Player extends Personagem {
                 definirDirecao(Direcao.DIREITA);
         }
 
+        // Os eixos são tentados separadamente: assim o jogador pode deslizar
+        // ao longo de uma parede quando apenas um dos eixos está bloqueado.
         boolean movimento = false;
         if (dx != 0)
             movimento |= tentarMover(getX() + dx, getY());
@@ -76,6 +93,7 @@ public class Player extends Personagem {
     }
 
     /** Move o jogador com uma plataforma, preservando a colisão visual relativa. */
+    /** Desloca o jogador pelo mesmo vetor de uma plataforma que o transporta. */
     public void serTransportado(int dx, int dy) {
         if (getWorld() != null && (dx != 0 || dy != 0)) setLocation(getX() + dx, getY() + dy);
     }
@@ -94,6 +112,8 @@ public class Player extends Personagem {
         if (suportado) {
             return;
         }
+        // O dano e o recuo só acontecem na entrada da zona sem suporte; a
+        // flag evita repetir o mesmo dano enquanto o jogador permanece lá.
         if (!quedaEmCurso) {
             quedaEmCurso = true;
             receberDano();
@@ -116,6 +136,8 @@ public class Player extends Personagem {
             teclaPressionada |= Greenfoot.isKeyDown("return");
         }
 
+        // A transição false -> true transforma uma tecla mantida numa única
+        // ação, evitando repetir interações em todos os frames.
         if (teclaPressionada && !teclaInteracaoPressionada) {
             if (!atacarInimigoPelasCostas()) {
                 Interagivel interagivel = procurarInteragivelPerto();
@@ -269,6 +291,8 @@ public class Player extends Personagem {
         }
 
         long revisao = mapa.getRevisaoInteracoes();
+        // A revisão do mapa invalida a cache quando uma chave ou outro objeto
+        // é removido; a posição invalida-a quando o jogador se desloca.
         if (mapa == interagivelCacheMapa && getX() == interagivelCacheX
                 && getY() == interagivelCacheY
                 && revisao == interagivelCacheRevisao) {
@@ -293,6 +317,7 @@ public class Player extends Personagem {
         return resultado;
     }
 
+    /** Devolve o primeiro objeto interagível dentro da área de proximidade. */
     public Interagivel getInteragivelPerto() {
         return procurarInteragivelPerto();
     }
@@ -306,11 +331,13 @@ public class Player extends Personagem {
     }
 
     /** Adiciona uma chave apenas ao inventário deste jogador. */
+    /** Adiciona uma chave ao inventário, evitando referências duplicadas. */
     public void adicionarChave(Chave chave) {
         if (chave != null && !chaves.contains(chave)) chaves.add(chave);
     }
 
     /** Indica se este jogador possui uma chave do tipo indicado. */
+    /** Verifica se o inventário contém uma chave do tipo indicado. */
     public boolean temChave(String tipo) {
         if (tipo == null) return false;
         for (Chave chave : chaves)
@@ -319,12 +346,14 @@ public class Player extends Personagem {
     }
 
     /** Devolve uma visão apenas de leitura das chaves deste jogador. */
+    /** Devolve o inventário através de uma vista não modificável. */
     public List<Chave> getChaves() {
         return Collections.unmodifiableList(chaves);
     }
 
     public int getNumeroChaves() { return chaves.size(); }
 
+    /** Procura a chave que corresponde à porta concreta recebida. */
     public Chave encontrarChave(Porta porta) {
         for (Chave chave : chaves) if (chave.abre(porta)) return chave;
         return null;
@@ -333,11 +362,13 @@ public class Player extends Personagem {
     boolean consumirChave(Chave chave) { return chaves.remove(chave); }
 
     /** Devolve o número de pedras ainda disponíveis neste jogador. */
+    /** Devolve o número de pedras disponíveis. */
     public int getPedras() {
         return pedras;
     }
 
     /** Adiciona uma pedra ao inventário deste jogador. */
+    /** Acrescenta uma pedra sem ultrapassar o limite do inventário. */
     public void adicionarPedra() {
         if (pedras < MAX_PEDRAS) {
             pedras++;
@@ -345,6 +376,7 @@ public class Player extends Personagem {
     }
 
     /** Indica se este jogador ainda pode lançar uma pedra. */
+    /** Indica se o jogador pode iniciar um lançamento. */
     public boolean temPedras() {
         return pedras > 0;
     }
@@ -356,6 +388,8 @@ public class Player extends Personagem {
             Porta porta = mapa.encontrarPortaFechada(pes);
             if (porta != null && !porta.abrir(this, mapa, getMundo())) return false;
         }
+        // Uma porta pode ser aberta ao tentar atravessá-la; qualquer outro
+        // bloqueio impede a atualização da posição.
         if (mapa != null && !mapa.estaBloqueado(getPes(x, y))) {
             setLocation(x, y);
             return true;

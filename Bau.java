@@ -1,6 +1,11 @@
 import greenfoot.Greenfoot;
 
-/** Representa um baú interagível do mapa. */
+/**
+ * Baú interagível que passa uma única vez do estado fechado para aberto.
+ *
+ * <p>O estado é mantido no objeto para que a imagem, a mensagem do HUD e o
+ * som acompanhem a mesma transição, sem repetir o efeito em interações futuras.</p>
+ */
 public class Bau extends ObjetoInteragivel {
     private boolean aberto;
 
@@ -9,6 +14,7 @@ public class Bau extends ObjetoInteragivel {
         this.aberto = false;
     }
 
+    /** Abre o baú uma única vez e reproduz o som correspondente. */
     public void abrir() {
         if (!aberto) {
             aberto = true;
@@ -17,6 +23,7 @@ public class Bau extends ObjetoInteragivel {
         }
     }
 
+    /** Indica se o baú já foi aberto. */
     public boolean estaAberto() {
         return aberto;
     }

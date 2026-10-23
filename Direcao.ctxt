@@ -1,10 +1,12 @@
 #BlueJ class context
 comment0.target=Direcao
-comment0.text=Dire\u00E7\u00F5es\ l\u00F3gicas\ usadas\ pelo\ movimento\ e\ pela\ anima\u00E7\u00E3o\ dos\ personagens.
+comment0.text=\r\n\ Enumera\u00E7\u00E3o\ das\ quatro\ dire\u00E7\u00F5es\ ortogonais\ usadas\ pelo\ jogo.\r\n\r\n\ <p>Cada\ valor\ associa\ a\ dire\u00E7\u00E3o\ visual\ ao\ deslocamento\ cartesiano\ que\ \u00E9\r\n\ utilizado\ pelo\ movimento,\ pelas\ colis\u00F5es\ e\ pelo\ cone\ de\ vis\u00E3o.</p>\r\n
 comment1.params=dx\ dy
 comment1.target=Direcao(int,\ int)
 comment2.params=
 comment2.target=int\ getDx()
+comment2.text=Devolve\ o\ deslocamento\ horizontal\ associado\ \u00E0\ dire\u00E7\u00E3o.
 comment3.params=
 comment3.target=int\ getDy()
+comment3.text=Devolve\ o\ deslocamento\ vertical\ associado\ \u00E0\ dire\u00E7\u00E3o.
 numComments=4

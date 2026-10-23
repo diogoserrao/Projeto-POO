@@ -5,6 +5,15 @@ import java.util.Collections;
 import java.awt.Rectangle;
 import java.awt.Point;
 
+/**
+ * Mundo principal da partida e coordenador dos seus atores.
+ *
+ * <p>Carrega a fase através de {@link CarregadorTiled}, cria jogadores,
+ * inimigos, armadilhas e plataformas e coordena o HUD e as transições entre
+ * estados. A lógica específica de cada entidade permanece nas respetivas
+ * classes; aqui ficam apenas a composição do cenário e as decisões globais
+ * de vitória, derrota e mudança de fase.</p>
+ */
 public class MyWorld extends World {
 
     private DungeonMap mapa;
@@ -27,11 +36,17 @@ public class MyWorld extends World {
     private boolean jogoTerminou = false;
     private boolean jogoVenceu = false;
 
+    /** Cria o mundo com a primeira fase carregada. */
     public MyWorld() {
         super(1280, 960, 1, false);
         carregarFase(1);
     }
 
+    /**
+     * Reconstrói o cenário e os atores para a fase indicada.
+     *
+     * @param fase número da fase a carregar
+     */
     public void carregarFase(int fase) {
 
         this.faseAtual = fase;
@@ -72,6 +87,7 @@ public class MyWorld extends World {
         }
     }
 
+    /** Adiciona ao mundo as plataformas fornecidas pelo mapa. */
     private void configurarPlataformas() {
         for (Plataforma plataforma : mapa.getPlataformas()) {
             if (plataforma.getWorld() == null) {
@@ -81,6 +97,7 @@ public class MyWorld extends World {
         }
     }
 
+    /** Cria os dois jogadores e coloca-os nos pontos de spawn da fase. */
     private void configurarSpawnAtor() {
 
         List<Point> spawns = mapa.getSpawnsJogadores();
@@ -131,6 +148,7 @@ public class MyWorld extends World {
 
     }
 
+    /** Cria as pedras iniciais que podem ser recolhidas pelos jogadores. */
     private void configurarPedras() {
         for (Point posicao : mapa.getPosicoesPedras()) {
             Pedra pedra = new Pedra();
@@ -158,6 +176,7 @@ public class MyWorld extends World {
         return maisProximo;
     }
 
+    /** Avança para a fase seguinte ou mostra o ecrã de vitória. */
     public void proximaFase() {
 
         if (jogoVenceu || transicaoEmCurso) {
@@ -191,6 +210,7 @@ public class MyWorld extends World {
         return !jogoVenceu && !jogoTerminou && !transicaoEmCurso && !faseConcluida;
     }
 
+    /** Processa pedidos pendentes e atualiza o HUD e a condição de derrota. */
     @Override
     public void act() {
 
@@ -232,11 +252,13 @@ public class MyWorld extends World {
         return jogoTerminou;
     }
 
+    /** Devolve o mapa lógico da fase atual. */
     public DungeonMap getMapa() {
         return mapa;
     }
 
     /** Devolve a pontuacao acumulada na partida atual. */
+    /** Devolve a pontuação acumulada por derrotar inimigos. */
     public int getPontuacao() {
         return pontuacao;
     }

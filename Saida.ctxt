@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Saida
-comment0.text=Porta\ especial\ que\ conclui\ a\ fase\ apenas\ com\ os\ dois\ jogadores\ juntos.
+comment0.text=\r\n\ Porta\ final\ da\ fase,\ sujeita\ \u00E0\ coopera\u00E7\u00E3o\ dos\ dois\ jogadores.\r\n\r\n\ <p>Reutiliza\ a\ valida\u00E7\u00E3o\ e\ o\ consumo\ da\ chave\ de\ {@link\ Porta},\ mas\ s\u00F3\r\n\ conclui\ a\ abertura\ quando\ o\ mundo\ permite\ avan\u00E7ar\ e\ ambos\ os\ jogadores\ se\r\n\ encontram\ na\ zona\ da\ sa\u00EDda.</p>\r\n
 comment1.params=nome\ area
 comment1.target=Saida(java.lang.String,\ java.awt.Rectangle)
 comment2.params=jogador\ mapa\ mundo

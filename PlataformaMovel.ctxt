@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=PlataformaMovel
-comment0.text=Plataforma\ que\ percorre\ horizontalmente\ a\ \u00E1rea\ indicada\ pelo\ Tiled.
+comment0.text=\r\n\ Plataforma\ que\ percorre\ horizontalmente\ o\ percurso\ definido\ no\ mapa.\r\n\r\n\ <p>Antes\ de\ se\ mover,\ regista\ os\ jogadores\ apoiados\ nela\ e\ aplica-lhes\ o\r\n\ mesmo\ deslocamento\ horizontal,\ preservando\ a\ posi\u00E7\u00E3o\ relativa\ \u00E0\ plataforma.</p>\r\n
 comment1.params=area\ percurso
 comment1.target=PlataformaMovel(java.awt.Rectangle,\ java.awt.Rectangle)
 comment2.params=area\ percurso\ velocidade

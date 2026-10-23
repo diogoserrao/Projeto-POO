@@ -1,7 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
-/** Representa uma alavanca interagível do mapa. */
+/**
+ * Alavanca que pode desativar permanentemente as armadilhas que lhe foram
+ * associadas no mapa.
+ *
+ * <p>O carregador estabelece as associações e a interação apenas altera o
+ * estado da alavanca e das armadilhas; o {@link DungeonMap} fica responsável
+ * por redesenhar a camada visual.</p>
+ */
 public class Alavanca extends ObjetoInteragivel {
     private final String nome;
     private boolean ativada;
@@ -12,12 +19,15 @@ public class Alavanca extends ObjetoInteragivel {
         this.nome = nome;
     }
 
+    /** Indica se a alavanca já foi ativada. */
     public boolean estaAtivada() {
         return ativada;
     }
 
+    /** Devolve o identificador usado pelo carregador para ligar armadilhas. */
     public String getIdentificador() { return nome.trim().toLowerCase(); }
 
+    /** Associa uma armadilha e sincroniza imediatamente o estado se necessário. */
     public void associarArmadilha(Armadilha armadilha) {
         if (armadilha != null && !armadilhas.contains(armadilha)) armadilhas.add(armadilha);
         if (ativada && armadilha != null) armadilha.desativarPermanentemente();
@@ -40,6 +50,8 @@ public class Alavanca extends ObjetoInteragivel {
 
     @Override
     public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
+        // A alavanca é uma transição irreversível: todas as armadilhas
+        // associadas passam ao estado seguro na mesma interação.
         if (jogador == null || ativada) return;
         ativada = true;
         for (Armadilha armadilha : armadilhas) armadilha.desativarPermanentemente();

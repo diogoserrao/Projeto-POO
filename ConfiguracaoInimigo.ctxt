@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=ConfiguracaoInimigo
-comment0.text=\r\n\ Guarda\ a\ posi\u00E7\u00E3o\ inicial\ e\ a\ zona\ de\ patrulha\ de\ um\ inimigo.\r\n
+comment0.text=\r\n\ Dados\ imut\u00E1veis\ de\ coloca\u00E7\u00E3o\ de\ um\ inimigo\ lidos\ a\ partir\ do\ mapa.\r\n\r\n\ <p>A\ configura\u00E7\u00E3o\ mant\u00E9m\ o\ ponto\ de\ nascimento\ e,\ quando\ existe,\ o\r\n\ ret\u00E2ngulo\ de\ patrulha.\ As\ c\u00F3pias\ devolvidas\ evitam\ que\ o\ carregador\ ou\ o\r\n\ mundo\ alterem\ acidentalmente\ a\ geometria\ original.</p>\r\n
 comment1.params=spawn\ patrulha
 comment1.target=ConfiguracaoInimigo(java.awt.Rectangle,\ java.awt.Rectangle)
 comment2.params=

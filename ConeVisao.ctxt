@@ -1,14 +1,18 @@
 #BlueJ class context
 comment0.target=ConeVisao
-comment0.text=Camada\ visual\ independente\ do\ inimigo,\ com\ imagens\ partilhadas\ por\ geometria.
+comment0.text=\r\n\ Ator\ visual\ que\ desenha\ o\ cone\ de\ vis\u00E3o\ de\ um\ inimigo.\r\n\r\n\ <p>A\ imagem\ \u00E9\ criada\ uma\ vez\ por\ combina\u00E7\u00E3o\ de\ raio\ e\ \u00E2ngulo\ e\ depois\ \u00E9\r\n\ reutilizada\ para\ as\ quatro\ dire\u00E7\u00F5es.\ Esta\ classe\ s\u00F3\ representa\ a\ camada\r\n\ visual;\ a\ dete\u00E7\u00E3o\ efetiva\ permanece\ em\ {@link\ Inimigo}.</p>\r\n
 comment1.params=raio\ angulo
 comment1.target=ConeVisao(int,\ double)
+comment1.text=Cria\ o\ ator\ visual\ com\ uma\ imagem\ inicial\ orientada\ para\ baixo.
 comment2.params=raio\ angulo\ direcao
 comment2.target=void\ atualizar(int,\ double,\ Direcao)
+comment2.text=Atualiza\ a\ geometria\ visual\ quando\ o\ inimigo\ muda\ de\ dire\u00E7\u00E3o\ ou\ perfil.
 comment3.params=raio\ angulo\ direcao
 comment3.target=greenfoot.GreenfootImage\ obterImagem(int,\ double,\ Direcao)
+comment3.text=Reutiliza\ a\ imagem\ em\ cache\ para\ a\ combina\u00E7\u00E3o\ geom\u00E9trica\ recebida.
 comment4.params=raio\ angulo
 comment4.target=greenfoot.GreenfootImage[]\ criarImagens(int,\ double)
+comment4.text=Desenha\ as\ quatro\ orienta\u00E7\u00F5es\ do\ setor\ circular\ do\ cone\ de\ vis\u00E3o.
 comment5.params=
 comment5.target=void\ act()
 numComments=6

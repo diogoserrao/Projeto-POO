@@ -1,11 +1,18 @@
 import greenfoot.*;
 import java.awt.Rectangle;
 
-/** Move um inimigo para a frente e para tras dentro de uma zona. */
+/**
+ * Estratégia que desloca um inimigo entre os extremos de uma zona.
+ *
+ * <p>A orientação da zona determina se a patrulha é horizontal ou vertical.
+ * Ao chegar a um extremo, a estratégia abranda, evita ultrapassar o limite e
+ * mantém uma pausa curta antes de inverter o sentido.</p>
+ */
 public class PatrulhaZona implements Movimento {
     private static final int TEMPO_PAUSA_NA_EXTREMIDADE = 8;
     private static final int DISTANCIA_DESACELERACAO = 4;
 
+    /** Fase interna usada para separar deslocamento e pausa na extremidade. */
     private enum EstadoPatrulha {
         MOVENDO,
         PAUSANDO
@@ -18,6 +25,12 @@ public class PatrulhaZona implements Movimento {
     private EstadoPatrulha estadoPatrulha = EstadoPatrulha.MOVENDO;
     private int contadorPausa;
 
+    /**
+     * Cria uma patrulha para a zona indicada.
+     *
+     * @param zona retângulo que define o eixo e os limites da patrulha
+     * @param velocidade passo máximo por frame
+     */
     public PatrulhaZona(Rectangle zona, int velocidade) {
         if (zona == null) {
             throw new IllegalArgumentException("A zona de patrulha nao pode ser null");
@@ -30,6 +43,7 @@ public class PatrulhaZona implements Movimento {
 
     @Override
     public boolean mover(Inimigo inimigo) {
+        // O resultado informa ao inimigo se deve usar a animação de marcha.
         return patrulharZona(inimigo);
     }
 
