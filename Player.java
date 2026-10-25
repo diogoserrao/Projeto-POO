@@ -15,8 +15,6 @@ import java.util.List;
  */
 public class Player extends Personagem {
     private static final int MAX_PEDRAS = 3;
-    /* O som só é preparado quando ocorre dano, não durante a criação do mundo. */
-    private static GreenfootSound somDano;
     private final Controlos controlos;
     private static final int VELOCIDADE = EscalaJogo.px(4);
     private boolean teclaInteracaoPressionada;
@@ -237,31 +235,6 @@ public class Player extends Personagem {
         mundo.adicionarPedra(pedra);
         // O som só é emitido depois de a pedra ser efetivamente criada.
         Greenfoot.playSound("pedra.mp3");
-    }
-
-    private static GreenfootSound criarSomDano() {
-        GreenfootSound som = new GreenfootSound("dano.wav");
-        som.setVolume(35);
-        return som;
-    }
-
-    private static GreenfootSound obterSomDano() {
-        if (somDano == null) {
-            somDano = criarSomDano();
-        }
-        return somDano;
-    }
-
-    /** Reproduz dano apenas quando o jogador continua vivo após o golpe. */
-    @Override
-    public void receberDano() {
-        if (!estaVivo() || estaEmMorte()) {
-            return;
-        }
-        super.receberDano();
-        if (estaVivo()) {
-            obterSomDano().play();
-        }
     }
 
     /** O som de morte é emitido uma única vez, quando a morte começa. */

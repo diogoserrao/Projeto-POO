@@ -415,9 +415,15 @@ public abstract class Personagem extends Actor {
         for (int i = 0; i < quantidade && estaVivo(); i++) {
             perderVida();
         }
+        reproduzirSomDano();
         if (!estaVivo()) {
             iniciarMorte();
         }
+    }
+
+    /** Reproduz o som sempre que este personagem perde pelo menos uma vida. */
+    private void reproduzirSomDano() {
+        Greenfoot.playSound("dano.wav");
     }
 
     /** Recupera exatamente uma vida, sem ultrapassar o máximo. */

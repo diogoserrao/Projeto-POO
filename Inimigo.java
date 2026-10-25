@@ -174,12 +174,8 @@ public abstract class Inimigo extends Personagem {
             return;
         }
 
-        int vidasAntes = getVidas();
         receberDano();
         contadorInvulnerabilidade = INVULNERABILIDADE_APOS_GOLPE;
-        if (getVidas() < vidasAntes) {
-            reproduzirSomDano();
-        }
     }
 
     /** Recebe um golpe do jogador, eliminando imediatamente um golpe pelas costas. */
@@ -195,22 +191,13 @@ public abstract class Inimigo extends Personagem {
         }
 
         if (estaDeCostasPara(atacante)) {
-            int vidasAntes = getVidas();
             receberDano(getMaxVidas());
-            if (getVidas() < vidasAntes) {
-                reproduzirSomDano();
-                if (!estaVivo()) {
-                    morteFurtiva = true;
-                }
+            if (!estaVivo()) {
+                morteFurtiva = true;
             }
         } else {
             receberAtaque();
         }
-    }
-
-    /** Som de dano apenas para golpes que retiraram pelo menos uma vida. */
-    private void reproduzirSomDano() {
-        Greenfoot.playSound("dano.wav");
     }
 
     private boolean estaDeCostasPara(Player jogador) {
