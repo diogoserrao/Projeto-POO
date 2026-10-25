@@ -35,10 +35,10 @@ public class StartScreen extends Ecra {
                 LARGURA / 2, 400, new Font("SansSerif", false, false, 26), TEXTO);
         desenharTexto(imagem, "Os dois jogadores têm de cooperar e chegar juntos à saída final.",
                 LARGURA / 2, 440, new Font("SansSerif", false, false, 22), TEXTO);
-        desenharTexto(imagem, "P1  |  WASD para mover  |  E para interagir",
-                LARGURA / 2, 500, new Font("SansSerif", false, false, 24), TEXTO);
-        desenharTexto(imagem, "P2  |  SETAS para mover  |  ENTER para interagir",
-                LARGURA / 2, 545, new Font("SansSerif", false, false, 24), TEXTO);
+        desenharTexto(imagem, "P1  |  WASD mover  |  E interagir  |  Q lançar pedra  |  CTRL saltar",
+                LARGURA / 2, 500, new Font("SansSerif", false, false, 21), TEXTO);
+        desenharTexto(imagem, "P2  |  SETAS mover  |  ENTER interagir  |  SHIFT lançar pedra  |  < saltar",
+                LARGURA / 2, 540, new Font("SansSerif", false, false, 21), TEXTO);
         desenharTexto(imagem, "Encontra as chaves, desbloqueia as portas e evita os inimigos.",
                 LARGURA / 2, 625, new Font("SansSerif", false, false, 22),
                 SECUNDARIO);
