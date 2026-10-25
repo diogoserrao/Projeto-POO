@@ -136,7 +136,7 @@ public class Hud {
     private String formatarVidas(Player jogador, int indiceJogador) {
         String vidas = "";
         for (int i = 0; i < jogador.getMaxVidas(); i++) {
-            vidas += i < jogador.getVidas() ? "[X]" : "[ ]";
+            vidas += i < jogador.getVidas() ?  "♥" : "♡";
             if (i < jogador.getMaxVidas() - 1) {
                 vidas += " ";
             }
