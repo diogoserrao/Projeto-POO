@@ -7,6 +7,7 @@ import greenfoot.Greenfoot;
  * som acompanhem a mesma transição, sem repetir o efeito em interações futuras.</p>
  */
 public class Bau extends ObjetoInteragivel {
+    private static final int PONTOS_POR_BAU = 50;
     private boolean aberto;
 
     public Bau(String nome, java.awt.Rectangle area) {
@@ -47,6 +48,9 @@ public class Bau extends ObjetoInteragivel {
     public void interagir(Player jogador, DungeonMap mapa, MyWorld mundo) {
         if (jogador == null || aberto) return;
         abrir();
+        if (mundo != null) {
+            mundo.adicionarPontos(PONTOS_POR_BAU);
+        }
         if (mapa != null) mapa.redesenharObjetos();
     }
 }

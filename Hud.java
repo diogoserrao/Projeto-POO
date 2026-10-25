@@ -99,25 +99,27 @@ public class Hud {
 
     private String formatarControlos(Player jogador, int indiceJogador) {
         Controlos controlos = jogador.getControlos();
-        String nome;
-        if ("a".equals(controlos.getEsquerda())
-                && "d".equals(controlos.getDireita())
-                && "w".equals(controlos.getCima())
-                && "s".equals(controlos.getBaixo())) {
-            nome = "WASD";
-        } else if ("left".equals(controlos.getEsquerda())
-                && "right".equals(controlos.getDireita())
-                && "up".equals(controlos.getCima())
-                && "down".equals(controlos.getBaixo())) {
-            nome = "Setas";
-        } else {
-            nome = "Cima: " + controlos.getCima()
-                    + ", Baixo: " + controlos.getBaixo()
-                    + ", Esquerda: " + controlos.getEsquerda()
-                    + ", Direita: " + controlos.getDireita();
+        return "P" + (indiceJogador + 1)
+                + " | Interagir: " + formatarTecla(controlos.getInteragir())
+                + " | Lançar: " + formatarTecla(controlos.getLancar())
+                + " | Saltar: " + formatarTecla(controlos.getSaltar());
+    }
+
+    /** Apresenta nomes curtos e legíveis para teclas especiais no HUD. */
+    private String formatarTecla(String tecla) {
+        if ("control".equals(tecla)) {
+            return "CTRL";
         }
-        return nome + ", Lançar: " + controlos.getLancar()
-                + ": Jogador " + (indiceJogador + 1);
+        if ("shift".equals(tecla)) {
+            return "SHIFT";
+        }
+        if ("space".equals(tecla)) {
+            return "ESPAÇO";
+        }
+        if ("enter".equals(tecla)) {
+            return "ENTER";
+        }
+        return tecla.toUpperCase();
     }
 
     private int posicaoJogador(int indice) {
@@ -132,14 +134,15 @@ public class Hud {
 
     /** Usa a mesma representacao visual de vidas existente no jogo. */
     private String formatarVidas(Player jogador, int indiceJogador) {
-        String coracoes = "";
+        String vidas = "";
         for (int i = 0; i < jogador.getMaxVidas(); i++) {
-            coracoes += i < jogador.getVidas() ? "[X]" : "[ ]";
+            vidas += i < jogador.getVidas() ? "[X]" : "[ ]";
             if (i < jogador.getMaxVidas() - 1) {
-                coracoes += " ";
+                vidas += " ";
             }
         }
 
-        return "P" + (indiceJogador + 1) + ": " + coracoes;
+        return "P" + (indiceJogador + 1) + ": " + vidas;
     }
+
 }

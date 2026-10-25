@@ -6361,7 +6361,7 @@
  <objectgroup id="41" name="Inimigos">
   <object id="11" name="Patrulha_1" x="-71.3333" y="22.6667" width="6.66667" height="108"/>
   <object id="12" name="Spawn_1" x="-68.6667" y="120"/>
-  <object id="13" name="Spawn_2" x="101.333" y="51.3333"/>
+  <object id="13" name="Spawn_2" x="106.333" y="50.8333"/>
   <object id="14" name="Spawn_4" x="91.3333" y="275.333"/>
   <object id="15" name="Spawn_3" x="154" y="271.667"/>
   <object id="16" name="Patrulha_4" x="88.6667" y="210.667" width="7.33333" height="73.3334"/>
