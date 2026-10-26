@@ -1,12 +1,8 @@
-----------------------------------------------------------------------------
-Este é o arquivo README do projeto. Você deve descrever aqui o seu projeto.
-Informe ao usuário (alguém que não sabe nada sobre este projeto!) tudo que
-ele/ela precisa saber. Os comentários devem incluir, pelo menos:
-------------------------------------------------------------------------
+
 
 TÍTULO DO PROJETO: Dungeon Escape
-OBJETIVO DO PROJETO: Jogo cooperativo para dois jogadores explorarem três fases.
-VERSÃO ou DATA: 23/09/2026
+OBJETIVO DO PROJETO: Jogo cooperativo para dois jogadores explorarem duas fases.
+VERSÃO ou DATA: 26/10/2026
 COMO INICIAR O PROJETO: Abrir a pasta no Greenfoot, compilar e executar StartScreen.
 AUTORES: Projeto POO
 INSTRUÇÕES PARA O USUÁRIO:

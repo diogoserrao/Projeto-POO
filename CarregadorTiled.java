@@ -462,8 +462,6 @@ public class CarregadorTiled {
                     if (percurso == null && percursos.size() == 1) percurso = percursos.values().iterator().next();
                     if (percurso != null) plataformas.add(new PlataformaMovel(area, percurso));
                     else System.out.println("Aviso: plataforma móvel sem percurso: " + nome);
-                } else if (tipo.startsWith("plataformatemporaria")) {
-                    plataformas.add(new PlataformaTemporaria(area));
                 }
             }
         }
