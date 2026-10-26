@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=StartScreen
-comment0.text=\r\n\ Menu\ inicial\ que\ apresenta\ os\ controlos\ e\ inicia\ uma\ nova\ partida\ ao\ premir\r\n\ Enter.\r\n
+comment0.text=Menu\ inicial\ que\ apresenta\ a\ miss\u00E3o\ e\ os\ controlos\ dos\ dois\ jogadores.
 comment1.params=
 comment1.target=StartScreen()
 comment1.text=Cria\ o\ menu\ e\ desenha\ a\ informa\u00E7\u00E3o\ inicial\ da\ miss\u00E3o.
@@ -8,4 +8,12 @@ comment2.params=
 comment2.target=void\ act()
 comment3.params=
 comment3.target=void\ desenharMenu()
-numComments=4
+comment4.params=imagem
+comment4.target=void\ prepararFundoInicio(greenfoot.GreenfootImage)
+comment5.params=imagem\ x\ y\ largura\ altura\ nome\ subtitulo\ cor\ cima\ esquerda\ baixo\ direita\ interagir\ lancar\ saltar
+comment5.target=void\ desenharCartaoJogador(greenfoot.GreenfootImage,\ int,\ int,\ int,\ int,\ java.lang.String,\ java.lang.String,\ greenfoot.Color,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String)
+comment6.params=imagem\ texto\ centroX\ centroY
+comment6.target=void\ desenharTecla(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int)
+comment7.params=imagem\ texto\ x\ linhaBase\ fonte\ cor
+comment7.target=void\ desenharTextoEsquerda(greenfoot.GreenfootImage,\ java.lang.String,\ int,\ int,\ greenfoot.Font,\ greenfoot.Color)
+numComments=8

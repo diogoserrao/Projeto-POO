@@ -47,7 +47,7 @@ public abstract class Ecra extends World {
         imagem.setFont(fonteEscalada);
         imagem.setColor(cor);
         int largura = fonteEscalada.getSize() * texto.length() / 2;
-        imagem.drawString(texto, centroX - largura / 2,
+        imagem.drawString(texto, EscalaJogo.px(centroX) - largura / 2,
                 EscalaJogo.px(linhaBase));
     }
 
